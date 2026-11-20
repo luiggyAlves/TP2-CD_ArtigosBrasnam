@@ -1,0 +1,625 @@
+Analisando a governabilidade presidencial a partir de padrões
+de homofilia na Câmara dos Deputados: Estudos de Casos no
+Brasil e nos EUA
+Breno de Sousa Matos1, Carlos H. G. Ferreira1, Jussara M. Almeida1
+1Departamento de Ciência da Computação - Universidade Federal de Minas Gerais
+{brenomatos, chgferreira, jussara}@dcc.ufmg.br
+Abstract. In this work, we propose an approach to analyze the governability of
+the president based on roll call votes in the House of Representatives. In order to
+identify patterns of homophily between the government group and the remaining
+deputies, we model the roll call votes as a graph to observe how the homophily
+process impacts on the governability of the president in two countries, i.e., Brazil
+and United States.
+Resumo. Neste trabalho, propomos uma abordagem para analisar a governa-
+bilidade do presidente com base nas votações realizadas na Câmara dos De-
+putados. Para isso, modelamos as votações em forma de um grafo, de modo a
+identificar padrões de homofilia entre a base do governo e os demais deputados
+em dois países, isto é, Brasil e Estados Unidos.
+1. Introdução
+Nos últimos anos, vários países têm vivenciado episódios polêmicos na política. No Brasil
+é possível citar o impeachment da ex-presidente Dilma Rousseff, marcado por uma intensa
+disputa entre os poderes legislativo e executivo [Fearnside 2016]. Já nos Estados Unidos
+(EUA), mesmo tendo a maioria das cadeiras ocupadas por deputados do seu partido, ao
+assumir a presidência em 2017, o presidente Donald Trump apresentou em seus primeiros
+meses de governo uma profunda dificuldade em manter um bom relacionamento com a
+Câmara dos Deputados [Washington-Post 2017].
+A governabilidade constitui uma importante característica que diz respeito à capa-
+cidade de um presidente da república de governar e aplicar as políticas públicas desejadas
+[Santos 1997]. Porém, em países como o Brasil, isso não é tão simples, devido aos proble-
+mas no sistema político, tais como, a alta fragmentação partidária, presente em pelo me-
+nos outros 57 países [Wehner 2010], e a permutação de deputados nos partidos durante o
+governo [Figueiredo 2007]. Contudo, é comum que os presidentes tentem manter o maior
+número possível de partidos e deputados na base governista para, consequentemente, au-
+mentar a sua governabilidade [Figueiredo 2007]. Já nos Estados Unidos, a existência de
+uma Câmara dos Deputados dividida entre dois partidos com ideologias cada vez mais
+extremas, desafia o equilíbrio entre a base governista e oposição [Andris et al. 2015].
+As relações entre a base aliada do governo e os demais deputados durante as
+votações podem ser analisadas por meio da homofilia. A homofilia, também conhecida
+como assortatividade, é a tendência dos nós presentes em uma rede se conectarem a outros
+indivíduos similares segundo algum critério [Newman 2003]. Assim, quanto mais a alta
+
+a assortatividade em uma votação na Câmara dos Deputados, menor é a interação entre
+a base governista do presidente e os demais deputados, o que pode impor dificuldades
+ao governo do presidente em aprovar as votações de seu interesse. Neste contexto, nós
+propomos uma abordagem para analisar a governabilidade política do presidente base-
+ada na homofilia em redes de votações na Câmara dos Deputados. Mais especificamente,
+estamos interessados em verificar como as relações entre os deputados da base aliada e
+os demais deputados estão associadas à estabilidade política do presidente em exercício.
+Para isso, avaliamos as votações do plenário da Câmara dos Deputados do Brasil, consi-
+derando as coalizões realizadas pelo governo nesse período. De maneira semelhante, nós
+aplicamos a nossa abordagem nos Estados Unidos.
+2. Materiais e Métodos
+2.1. Trabalhos Relacionados
+A homofilia no contexto político tem sido amplamente estudada em redes soci-
+ais [Vergeer 2015].
+No Twitter, usuários foram avaliados na eleição americana de
+2016 em [Colleoni et al. 2014]. Já em [Halberstam and Knight 2016], são investigadas
+comunicações políticas em redes sociais caracterizadas por homofilia e tamanho de gru-
+pos ideológicos. Durante a votação do impeachment da ex-presidente brasileira Dilma
+Rousseff, um estudo revela que mensagens de um grupo raramente chegam ao grupo
+de ideias contrárias, caracterizando o processo de homofilia [de França et al. 2018]. Um
+método foi proposto em [Barber 2014] para estimar a ideologia dos usuários de mídias
+sociais. Em paralelo, um estudo realizado em [Vaz de Melo 2015] mostra que os partidos
+políticos brasileiros são altamente redundantes. Assim, o número de partidos que o país
+deveria ter é muito menor do que o existente. Diferentemente dos trabalhos analisados
+na literatura, este trabalho busca investigar o processo de homofilia no contexto político,
+propondo uma nova abordagem aplicada às votações na Câmara dos Deputados.
+2.2. Bases de Dados
+Os dados das votações nominais do plenário da Câmara dos Deputados do Brasil são
+disponibilizados através de uma interface de programação de aplicações (API)1. Foram
+coletadas as votações realizadas entre a 53ª e a 55ª legislatura, que compreende o período
+de 2007 a 2017. Já nos Estados Unidos, os dados das votações foram coletados pela API
+ProPublica2. O período considerado foi de 2009 a 2017, período compreendido entre o
+111° e o 115° congresso. Nós também utilizamos a base de dados do Centro Brasileiro de
+Análise e Planejamento (CEBRAP), que fornece entre as várias informações, início, fim
+e partidos das coalizões realizadas pelo governo [CEBRAP 2017]. A Tabela 1 sumariza
+os dados das votações finais utilizadas no Brasil e Estados Unidos.
+2.3. Modelagem das Votações em Grafo
+No Brasil, um voto pode ser do tipo: Sim, Não, Abstenção ou Obstrução. De maneira
+similar, nos Estados Unidos um voto pode ser do tipo Yes, No e Not Voting. No Brasil,
+1http://www2.camara.leg.br/transparencia/dados-abertos/
+dados-abertos-legislativo
+2https://projects.propublica.org/api-docs/congress-api/
+
+Tabela 1. Dados das Votações na Câmara dos Deputados
+Brasil
+Legislatura
+Ano
+Presidente
+Partido
+# de Votações
+# de Votos
+# de Partidos
+# de Deputados
+53ª
+2007
+Lula
+PT
+209
+76649
+21
+532
+53ª
+2008
+Lula
+PT
+142
+48667
+20
+542
+53ª
+2009
+Lula
+PT
+148
+50163
+19
+541
+53ª
+2010
+Lula
+PT
+75
+24700
+19
+544
+54ª
+2011
+Dilma
+PT
+93
+33809
+23
+552
+54ª
+2012
+Dilma
+PT
+73
+24883
+23
+554
+54ª
+2013
+Dilma
+PT
+137
+47180
+23
+542
+54ª
+2014
+Dilma
+PT
+81
+27686
+24
+556
+55ª
+2015
+Dilma
+PT
+224
+111897
+25
+550
+55ª
+2016
+Dilma/Temer
+PT/PMDB
+163
+78521
+27
+562
+55*
+2017
+Temer
+PMDB
+170
+79473
+26
+534
+Estados Unidos
+Congresso
+Ano
+Presidente
+Partido
+# de Votações
+# de Votos
+# de Partidos
+# de Deputados
+111º
+2009
+Barack Obama
+D
+991
+403549
+3
+442
+111º
+2010
+Barack Obama
+D
+664
+273088
+3
+446
+112º
+2011
+Barack Obama
+D
+948
+393321
+2
+439
+112º
+2012
+Barack Obama
+D
+658
+270137
+2
+440
+113º
+2013
+Barack Obama
+D
+641
+257367
+2
+438
+113º
+2014
+Barack Obama
+D
+563
+229596
+2
+438
+114º
+2015
+Barack Obama
+D
+704
+286938
+2
+437
+114º
+2016
+Barack Obama
+D
+621
+255086
+2
+438
+115º
+2017
+Donald Trump
+R
+710
+226712
+2
+441
+apenas os votos Sim, Não ou Obstrução foram considerados para construção dos gra-
+fos. Já nos Estados Unidos, somente os votos Yes e No foram utilizados. Então, mo-
+delamos as votações de cada país (Brasil e EUA) em grafos da seguinte forma: Para
+cada votação v analisada, foi criado um grafo Gv(V, A) não direcionado e não ponde-
+rado onde V = {v1, v2, ...vn} é um conjunto de vértices que representam os deputados,
+e A = {a1, a2, a3, ..., an} um conjunto de arestas. Uma aresta (vi, vj) liga dois vértices
+(deputados) vi e vj (i̸ = j), se, na votação sendo modelada, os dois deputados votaram
+igualmente. Por fim, cada deputado foi associado a um atributo que especifica o seu
+grupo, utilizado para o cálculo da assortatividade. No Brasil, os deputados foram dividi-
+dos no grupo da coalizão do governo, composto por deputados de partidos que estavam
+na coalizão estabelecida no período da votação, e um segundo grupo composto pelos de-
+putados cujo partido não pertencia à coalizão. Já nos Estados Unidos, foram mantidos os
+partidos originais.
+2.4. Métricas Avaliadas
+Após a modelagem dos grafos, foram calculadas as seguintes métricas: Assortatividade:
+mensura, através de um coeficiente entre -1 e 1, a preferência de nós de uma mesma rede
+se conectarem entre si com base em características similares [Newman 2003]; Número
+de vitórias e derrotas para o partido do presidente: para cada votação, verificou-se
+se o posicionamento da maioria do partido do presidente foi condizente com o posicio-
+namento que venceu a votação; Número de vitórias e derrotas para a coalizão: para
+cada votação, foi verificada a lista de partidos que faziam parte da coalizão na data da
+votação, de acordo com a base de dados do CEBRAP, verificando se a coalizão venceu a
+votação; Tamanho da maior componente: para cada votação, verificou-se o número de
+deputados na maior componente do grafo.
+3. Resultados
+Iniciamos nossa análise pelo Brasil, onde a Tabela 2 mostra, por legislatura, ano e pre-
+sidente, o número de derrotas e vitórias (como explicado na subseção 2.4) nas votações
+analisadas, em relação ao partido do presidente e a coalizão estabelecida. Por último,
+é apresentado o percentual médio do tamanho da maior componente para as vitórias e
+
+2017
+2016
+2015
+2014
+2013
+2012
+2011
+2010
+2009
+2008
+2007
+0.6
+0.5
+0.4
+0.3
+0.2
+0.1
+0.0
+Ano
+Assortatividade
+(a) Brasil
+2017
+2016
+2015
+2014
+2013
+2012
+2011
+2010
+2009
+1.0
+0.8
+0.6
+0.4
+0.2
+0.0
+Ano
+Assortatividade 
+(b) Estados Unidos
+Figura 1. Assortatividade calculada nas votações.
+Tabela 2. Descrição das vitórias e derrotas observadas nas votações do Brasil
+Legislatura
+Ano
+Presidente
+Partido do Presidente
+Coalizão do Presidente
+% Média da Maior Componente
+# de vitórias
+# de derrotas
+# de vitórias
+# de derrotas
+Vitórias
+Derrotas
+53ª
+2007
+Lula
+198
+11
+202
+7
+80,77±1,25
+55,86±2,63
+53ª
+2008
+Lula
+140
+2
+141
+1
+82,47±1,72
+61,89±67,21
+53ª
+2009
+Lula
+137
+11
+142
+6
+82,56±1,92
+65,8±6,8
+53ª
+2010
+Lula
+70
+5
+73
+2
+85,82±3
+71,56±16,08
+54ª
+2011
+Dilma
+90
+3
+91
+2
+82,86±1,89
+64,8±36,59
+54ª
+2012
+Dilma
+63
+10
+67
+6
+83,3±3,55
+60,4±4,89
+54ª
+2013
+Dilma
+115
+22
+126
+11
+80,89±2,48
+62,2±4,91
+54ª
+2014
+Dilma
+62
+19
+78
+3
+88,44±3,47
+68,52±4,05
+55ª
+2015
+Dilma
+163
+61
+208
+16
+74,21±2,38
+63,58±2,03
+55ª
+2016
+Dilma/Temer
+72
+91
+155
+8
+80,24±2,72
+74,02±1,36
+55ª
+2017
+Temer
+92
+78
+165
+5
+81,29±3,02
+67,77±1,61
+derrotas considerando o posicionamento do partido do presidente em exercício, com um
+intervalo de confiança de 95%.
+Na 53ª legislatura, a dispersão dos valores de assortatividade calculados é relati-
+vamente alta nos dois primeiros anos do período citado (Figura 1a) quando comparados
+aos dois últimos da mesma Legislatura. Com assortatividade maior, há menor interação
+e concordância entre a oposição e os deputados da coalizão do governo. Consequente-
+mente, isso resulta em número de derrotas superior a todos os valores registrados até o
+ano avaliado. No último ano de governo, é possível observar uma menor dispersão das
+assortatividades calculadas, além das maiores médias de deputados na maior componente,
+em derrotas e vitórias, considerando todos os anos de governo do ex-presidente Lula, in-
+dicando uma maior estabilidade. Na 54ª Legislatura, é possível observar menor dispersão
+nos valores de assortatividade calculados durante os três primeiros anos (em relação à
+53ª legislatura). Além disso, há um crescimento no número de derrotas proporcional nas
+votações, para o partido do presidente e para a coalizão. A presença de mais valores ex-
+tremos e uma maior variação no percentual médio do tamanho da maior componente, para
+vitórias e para derrotas, indicam o início de um período de maior instabilidade, conside-
+rando todos os anos analisados até o momento.
+Por último é analisada a 55ª Legislatura, período governado parcialmente por
+Dilma (até seu impeachment em 2016) e Michel Temer. Em 2015, há enfraquecimento
+do governo, com maior frequência de maiores valores das assortatividades calculadas,
+indicando aumento no processo de homofilia, quando comparados aos demais anos sob
+governo da ex-presidente Dilma. A alta assortatividade associada ao crescente número de
+derrotas, tanto do partido do presidente quanto da coalizão estabelecida, como mostra a
+Tabela 2, definem um período crítico para o governo. Também em 2016, o partido do pre-
+
+Tabela 3. Descrição das vitórias e derrotas observadas nas votações dos EUA
+Congresso
+Ano
+Presidente
+Partido do Presidente
+% Média da Maior Componente
+# de vitórias
+# de derrotas
+# de vitórias
+# de derrotas
+111º
+2009
+Obama
+907
+22
+75,38±1,16
+58,37±2,36
+111º
+2010
+Obama
+622
+9
+77,46±0,53
+57,36±4,89
+112º
+2011
+Obama
+275
+633
+75,98±1,79
+56,71±0,32
+112º
+2012
+Obama
+210
+415
+77,48±2,14
+56,43±0,41
+113º
+2013
+Obama
+205
+389
+80,86±2,13
+54,67±0,43
+113º
+2014
+Obama
+179
+352
+78,29±2,27
+53,61±0,37
+114º
+2015
+Obama
+209
+453
+79,32±2,11
+56,29±0,33
+114º
+2016
+Obama
+176
+412
+82,66±2,29
+55,26±0,32
+115º
+2017
+Trump
+155
+370
+80,17±2,81
+53,91±0,27
+sidente tem maior número de derrotas do que vitórias, um comportamento atípico em todo
+o período analisado. Em 2017, inteiramente sob o governo do presidente Michel Temer, o
+fato de que 75% das assortatividades observadas nas votações de 2017 serem menores ou
+iguais a 0,2 e o alto número de vitórias da coalizão, indicam uma alta governabilidade por
+parte do presidente. Apesar disso, o maior número de derrotas em relação ao número de
+vitórias, considerando o partido do presidente, indica uma instabilidade dentro do próprio
+partido, como mostra a Tabela 2.
+Já nos Estados Unidos, o boxplot da Figura 1b apresenta a distribuição dos va-
+lores das assortatividades calculados nas votações. A Tabela 3 mostra, por congresso,
+ano e presidente, o número de derrotas e vitórias (Como explicado na subseção 2.4) nas
+votações analisadas (em relação ao partido do presidente). Por último, é apresentado o
+percentual médio do tamanho da maior componente para as vitórias e derrotas, consi-
+derando o posicionamento do partido do presidente em exercício, com um intervalo de
+confiança de 95%. Durante o primeiro governo do ex-presidente Barack Obama, 111º e
+112º congresso, é possível observar na Figura 1b que aproximadamente 50% das votações
+têm assortatividade menor ou igual a 0,2 em 2009 e 0 em 2010, respectivamente. Dessa
+forma, é possível identificar um governo estável, em que o processo de homofilia é menos
+intenso, alinhado à maior razão de vitórias sob derrotas nos anos avaliados, apresentada
+na Tabela 3. No 112º, há crescimento na porcentagem de votações com assortatividade
+com valores em torno de 0,7, denotando governo mais instável em relação ao congresso
+anterior, também evidenciando crescente processo de homofilia. Além disso, o número
+de derrotas obtidas pelo partido do presidente passa a ser maior que o número de vitórias.
+A instabilidade observada no fim do primeiro governo do ex-presidente Barack
+Obama estendeu-se para o seu segundo mandato (113º e 114º congresso). Neste período,
+50% das votações possuem uma assortatividade maior que 0,8. Além disso, o número de
+derrotas é sempre superior ao número de vitórias. Isto descreve o processo de homofilia
+em função da baixa interação entre o partido do presidente e a oposição. Entretanto,
+maiores valores do percentual médio do tamanho da maior componente mostram que, em
+alguns anos, o ex-presidente Barack Obama teve mais vitórias com uma maior margem de
+votos e, por outro lado, derrotas com uma menor margem de votos. No 115º congresso,
+com o presidente Donald Trump, é possível observar frequência maior de votações com
+alta assortatividade, sem precedentes no período avaliado, em que 50% das votações têm
+assortatividade maior ou igual 0,89. Apesar da mudança de governo e partido ocorrida,
+a razão entre vitórias e derrotas do partido do presidente assemelha-se ao último ano de
+governo do ex-presidente Barack Obama. Isso também resulta no pior primeiro ano de
+governo para um presidente no período analisado, com uma Câmara dos Deputados cada
+vez mais heterogênea, indicando aumento no processo de homofilia.
+
+4. Conclusão
+Este trabalho propôs avaliar o comportamento dos deputados na Câmara dos Deputados
+de modo a inferir padrões sob governabilidade do presidente. No Brasil, foi possível
+ver como os valores da assortatividade podem ser relacionados à estabilidade política do
+governo, observando também o número de derrotas e vitórias. Já nos Estados Unidos,
+em que os partidos políticos são ideologicamente polarizados, foi possível observar que o
+extremismo ideológico tem aumentado nos últimos anos.
+Referências
+Andris, C., Lee, D., Hamilton, M. J., Martino, M., Gunning, C. E., and Selden, J. A.
+(2015). The rise of partisanship and super-cooperators in the u.s. house of representa-
+tives. PLOS ONE, 10(4):1–14.
+Barber, P. (2014). How social media reduces mass political polarization. Evidence from
+Germany, Spain, and the US, New York University.
+CEBRAP (2017). Centro brasileiro de pesquisa e planejamento. http://cebrap.
+org.br/.
+Colleoni, E., Rozza, A., and Arvidsson, A. (2014). Echo chamber or public sphere?
+predicting political orientation and measuring political homophily in twitter using big
+data. Journal of Communication, 64(2):317–332.
+de França, F. O., Goya, D., and Penteado, C. C. (2018). Analysis of the twitter interactions
+during the impeachment of brazilian president. In Proceedings of the 51st Hawaii
+International Conference on System Sciences.
+Fearnside, P. M. (2016).
+Brazilian politics threaten environmental policies.
+Science,
+353(6301):746–748.
+Figueiredo, A. C. (2007). Government coalitions in brazilian democracy. Brazilian Poli-
+tical Science Review, 1(2):182–216.
+Halberstam, Y. and Knight, B. (2016). Homophily, group size, and the diffusion of poli-
+tical information in social networks: Evidence from twitter. Journal of Public Econo-
+mics, 143:73–88.
+Newman, M. E. (2003). Mixing patterns in networks. Physical Review E, 67(2):026126.
+Santos, M. H. d. C. (1997). Governabilidade, Governança e Democracia: Criação de
+Capacidade Governativa e Relações Executivo-Legislativo no Brasil Pós-Constituinte.
+Dados, 40.
+Vaz de Melo, P. O. S. (2015). How many political parties should brazil have? a data-
+driven method to assess and reduce fragmentation in multi-party political systems.
+PLOS ONE, 10(10):1–24.
+Vergeer, M. (2015). Twitter and political campaigning. Sociology Compass, 9.
+Washington-Post (2017).
+6 months of president trump, in 7 issues. https:
+//www.washingtonpost.com/news/the-fix/wp/2017/07/20/
+6-months-of-president-trump-in-7-issues.
+Wehner, J. (2010).
+Institutional constraints on profligate politicians: The conditional
+effect of partisan fragmentation on budget deficits. Comparative Political Studies.

@@ -1,0 +1,1261 @@
+Ranqueamento de Licitações Públicas
+a partir de Alertas de Fraude
+Gabriel P. Oliveira1, Bárbara M. A. Mendes1,
+Camila S. Braz1, Lucas L. Costa1, Mariana O. Silva1,
+Michele A. Brandão1,2, Anisio Lacerda1, Gisele L. Pappa1
+1Universidade Federal de Minas Gerais (UFMG) – Belo Horizonte, MG, Brasil
+2Instituto Federal de Minas Gerais (IFMG) – Ribeirão das Neves, MG, Brasil
+gabrielpoliveira@dcc.ufmg.br, {barbaramit,camilabraz}@ufmg.br
+lucas-lage@ufmg.br, mariana.santos@dcc.ufmg.br
+michele.brandao@ifmg.edu.br, {anisio,glpappa}@dcc.ufmg.br
+Abstract. Fraud detection is a complex task in various scenarios. This work
+proposes an approach to rank public tenders suspected of fraud. For this, we
+have created 19 audit trails, which were modeled as a social network, and a
+strategy to consider the alerts they raised in the ranking. The results reveal that
+the proposed ranking approach can correctly identify bids suspected of fraud.
+Resumo. A detecção de fraudes é uma tarefa complexa nos diversos cenários.
+Este trabalho representa uma contribuição para essa tarefa ao propor uma
+abordagem para ranquear licitações públicas suspeitas de possuírem algum
+tipo de fraude. Para isso, foram elaboradas 19 trilhas de auditagem, que foram
+modeladas como uma rede social, e uma estratégia para considerar os alertas
+levantados por elas no ranqueamento. Os resultados revelam que a abordagem
+de ranqueamento foi capaz de identificar licitações suspeitas de fraude.
+1. Introdução
+Dados são recursos valiosos para organizações públicas e privadas, permitindo a
+extração de informações para auxiliar na tomada de decisão em diversas áreas
+[Velasco et al. 2021].
+No setor público, vários países têm firmado acordos para in-
+centivar e fortalecer a transparência governamental, uma política apoiada pelas Tec-
+nologias de Informação e Comunicação (TICs), que também ajudam no combate à
+corrupção [Park and Kim 2020]. Dentre os dados abertos brasileiros, encontram-se as
+licitações públicas, que são um conjunto de procedimentos administrativos utilizados pela
+Administração Pública para comprar ou contratar produtos e serviços1.
+Apesar dos mecanismos impostos pela legislação para prevenir fraudes em
+licitações públicas, o Brasil ainda enfrenta escândalos de corrupção. A checagem ma-
+nual em tempo real é comumente utilizada para acompanhar todo o processo licitatório,
+desde a publicação do edital até o cumprimento do objeto licitado. Contudo, essa inspeção
+manual é um processo demorado e que exige grande mobilização de recursos humanos.
+Nesse sentido, é essencial combinar perícia humana com sistemas computacionais. A
+detecção de fraudes em licitações é complexa, já que essas práticas envolvem interações
+1Lei nº 8.666/93: http://www.planalto.gov.br/ccivil 03/Leis/L8666cons.htm
+
+diretas, indiretas e temporais entre as entidades envolvidas. Dessa forma, é necessário
+o uso de formas automáticas de monitoramento, análise e cruzamento dos dados para
+auxiliar na identificação de infrações.
+Este trabalho tem como principal objetivo aplicar conceitos de trilhas de audita-
+gem e Redes Sociais (RS) para identificar indícios de fraudes em licitações públicas, faci-
+litando a análise desses dados por meio de tecnologias da informação. Para alcançar essa
+meta, um conjunto de trilhas de auditagem foi definido em colaboração com especialistas
+do Ministério Público de Minas Gerais, a partir de dados de licitações públicas municipais
+e estaduais de Minas Gerais. Essas trilhas são sequências de passos que ajudam a identifi-
+car tipos específicos de irregularidades encontradas em fraudes de licitações, selecionando
+os dados relevantes das bases de dados de licitações. Por exemplo, é possível identificar
+licitações com apenas um licitante ou licitantes que possuem sócios em comum.
+Assim como em análises anteriores [Costa et al. 2022, Costa et al. 2023], neste
+trabalho, utilizamos uma abordagem baseada em grafos para a detecção de fraudes em
+licitações públicas. Como principal novidade, incluímos sete novas trilhas de audita-
+gem ao modelo de ranqueamento de licitações baseado no número de alertas de fraude.
+Tal metodologia, além de reduzir o volume de dados a serem analisados por especialis-
+tas e indicar uma lista de prioridades de investigação, também fornece subsídios para a
+elaboração de algoritmos capazes de classificar automaticamente as licitações.
+2. Trabalhos Relacionados
+As teorias de redes sociais têm sido aplicadas em diversos contextos,
+como
+detecção de emoções e identificação de suspeitos de crimes [Kansaon et al. 2019,
+Florentino et al. 2022].
+No contexto de detecção de fraudes, as redes sociais têm
+sido utilizadas para obter informações sobre colaborações entre suspeitos de fraude
+[ Óskarsdóttir et al. 2022].
+Além disso, técnicas de mineração de dados e aprendi-
+zado de máquina têm sido empregadas na detecção automática de fraudes, incluindo a
+quantificação de padrões de risco de corrupção [Velasco et al. 2021] e o desenvolvimento
+de classificadores para identificação de fraudes [Anowar and Sadaoui 2019].
+Outra abordagem utilizada é a mineração de processos, que combina mineração de
+dados e análise de processos para a detecção de fraudes. Essa abordagem foi aplicada na
+auditoria de fraudes em pedidos de pagamento da União Europeia [Santoro et al. 2020]
+e no monitoramento do comportamento de usuários em uma plataforma de e-commerce
+[Yu et al. 2023]. Embora as abordagens baseadas em dados rotulados e mineração de
+processos sejam comuns, o uso de redes sociais tem se mostrado uma alternativa mais
+simples e efetiva para a detecção de fraudes [Araújo et al. 2021, Li et al. 2023].
+Apesar das diversas abordagens existentes, poucos estudos têm se dedi-
+cado especificamente à detecção de fraudes em licitações públicas [Grace et al. 2016,
+Andrade et al. 2020, Lima et al. 2020]. Este trabalho visa preencher essa lacuna ao anali-
+sar alertas de fraudes em licitações públicas em Minas Gerais por meio da análise da rede
+social construída a partir das trilhas de auditagem. Além disso, uma abordagem baseada
+nos alertas gerados pelas trilhas é aplicada para ranquear as licitações públicas.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+ 
+Figura 1. Metodologia para alerta de fraudes em licitaç ões.
+3. Conjunto de Dados
+As trilhas de auditagem construídas consomem dados relacionados principalmente a
+licitações ocorridas em Minas Gerais e seus licitantes. Neste trabalho, consideramos
+informações de 767.188 licitações públicas ocorridas em Minas Gerais de 2007 a 2022,
+compreendendo um total de 110.387 licitantes, incluindo pessoas físicas e jurídicas. Os
+dados foram fornecidos pelo Ministério Público de Minas Gerais (MPMG) no âmbito do
+Programa de Capacidades Analíticas e são disponibilizados em um armazém de dados
+que agrega informações de diferentes fontes públicas e privadas.
+Os dados de licitações são provenientes do Sistema Informatizado de Contas dos
+Municípios (SICOM)2 e do Portal da Transparência do Estado3 e contêm informações
+como data, modalidade e itens de licitações, além da lista de licitantes participantes e
+vencedores. As informações sobre os licitantes são complementadas com dados sigilosos
+provenientes do Serviço Federal de Processamento de Dados (SERPRO), que incluem
+dados cadastrais e quadro societário de empresas. Além disso, algumas trilhas específicas
+consideram informações de outras fontes, como o registro de ligações de energia elétrica
+da Companhia Energética de Minas Gerais (CEMIG), dados de filiação partidária e de
+doações e serviços prestados a campanhas eleitorais do Tribunal Superior Eleitoral (TSE)
+e do Tribunal Regional Eleitoral de Minas Gerais (TRE-MG), e dados do Instituto de
+Previdência dos Servidores do Estado de Minas Gerais (IPSEMG).
+4. Metodologia para Identificação de Fraudes
+Esta seção apresenta a metodologia proposta para identificação de possíveis fraudes a
+partir de alertas gerados para licitações públicas. Todas as etapas da metodologia foram
+pensadas a partir da definição das trilhas de auditagem (Seção 4.1). A Figura 1 sumariza a
+metodologia utilizada, que consiste em: filtragem e pré-processamento dos dados (Seção
+4.2), modelagem de uma rede social para representar as trilhas (Seção 4.3) e, por fim, um
+modelo de ranqueamento de licitações com base nos alertas gerados pelas trilhas.
+4.1. Definição das Trilhas de Auditagem
+Neste trabalho, foram definidas em conjunto com especialistas uma série de regras (i.e.,
+trilhas) para gerar alertas que podem indicar possíveis fraudes em licitações públicas. A
+Tabela 1 apresenta as 19 trilhas consideradas neste trabalho, sendo que 12 trilhas foram
+definidas em [Costa et al. 2023] e as sete novas são propostas neste trabalho (marcadas
+em negrito na tabela). As primeiras doze trilhas visam investigar se existem irregula-
+ridades na licitação considerando características do licitante (e.g., licitante com CNPJ
+2SICOM: https://portalsicom1.tce.mg.gov.br/
+3Portal da Transparência do Estado de Minas Gerais:
+https://www.transparencia.mg.gov.br/
+compras-e-patrimonio/compras-e-contratos
+
+Tabela 1. Definiç ão das trilhas de auditagem a serem aplicadas nas licitaç ões.
+#
+Trilha de Auditagem
+Regra
+Trilhas de Licitante
+T1
+Licitante licitando antes de registro
+Verificar as licitações que contenham participantes que estão licitando antes
+da empresa iniciar suas atividades
+T2
+Licitante licitando com sanção ativa
+Verificar as licitações que contenham licitantes com alguma sanção ativa na
+base do CEIS (Cadastro de Empresas Inidôneas e Suspensas)
+T3
+Licitante com CNPJ inativo
+Verificar as licitações com a presença de licitantes com o CNPJ inativo
+T4
+Licitante perdedor frequente
+Identificar licitações com licitantes com alto percentual de derrotas
+T5
+Licitante vencedor frequente
+Identificar licitações com licitantes com alto percentual de vitórias
+T6
+Licitante único
+Identificar licitações com licitante único
+T7
+Licitante com CNAE incongruente
+Identificar licitações com licitantes cujo código CNAE (Classificação Naci-
+onal de Atividades Econômicas) é incongruente com a descrição dos itens
+licitados [Oliveira et al. 2022, Costa et al. 2023]
+T8
+Licitante que prestou serviço para cam-
+panhas políticas
+Identificar licitações com licitantes que prestaram serviço para campanhas
+políticas
+T9
+Licitante cujo lance foi o menor e não
+venceu
+Identificar licitações com licitantes que deram o menor lance, mas o lance não
+foi o vencedor
+T10
+Licitante sem registro de ligação de
+energia elétrica em MG
+Identificar licitações com a presença de licitantes baseados em Minas Gerais
+sem registro de ligação de energia elétrica no estado
+T11
+Licitante de pequeno porte com fatura-
+mento anual acima do limite
+Identificar licitações com licitantes que são empresas de pequeno porte, mas
+que possuem o faturamento acima do permitido por lei [Braz et al. 2023]
+T12
+Licitante de pequeno porte vinculado a
+outra pessoa jurídica
+Identificar licitações com licitantes que são empresas de pequeno porte e pos-
+suem outras pessoas jurídicas como sócias [Braz et al. 2023]
+Trilhas de Sócio
+T13
+Licitante cujos sócios são ou têm vínculo
+com servidores públicos
+Identificar as licitações que apresentam licitantes cujos sócios são servido-
+res públicos ou dependentes de servidores da entidade que realiza a licitação
+[Costa et al. 2023]
+T14
+Licitante cujos sócios são doadores de
+campanha política
+Identificar licitações com licitantes cujos sócios fizeram doações para campa-
+nhas políticas
+T15
+Licitante cujos sócios são filiados a par-
+tidos políticos
+Identificar licitações com licitantes cujos sócios são filiados a partidos
+políticos
+Trilhas de Vínculo
+T16
+Licitantes com sócios em comum
+Identificar as licitações com licitantes distintos que possuem pelo menos um
+sócio em comum
+T17
+Licitantes com e-mails em comum
+Verificar se a licitação possui licitantes distintos com e-mails em comum
+T18
+Licitantes com telefones em comum
+Verificar se a licitação possui licitantes distintos com telefone em comum
+T19
+Licitantes com endereços em comum
+Identificar as licitações com licitantes distintos com endereço em comum
+*Trilhas em negrito foram propostas neste trabalho.
+– Cadastro Nacional de Pessoas Jurídicas – inativo), sendo denominadas Trilhas de Lici-
+tante. As três trilhas seguintes verificam irregularidades relacionadas a pessoas sócias dos
+licitantes, sendo denominadas Trilhas de Sócio. Já as quatro trilhas restantes investigam
+irregularidades considerando os vínculos entre os licitantes (e.g., empresas com sócios
+em comum), sendo chamadas Trilhas de Vínculo.
+É importante ressaltar que uma trilha analisada separadamente não necessaria-
+mente indica fraude. Por exemplo, a trilha T8 visa identificar licitações com licitantes que
+doaram para campanhas políticas. De acordo com a legislação vigente no Brasil, tal ato
+não é ilegal. No entanto, ao considerar este alerta em conjunto com alertas gerados por
+outras trilhas, é possível ter uma indicação de investigação por parte de especialistas. Ou
+seja, a construção e execução das trilhas não exclui a necessidade da análise manual das
+licitações públicas, mas otimiza e torna o trabalho dos analistas mais eficiente.
+4.2. Filtragem e Pré-processamento dos Dados
+Conforme mencionado na Seção 3, são utilizados dados públicos de licitações, e dessa
+forma os licitantes que são pessoas físicas estão com o CPF (CADASTRO DE PESSOA
+
+Empresa
+Vínculo Empresa-Empresa
+Pessoa
+Vínculo Empresa-Pessoa
+Licitação
+Figura 2. Rede social heterogênea entre empresas licitantes e seus sócios.
+FÍSICA) mascarado no conjunto de dados considerado. Isso impossibilita qualquer pro-
+cessamento sobre esses dados e, portanto, eles são removidos das análises. Sendo assim,
+são considerados apenas três tipos de entidades de interesse neste trabalho: licitações,
+licitantes do tipo pessoa jurídica (Empresas) e seus sócios (Pessoas).
+Após a filtragem dos dados, o próximo passo é lidar com os dados brutos re-
+tornados pelas consultas.
+Para isso, são executadas duas etapas adicionais de pré-
+processamento dos dados: padronização de dados e construção de atributos referente às
+entidades. A primeira visa normalizar informações de contato (i.e., e-mail, endereço e te-
+lefone) e também utiliza expressões regulares para verificar o formato de cada campo. Já
+o segundo tipo de pré-processamento é necessário devido às múltiplas fontes de dados uti-
+lizadas para construir o conjunto final de dados (Seção 3). Por exemplo, as licitações es-
+taduais só possuem informações dos licitantes vencedores. Por isso, para essas licitações,
+apenas tais licitantes são considerados.
+4.3. Modelagem da Rede Social
+O problema para levantar alertas de fraudes em licitações pode ser modelado como uma
+rede social representada por um grafo G, com dois tipos de nós: as empresas licitantes
+(V ) e os sócios dessas empresas (V ). Nesse grafo, há dois tipos de arestas: entre nós do
+tipo empresa que participaram de uma mesma licitação (E) e entre nós empresa e pessoa
+(E), onde a pessoa é uma sócia da empresa. No caso de nós entre empresas, cada aresta
+possui um peso representado pela quantidade de vínculos que uma empresa licitante tem
+com outra. Os vínculos levados em conta foram sócios, e-mail, telefones ou endereço
+em comum. No caso de relações entre empresas e pessoas, a relação só existe quando a
+pessoa é sócia da empresa. A Figura 2 ilustra a modelagem dessa rede social.
+Além disso, os nós da rede social proposta apresentam atributos, que apesar de
+já utilizados para construir as arestas do grafo, são necessários para definir as regras que
+devem ser seguidas pelas trilhas de auditagem (apresentadas na Seção 4.1). Para o licitante
+(nó do tipo empresa), temos a data de registro da empresa (data registro), CNPJ, CNAE
+(Classificação Nacional de Atividades Econômicas), status da empresa na Receita Federal
+(e.g., ativa ou não), endereço, e-mail, telefone, sócios e sanções. Para o sócio (nó pessoa),
+temos o CPF e o tipo de vínculo com a empresa (e.g., sócio, representante legal).
+É importante destacar que com a data de cada licitação, foram construídos dois
+novos atributos: vencedor frequente e perdedor frente, que assumem valor verdadeiro ou
+falso. Para a identificação de empresas vencedoras frequentes, foram analisadas empresas
+que somaram um valor total homologado maior ou igual a R$400.000,00 (quatrocentos
+
+mil reais). Para uma empresa ser considerada vencedora de uma licitação, é necessário
+que ela tenha vencido pelo menos 70% das licitações concorridas. Para a identificação
+de empresas perdedoras frequentes, foram analisadas empresas que tenham perdido pelo
+menos 70% das licitações com uma participação mínima de pelo menos seis licitações
+por ano. Para uma empresa ser perdedora em uma licitação, ela não pode ter vencido em
+nenhum item.
+4.4. Ranqueamento de Licitações por Alertas
+Para realizar o ranqueamento de licitações, este artigo apresenta uma abordagem que gera
+uma pontuação para cada licitação e define o grau de risco das trilhas de auditagem. A
+abordagem é baseada em [Costa et al. 2023] e foi atualizada para incluir as novas trilhas
+e aprimorar limitações da versão anterior.
+Definição da Abordagem de Ranqueamento. Essa abordagem considera dois aspectos:
+(i) a definição empírica de pesos diferentes para cada trilha de acordo com seu potencial
+risco de fraude; e (ii) o uso do valor total licitado, uma vez que licitações de maior valor
+são consideradas mais relevantes e têm prioridade na alocação de recursos humanos. O
+indicador de risco de fraude de uma licitação pode ser calculado pelo produto escalar do
+vetor contendo os alertas gerados pelas trilhas para a licitação em questão com o vetor
+de pesos de cada trilha. Este resultado é depois multiplicado pelo valor normalizado da
+licitação. Tal indicador é dado pela função: Ri (Qi∗, P, vi) = (Qi∗· P) log(vi), onde:
+• QI×X = {qix ∈N} é a matriz com a quantidade de alertas das licitações e trilhas,
+onde as linhas são as licitações e as colunas são as trilhas. A célula dessa matriz,
+qix, representa a quantidade de alertas que a licitação i possui na trilha x.
+• Qi∗é uma linha da matriz Q, que representa os alertas da licitação i, ou seja,
+Qi∗= {qi1, qi2, ..., qi19};
+• P é o vetor dos pesos de cada trilha, e o peso atribuído para a trilha x é represen-
+tado por px, ou seja, P = {px ∈R};
+• vi é o valor total da licitação i.
+O cálculo da quantidade de alertas qix depende do tipo de trilha (Tabela 1). Quando
+a trilha é de licitantes, a quantidade de alertas que descumprem a regra da trilha é o número
+de nós do tipo empresa; já para trilha de sócio, a quantidade de alertas é o número de nós
+do tipo pessoa; e para trilhas de vínculo, essa quantidade é o número de arestas.
+Grau de Risco das Trilhas. Foi atribuído um grau de risco para cada trilha e um valor de
+peso para cada grau de risco. Esse grau de risco foi atribuído por auditores especializados
+de acordo com a gravidade do alerta gerado pela trilha de auditagem. Em resumo, as
+trilhas de grau de risco alto (T1, T2, T3, T16) vão ter peso 1, as trilhas de grau médio (T7,
+T9, T10, T13, T19) vão ter peso 0,8 e as trilhas de grau baixo (T4, T5, T6, T8, T11, T12, T14,
+T15, T17, T18) vão ter peso 0,6. Esses valores de peso foram definidos empiricamente em
+conjunto com auditores especialistas do MPMG.
+5. Caracterização e Análise da Rede Social Real
+A análise da rede social entre licitantes e seus sócios possibilita a identificação de
+possíveis alertas de fraude. Na Seção 5.1, é fornecida uma visão geral da rede por meio
+de métricas topológicas que a descrevem. Posteriormente, na Seção 5.2, é realizada uma
+
+Empresa
+Pessoa
+Vínculo Empresa-Empresa
+Vínculo Empresa-Pessoa
+Figura 3. Exemplo de um componente conectado da RS entre empresas licitantes
+e seus sócios. Empresas estão conectadas quando possuem vínculos em
+comum (e.g., endereço) e participam de um mesmo processo licitatório.
+Tabela 2. Estatísticas da rede social de licitantes e seus sócios para a rede com-
+pleta e seu componente gigante.
+Completa
+C. Gigante
+Completa
+C. Gigante
+Empresas (CNPJ)
+26.045
+2
+Densidade (10−2)
+0,0030
+0,7484
+Pessoas (CPF)
+30.129
+284
+Grau médio
+1,6948
+2,1329
+Nós (CNPJ e CPF)
+56.174
+286
+CC médio
+0,4195
+0
+Arestas
+47.603
+305
+Componentes conectados
+18.212
+1
+CC: Coeficiente de Clusterização
+análise de correlação entre as trilhas de auditagem para verificar a coocorrência de aler-
+tas de fraude. Essa abordagem permite identificar padrões e conexões entre os diferentes
+indícios de fraude, contribuindo para uma compreensão mais completa do cenário e auxi-
+liando na detecção e investigação de potenciais irregularidades nas licitações.
+5.1. Visão Geral da Rede Social
+Nesta seção, são analisados os relacionamentos da rede social para aprofundar o entendi-
+mento da dinâmica das conexões entre empresas licitantes e seus sócios. A complexidade
+da rede fica evidente em seu tamanho, uma vez que ela é composta por mais de 56 mil nós,
+representando empresas e seus sócios, e quase 48 mil arestas que representam as conexões
+entre esses nós. Essa vasta quantidade de nós e arestas reflete a riqueza de interações e
+vínculos presentes na rede, proporcionando uma visão abrangente dos relacionamentos
+entre os participantes das licitações públicas. Ilustrar tal rede de forma adequada é uma
+tarefa desafiadora. Portanto, a Figura 3 apresenta somente a visualização de um dos mai-
+ores componentes conectados da rede.
+Em seguida, foram aplicadas métricas topológicas para analisar as principais ca-
+racterísticas da rede social. Foram considerados o número de nós e arestas presentes na
+rede, a densidade, que representa a razão entre a quantidade de arestas existentes e todas
+as arestas possíveis, o grau médio, que indica a média de conexões de cada nó, e o coe-
+ficiente de clusterização, que mede a tendência dos nós de se conectarem uns aos outros
+[Barabási 2016]. A Tabela 2 apresenta os resultados das métricas topológicas tanto para
+a rede completa quanto para seu componente gigante.
+O número de nós e arestas da rede completa revela a complexidade da estrutura
+construída. A maioria dos nós são representados por pessoas físicas que atuam como
+sócias das empresas licitantes, o que é esperado, considerando que empresas de médio e
+
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1 -0.4-0.1-0.1 0 -0.3 0
+0 -0.1 0 -0.1
+1
+0
+0 -0.1-0.1-0.1 0 -0.1 0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0 -0.1 0
+0
+0 0.1 0
+1
+0 0.1 0
+0
+0
+0
+1 -0.1 0
+0 -0.1 0
+1
+0
+0 -0.1 0
+1
+0
+0
+0
+1
+0
+0
+1
+0
+1
+T01
+T02
+T03
+T04
+T05
+T06
+T07
+T08
+T09
+T10
+T11
+T12
+T13
+T14
+T15
+T01
+T02
+T03
+T04
+T05
+T06
+T07
+T08
+T09
+T10
+T11
+T12
+T13
+T14
+T15
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0 0.1-0.1 0
+0
+0 -0.1-0.2 0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1 -0.1 0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1 -0.5-0.1-0.1 0 -0.30.1 0 -0.1 0 -0.1
+1 0.1 0 -0.1 0 -0.2 0 -0.1 0
+0
+1 0.1 0
+0 -0.1 0
+0 0.1 0
+1
+0 -0.1-0.1 0
+0 0.1 0
+1 -0.1 0
+0
+0
+0
+0
+1 -0.4 0 0.1-0.1 0
+1
+0
+0 -0.2 0
+1
+0
+0
+0
+1
+0
+0
+1
+0
+1
+T01
+T02
+T03
+T04
+T05
+T06
+T07
+T08
+T09
+T10
+T11
+T12
+T13
+T14
+T15
+T01
+T02
+T03
+T04
+T05
+T06
+T07
+T08
+T09
+T10
+T11
+T12
+T13
+T14
+T15
+1
+-0.2
+-0.1
+0
+1
+-0.4
+-0.1
+1
+-0.1
+1
+T16
+T17
+T18
+T19
+T16
+T17
+T18
+T19
+-1.0
+-0.5
+0.0
+0.5
+1.0
+Correlação
+de Pearson
+(a)
+(b)
+(c)
+Figura 4. Correlaç ão entre as trilhas de (a-b) licitantes e aos (c) pares de lici-
+tante. A matriz (b) é uma versão filtrada da (a), onde foram removidas as
+ocorrências em que o licitante se enquadra em apenas uma das trilhas. ×
+indica uma correlaç ão estatisticamente não significativa (p-valor ≥0,05).
+.
+grande porte geralmente possuem vários representantes legais. Essa distribuição também
+é observada no componente gigante da rede, que abrange 2 empresas e 284 sócios no
+total. Ao analisar métricas como o número de arestas, coeficiente médio de clusterização
+e densidade da rede, é possível perceber que a rede social construída é esparsa, i.e., apre-
+senta uma baixa densidade (valor próximo a zero) de conexões em relação ao total de
+conexões possíveis. Assim, o fato de relacionamentos na rede serem relativamente raros
+torna sua análise ainda mais relevante, pois eles podem evidenciar alertas de fraude mais
+facilmente, além de revelar possíveis esquemas de associações entre licitantes.
+Por fim, o número de componentes conectados na rede completa revela uma alta
+fragmentação entre licitantes. Isso pode significar que as trilhas de auditagem não conse-
+guiram revelar grandes grupos de licitantes que possuam vínculos em comum. Se a rede
+possuísse poucos componentes conectados, poderia-se imaginar uma grande associação
+entre empresas licitantes, necessitando uma posterior análise por parte de especialistas.
+Ainda assim, os relacionamentos dentro dos pequenos grupos existentes na rede devem
+ser analisados a fim de verificar os alertas de possíveis fraudes. Portanto, análises mais
+aprofundadas nos resultados das trilhas são necessárias.
+5.2. Análise de Correlação entre as Trilhas de Auditagem
+Nesta seção, é realizada uma análise de correlação entre as trilhas de auditagem, tanto
+relacionadas às arestas (pares de licitantes), quanto aos nós (licitantes ou sócios). Para
+isso, foram consideradas um total de 583.631 licitações que se enquadram em pelo menos
+uma das trilhas descritas na Tabela 1. Visando avaliar a coocorrência entre essas trilhas,
+foram geradas matrizes de correlação.
+Correlação em nível de licitante.
+As Figuras 4(a) e 4(c) mostram as matrizes de
+correlação de Pearson entre as trilhas referentes aos licitantes e aos pares de licitante,
+respectivamente. Para facilitar a visualização e interpretação dos resultados, a Figura 4(b)
+exibe uma versão filtrada da matriz (a), na qual foram removidas as licitações que são
+exclusivas de uma única trilha. Essa filtragem permite identificar padrões mais relevantes
+de coocorrência entre as trilhas, eliminando associações isoladas e menos significativas.
+Ao comparar as Figuras 4(a) e 4(b), é possível identificar padrões mais claros
+
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0 0.1 0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1 -0.3 0
+0 0.1 0 0.3 0
+0 0.1 0
+0 0.1 0
+0
+1
+0
+0 -0.1-0.1-0.1 0 -0.1 0
+0
+0 -0.1-0.1 0
+1
+0
+0
+0
+0
+0
+0 0.1 0
+0
+0
+0
+0
+1
+0 -0.10.1 0
+0 0.1 0
+0
+0
+0
+0
+1
+0 0.1 0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0 0.1-0.10.1 0
+0
+0
+0
+1
+0 0.1 0
+0
+0 0.1 0.1 0
+1
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1 0.1 0.1 0.1
+1 0.6 0.1
+1 0.1
+1
+T01
+T02
+T03
+T04
+T05
+T06
+T07
+T08
+T09
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T01
+T02
+T03
+T04
+T05
+T06
+T07
+T08
+T09
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0 0.1 0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1 -0.1 0
+0 0.1 0.1 0.5 0
+0 0.1 0
+0
+0
+0
+0
+1 0.1 0 -0.10.2 0.1 0 -0.1 0
+0
+0 -0.1-0.1 0
+1 0.1 0
+0 -0.1 0
+0 0.1 0
+0
+0
+0
+0
+1
+0 -0.10.1 0
+0 0.2 0
+0
+0
+0
+0
+1
+0 0.1 0
+0
+0
+0
+0
+0
+0
+0
+1 0.1 0 0.1-0.10.1 0
+0
+0
+0
+1
+0 0.1 0 0.1 0 0.1 0.1 0
+1
+0
+0
+0
+0
+0
+0
+0
+1
+0 0.1 0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1 0.1 0.1 0.1
+1 0.6 0.1
+1 0.1
+1
+T01
+T02
+T03
+T04
+T05
+T06
+T07
+T08
+T09
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T01
+T02
+T03
+T04
+T05
+T06
+T07
+T08
+T09
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+-1.0
+-0.5
+0.0
+0.5
+1.0
+Correlação
+de Pearson
+(a)
+(b)
+Figura 5. Correlaç ão entre as trilhas de auditagem, em nível de licitaç ão. A matriz
+(b) é uma versão filtrada da (a), onde foram removidas as ocorrências em
+que a licitaç ão se enquadra apenas em cada uma das trilhas. × indica uma
+correlaç ão estatisticamente não significativa (p-valor ≥0,05).
+.
+e relevantes na matriz (b), uma vez que ela destaca as correlações mais consistentes e
+recorrentes entre as trilhas. Após a filtragem, podemos notar que a maioria das correlações
+estatisticamente significativas apresenta uma relação negativa fraca a moderada, variando
+entre -0,1 a -0,4. A única correlação forte (-0.5) identificada acontece entre as trilhas T5 e
+T6, indicando uma coocorrência negativa. Ou seja, licitações que possuem licitantes com
+alto percentual de vitórias (T5) tendem a não possuir um único licitante (T6).
+Analisando as trilhas referentes aos pares de licitantes (i.e., T16 a T19), nota-se no-
+vamente que todas as correlações estatisticamente significativas apresentam uma relação
+negativa fraca a moderada, variando entre -0,1 a -0,4. De fato, a correlação mais evidente
+acontece entre as trilhas T17 e T18, que investigam licitações contendo licitantes com e-
+mails e telefones em comum, respectivamente. Tal resultado indica que grande parte dos
+pares de licitantes enquadrados na trilha de e-mails não se enquadram na de telefone, e
+vice-versa. Ou seja, no geral, empresas licitantes que possuem e-mails em comum, não
+compartilham o mesmo telefone.
+Correlação em nível de licitação.
+Na Figura 5, foi analisada a correlação entre todas
+as trilhas, agora em nível de licitação. Em outras palavras, foi analisada a ocorrência
+simultânea das trilhas em uma mesma licitação. Mais uma vez, foi feita a filtragem das
+licitações que são exclusivas de uma única trilha (Figura 5(b)). No geral, a grande maioria
+das correlações não é estatisticamente significativa ou não apresentam nenhuma relação,
+mesmo após a filtragem. A correlação mais evidente é a relação positiva forte (0,6) entre
+as trilhas T17 e T18, indicando que se uma licitação apresentar licitantes distintos com
+e-mails em comum, há uma grande chance de também apresentar licitantes distintos com
+número de telefone em comum, e vice-versa.
+Após a filtragem, outra correlação positiva (0,5) aparente ocorre entre as trilhas
+T5 e T11. Tal resultado indica que se uma licitação tem licitantes com alto percentual de
+vitórias (T5), ela tem mais chances de ter licitantes que são empresas de pequeno porte,
+mas que possuem o faturamento acima do permitido por lei (T11). Essa correlação pode
+indicar uma prática fraudulenta em que empresas de pequeno porte estão inflando seus
+resultados para obter vantagens competitivas.
+
+Tabela 3. Top 5 licitaç ões com maiores valores para o Indicador de Risco.
+Pos.
+Trilhas (Qtd. Alertas)
+Modalidade
+Valor Licitado
+Risco
+1ª
+T10 (88), T17 (2), T18 (3), T19 (1)
+Concurso
+R$ 548.500,00
+980,55
+2ª
+T10 (57), T11 (11), T17 (5), T18 (2), T19 (7)
+Pregão Presencial
+R$ 3.432.317,50
+933,02
+3ª
+T9 (1), T10 (55), T11 (6), T17 (5), T18 (2), T19 (4)
+Pregão Presencial
+R$ 2.710.163,40
+826,54
+4ª
+T10 (51), T11 (6), T17 (4), T18 (2), T19 (3)
+Pregão Presencial
+R$ 2.947.456,20
+750,78
+5ª
+T2 (1), T5 (39), T8 (2), T11 (18), T14 (5),T16 (1),
+T17 (1), T18 (1), T19 (1)
+Pregão Eletrônico
+R$ 19.411.624,20
+711,53
+Por fim, a falta de correlação geral entre a maioria das trilhas (de vínculo e licitan-
+tes) revela a inexistência de um padrão entre os alertas, evidenciando o quão desafiador é
+a tarefa de análise de possíveis fraudes em licitações. Além disso, é importante destacar
+que a presença de uma correlação não implica necessariamente em uma relação causal
+entre as trilhas. A interpretação dessas correlações requer uma análise mais aprofundada
+e contextualizada, considerando as particularidades do domínio das licitações públicas e
+a interação entre as diferentes trilhas de auditagem.
+6. Análise das Licitações no Ranqueamento
+Esta seção apresenta os resultados da abordagem de ranqueamento das licitações de
+acordo com seu indicador de risco. No total, 566.539 licitações foram classificadas com
+indicador de risco maior que zero e foram incluídas no ranqueamento. A Tabela 3 apre-
+senta as top 5 licitações ranqueadas. A primeira coluna indica a posição da licitação no
+ranqueamento, seguida pela coluna “Trilhas”, que mostra a quantidade de alertas das 19
+trilhas associadas à licitação. Nas colunas subsequentes, são apresentados o preço total
+dos objetos descritos na licitação (valor licitado) e o indicador de risco correspondente.
+A análise do ranqueamento revela que as licitações posicionadas no topo do ran-
+king apresentam um elevado número de alertas nas trilhas T5, T10 e T11, mesmo essas
+trilhas possuindo pesos baixos ou médios, conforme mencionado na Seção 4.4. Essas
+licitações foram bem ranqueadas devido à grande quantidade de alertas nessas trilhas.
+Por exemplo, as quatro primeiras licitações do ranking possuem mais de 50 alertas na
+trilha relacionada a licitantes sem registro de ligação de energia elétrica em Minas Gerais
+(T10), sendo que a primeira posição apresenta um total de 88 alertas nessa trilha. Em
+relação às trilhas de peso alto, apenas a quinta licitação possui um alerta referente a T2,
+sobre licitantes com sanção ativa.
+Esses resultados sugerem que, embora as trilhas de peso alto sejam consideradas
+importantes para a detecção de fraudes, as licitações com um elevado número de aler-
+tas nas trilhas de peso médio e baixo também merecem atenção. Isso pode indicar que,
+mesmo que um indicador específico possua um peso menor, a sua ocorrência em muitas
+licitações pode ser um sinal de potencial risco.
+Para avaliar o ranqueamento, foi realizada a comparação com uma pequena amos-
+tra de 117 licitações já investigadas pelo MPMG e que comprovadamente tiveram algum
+tipo de fraude. Dessas 117, 113 (96,58%) possuem pelo menos um alerta identificado e,
+portanto, possuem um indicador de risco maior que zero e fazem parte do ranqueamento.
+A Tabela 4 apresenta as top 5 licitações fraudulentas investigadas por especialistas do
+MPMG e que possuem um indicador de risco. Observa-se que nenhuma delas ficou no
+
+Tabela 4. Posiç ão no ranqueamento de licitaç ões já investigadas pelo MPMG.
+Pos.
+Trilhas (Qtd. Alertas)
+Modalidade
+Valor Licitado
+Risco
+10324ª
+T9 (5), T10 (3), T11 (3)
+Pregão Presencial
+R$ 299.007,48
+103,39
+14542ª
+T5 (4), T10 (3), T11 (3)
+Pregão Presencial
+R$ 780.299,50
+89,54
+16693ª
+T10 (4), T11 (5)
+Pregão Presencial
+R$ 792.506,84
+84,21
+19692ª
+T9 (3), T10 (3), T11 (2)
+Pregão Presencial
+R$ 439.300,00
+77,96
+23033ª
+T5 (2), T10 (3), T17 (1), T18 (1)
+Pregão Presencial
+R$ 3.407.281,40
+72,20
+top 5 do ranqueamento gerado pela abordagem proposta, sendo que a licitação de posição
+mais alta ficou em 10324ª.
+A justificativa para esse resultado é que existem licitações com uma quantidade
+maior de alertas no topo do ranqueamento, conforme mostrado na Tabela 3. No entanto,
+é importante destacar que as cinco primeiras licitações da Tabela 4 ficaram acima do per-
+centil 95 no ranqueamento, o que representa uma posição relativamente alta. Isso indica
+que a abordagem proposta conseguiu identificar licitações fraudulentas que estavam entre
+as mais suspeitas, embora não tenham alcançado o topo do ranqueamento.
+Esses resultados reforçam a importância de uma análise mais detalhada e comple-
+mentar por parte dos especialistas do MPMG, que consideram outros fatores além do ran-
+queamento, como evidências adicionais e informações específicas de cada licitação, para
+confirmar a presença de fraudes. O ranqueamento serve como uma ferramenta preliminar
+de triagem, que direciona a atenção para as licitações mais suspeitas e auxilia no processo
+de investigação. Portanto, embora as licitações fraudulentas não tenham alcançado o topo
+do ranqueamento, a abordagem proposta mostrou-se útil na identificação de licitações
+com indicadores de risco relevantes.
+7. Conclusões e Trabalhos Futuros
+As trilhas de auditagem definidas neste artigo combinam conceitos de redes sociais para
+identificar indícios de fraudes em licitações públicas. Os dados das licitações, licitantes
+e sócios foram modelados como uma rede social, permitindo a análise das interações
+entre os participantes. Os resultados obtidos demonstram a eficácia da metodologia na
+filtragem e redução do volume de dados a serem analisados por especialistas. Além disso,
+as descobertas fornecem subsídios para o desenvolvimento de algoritmos de classificação
+de licitações fraudulentas, contribuindo para o combate à corrupção. Como trabalhos
+futuros, planeja-se criar um painel interativo para facilitar a visualização e interpretação
+dos resultados obtidos através das trilhas.
+Limitações e desafios.
+A maior limitação deste trabalho está na disponibilidade de
+dados. Por exemplo, não existem dados históricos que informem a situação cadastral e
+societária da empresa no momento em que a licitação aconteceu. Além disso, algumas
+empresas que usam serviços de contabilidade cadastram o e-mail e telefone dos escritórios
+de contabilidade na Receita Federal. Por fim, algumas fontes externas não possuem dados
+recentes, o que pode afetar o resultado das trilhas para licitações mais atuais.
+Agradecimentos.
+Ao Ministério Público de Minas Gerais (MPMG) pelo apoio através
+do Projeto Capacidades Analíticas. Ao CNPq, CAPES e FAPEMIG pelo apoio aos pes-
+
+quisadores envolvidos. Por fim, a Arthur P. G. Reis, Clara A. Bacha e Matheus C. Teixeira
+pela participação nos trabalhos anteriores.
+Referências
+Andrade, P. H. M. A. et al. (2020). Auditing government purchases with a multicriteria
+anomaly detection strategy. J. Inf. Data Manag., 11(1).
+Anowar, F. and Sadaoui, S. (2019). Multi-class ensemble learning of imbalanced bidding
+fraud data. In Canadian AI, volume 11489 of LNCS, pages 352–358. Springer.
+Araújo, J. L. et al. (2021). Caracterização de c̈aminhos mais prováveisëm uma rede com-
+plexa de processos jurídicos. In BraSNAM, pages 44–54, Porto Alegre, Brasil. SBC.
+Barabási, A.-L. (2016). Network science. Cambridge University Press.
+Braz, C. et al. (2023). Análise de irregularidades em licitações públicas com foco em
+empresas de pequeno porte. In WCGE. SBC. [em submissão].
+Costa, L. L. et al. (2022). Alertas de fraude em licitações: Uma abordagem baseada em
+redes sociais. In BraSNAM, pages 37–48. SBC.
+Costa, L. L. et al. (2023). Identificação de licitações suspeitas de fraude por meio de
+trilhas de auditagem. iSys. [aceito para publicação].
+Florentino, É. S. et al. (2022). Identificando suspeitos de crimes por meio de interações
+implícitas no youtube. iSys, 15(1):3–1.
+Grace, E. et al. (2016). Detecting fraud, corruption, and collusion in international de-
+velopment contracts: The design of a proof-of-concept automated system. In IEEE
+BigData, pages 1444–1453. IEEE Computer Society.
+Kansaon, D. P. et al. (2019). Análise de algoritmos de classificação para detecção de
+emoções em tweets em português brasileiro. iSys, 12(3):116–138.
+Li, P. et al. (2023). LGM-GNN: A local and global aware memory-based graph neural
+network for fraud detection. IEEE Transactions on Big Data.
+Lima, M. et al. (2020). Inferring about fraudulent collusion risk on Brazilian public works
+contracts in official texts using a Bi-LSTM approach. In EMNLP, pages 1580–1588.
+Oliveira, G. P. et al. (2022). Detecting inconsistencies in public bids: An automated and
+data-based approach. In WebMedia, pages 182–190.
+Óskarsdóttir, M. et al. (2022). Social network analytics for supervised fraud detection in
+insurance. Risk Analysis, 42(8):1872–1890.
+Park, C. H. and Kim, K. (2020). E-government as an anti-corruption tool: Panel data
+analysis across countries. Intl. Review of Administrative Sciences, 86(4):691–707.
+Santoro, F. M. et al. (2020). Process mining techniques in internal auditing: A stepwise
+case study. iSys, 13(4):48–76.
+Velasco, R. B. et al. (2021). A decision support system for fraud detection in public
+procurement. Int. Trans. Oper. Res., 28(1):27–47.
+Yu, W. et al. (2023). A multiperspective fraud detection method for multiparticipant e-
+commerce transactions. IEEE Transactions on Computational Social Systems.

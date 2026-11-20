@@ -1,0 +1,691 @@
+Anotação de Dados para a Mineração de Argumentos em 
+Conteúdos de Redes Sociais em Português Brasileiro 
+Livia Alabarse dos Santos1, Vitor Domingos Baldoino dos Santos1, Renata Mendes 
+de Araujo1,2,3, Ivan Carlos Alcântara de Oliveira1 
+1 Faculdade de Computação e Informática - Universidade Presbiteriana Mackenzie - São 
+Paulo, SP, Brasil 
+2 Programa de Pós-Graduação em Sistemas de Informação - EACH/USP 
+3 Doutorado Profissional em Políticas Públicas - Escola Nacional de Administração 
+Pública - Brasília, DF, Brasil 
+{liviaalabarse.santos, vitordomingos.santos}@mackenzista.com.br, 
+{renata.araujo, ivan.oliveira}@mackenzie.br 
+ 
+Abstract. This paper presents the advances within the scope of the research 
+project HEIWA regarding the annotation process of a Brazilian Portuguese 
+tweet database extracted during the 2022 Brazilian electoral period, one of the 
+most polarized in the political history of Brazil. The annotation aimed to 
+prepare a subset of the database for training machine learning models for 
+argument mining in social media content. The article describes the strategies 
+for database segmentation, the stages of human and automatic annotation 
+using LLMs, the results obtained, and the challenges encountered. 
+Resumo. Este artigo apresenta os avanços obtidos no escopo do projeto de 
+pesquisa HEIWA em relação ao processo de anotação de uma base de dados 
+de tweets em português brasileiro extraídos ao longo do período eleitoral 
+brasileiro em 2022, um dos mais polarizados da história política do Brasil. A 
+anotação teve como objetivo preparar um recorte da base de dados para o 
+treinamento de modelos de aprendizagem de máquina para a mineração de 
+argumentos em conteúdos de redes sociais. O artigo descreve as estratégias de 
+recorte da base de dados, as etapas de anotação humana e híbrida usando 
+LLMs, os resultados obtidos e os desafios encontrados. 
+1.​ Introdução 
+A Mineração de Argumentação (MA) é uma área científica multidisciplinar, envolvendo 
+a Retórica, Filosofia, Linguística Computacional e Ciência de Dados, cujo objetivo é 
+identificar, extrair e compreender a estrutura de argumentação em textos e/ou 
+discussões, usando técnicas de processamento de texto [Lawrence e Reed 2020][Lytos 
+et al. 2019][Stede e Schneider 2019][Palau e Moens 2009][Lawrence et. al. 2012]. 
+Nos últimos anos, a comunidade científica na área de MA explora a aplicação do 
+conceito e das técnicas de MA no estudo da argumentação em textos extraídos de redes 
+sociais [Bosc et. al. 2016][Schaefer e Stede 2021][Vecchi et. al. 2021]. As pesquisas 
+partem da ideia de que esses textos possam conter uma atividade argumentativa e que a 
+compreensão dos argumentos utilizados durante a interação nas redes sociais pode 
+agregar para a tomada de decisões, gestão da informação e o entendimento do 
+comportamento coletivo em diversos domínios, como nas ciências políticas e sociais.
+
+O projeto HEIWA1 planeja construir soluções computacionais baseadas em 
+técnicas de MA para o entendimento de discussões em redes sociais, com um olhar 
+específico para o contexto brasileiro. O resultado esperado com o projeto é a construção 
+de uma plataforma que permita o acompanhamento de discussões em redes sociais, 
+preferencialmente pelos usuários das próprias redes, mas também para interessados no 
+estudo de comportamentos e mediação em redes sociais. As implicações dessas 
+tecnologias envolvem aspectos sociais, como o aperfeiçoamento da qualidade do debate 
+e a democracia, aspectos educacionais e de desenvolvimento de pensamento crítico. 
+A despeito dos esforços crescentes, a aplicação da MA em redes sociais ainda 
+enfrenta desafios significativos [Bosc et al. 2016a][Schaefer e Stede 2021]: a escassez 
+de datasets anotados; a baixa qualidade e/ou informalidade dos textos nas redes; o 
+tamanho reduzido das falas (tweets, posts), que impedem a riqueza de ideias, a ausência 
+de foco ou tópico em discussão, e, mais recentemente, o crescente custo e restrição de 
+uso das APIs das plataformas de redes sociais de maior escala (X, Facebook etc). A 
+literatura mostra abordagens exploratórias e nenhum dos trabalhos encontrados no 
+escopo desta pesquisa, tratam de conteúdos em português brasileiro. Além disso, nossa 
+pesquisa identificou que, no contexto dos trabalhos que tratam de MA em redes sociais, 
+a tarefa de anotação de dados é relatada de forma muito resumida ou não relatada, 
+desafio apontado também por Neto et al. (2024). Considerando a importância desta 
+etapa para o treinamento de algoritmos baseados em inteligência artificial, investimos 
+em organizar e relatar o processo de anotação de dados utilizado em nosso projeto 
+visando especificamente a tarefa de mineração de argumentos, cuja complexidade 
+envolve a combinação de diferentes tarefas de análise linguística, consequentemente, 
+trazendo complexidade para o processo de anotação. 
+Neste artigo, apresentamos os avanços obtidos no escopo do Projeto HEIWA 
+especificamente em relação ao processo de anotação de uma base de dados de tweets em 
+português brasileiro extraídos ao longo do período eleitoral em 2022 [Silva et al. 2024], 
+um dos mais polarizados da história política do Brasil. A anotação teve como objetivo 
+preparar um recorte da base de dados para o treinamento de modelos de aprendizagem 
+de máquina para a mineração de argumentos em desenvolvimento no projeto [Santos et 
+al 2024a]. Como contribuições específicas, este artigo descreve as estratégias de recorte 
+da base de dados, o processo de anotação envolvendo as etapas humana e automática 
+usando LLMs, os resultados obtidos e os desafios encontrados 
+​
+O artigo está estruturado da seguinte forma: a Seção 2 apresenta os objetivos da 
+MA em redes sociais e as estratégias do projeto para alcançar seus objetivos; a Seção 3 
+discute os trabalhos encontrados na literatura sobre anotação de dados visando a MA; a 
+Seção 4 descreve o dataset e a amostra usada na anotação; a Seção 5 detalha as etapas 
+da anotação; a Seção 6 aborda a avaliação da qualidade das anotações; e a Seção 7 
+conclui o artigo com os desafios e trabalhos futuros. 
+2.​ Mineração de Argumentos em Redes Sociais: A Estratégia do Projeto 
+HEIWA 
+Schaefer e Stede (2021) e Bosc et. al. (2016a) mencionam que as tarefas necessárias 
+1 https://ciberdem.mack.com.br/index.php/projeto-heiwa/
+
+para aplicação de MA em textos provenientes de redes sociais, em linhas gerais, 
+incluem: (i) a anotação de corpus; (ii) a detecção de argumentos e suas relações; e (iii) a 
+detecção de posicionamentos. Sobre a tarefa (i) anotação de corpus, a literatura mostra 
+um número escasso de bases anotadas e, pelo material levantado pela presente pesquisa, 
+nenhuma considerando conteúdo em português especificamente visando a mineração de 
+argumentos em redes sociais. A tarefa (ii), detecção de argumentos e relações, envolve, 
+primeiramente, a identificação, no conteúdo de cada postagem, de elementos 
+(alegações), que caracterizem as falas como argumentos ou não e, posteriormente, a 
+identificação de relações entre elas (oposição, apoio), permitindo a identificação de 
+estruturas (grafos) de argumentação. Por fim, a tarefa (iii), detecção de posicionamentos, 
+consiste em extrair os diferentes pontos de vista sobre um tópico em uma discussão. 
+​
+Os primeiros estudos de MA em redes sociais realizados no Projeto HEIWA 
+[Sousa, et. al. 2021] focaram na identificação de relações de oposição e apoio entre falas 
+em um corpus de postagens no Reddit. As falas dos participantes foram tratadas como 
+sentenças, e as relações entre elas foram identificadas pelo direcionamento das falas 
+entre os interlocutores na estrutura de threads de discussão. A natureza da relação 
+(oposição ou apoio) foi determinada pela análise de sentimentos (negativo, positivo ou 
+neutro), utilizando o algoritmo SGD para a classificação, treinado com as discussões já 
+classificadas presentes na base Internet Argument Corpus (IAC) [Walker et.al. 2012]. 
+Abordagens subsequentes desenvolvidas pela equipe, envolveram o uso de 
+técnicas de análise de sentimentos baseadas em deep learning [Tokuda, Coelho e Araujo 
+2021] [Salles e Coelho 2022], explorando as arquiteturas BERT e DistilBERT [Zhang et 
+al. 2020] como estratégia para elucidar as emoções e a polaridade das afirmações 
+presentes do corpus de argumentação utilizado no estudo anterior, e o dataset em inglês 
+GoEmotions [Demszky et al. 2020] para realizar a análise das emoções. 
+No intuito de avançar em tarefas mais sofisticadas de identificação da estrutura 
+de argumentos e contemplar conteúdos em português, passamos a explorar o uso de 
+modelos baseados no Transformer [Vaswani et al. 2017], aplicados a dados extraídos de 
+redes sociais em português [Santos et. al. 2024a]. A estratégia avançou também na 
+identificação de outros componentes de argumentação, sendo eles: análise de 
+sentimento, identificação de tópico, reconhecimento de entidades, detecção de ironia e 
+detecção de posição. Essas tarefas, em conjunto, são consideradas essenciais para o 
+entendimento do discurso nas redes sociais, visando a posterior identificação de 
+argumentos. A inclusão das tarefas de identificação de tópico e reconhecimento de 
+entidades nomeadas objetiva desagregar duas grandes atividades vistas na literatura: (i) 
+a identificação do assunto da discussão; e (ii) a detecção de relação entre pares de texto. 
+Com a desagregação, será possível investigar a eliminação da anotação de um dataset 
+para pares de tweets relacionados, como o apresentado em Bosc et al. (2016a). 
+Adicionalmente, a inclusão da detecção de ironia visa resolver a dificuldade adicional da 
+MA em redes sociais relacionada ao alto grau de informalidade do texto [Schaefer e 
+Stede 2021] e a mudança de semântica gerada pelo uso desse recurso linguístico. 
+3.​ Anotação de Dados para Mineração de Argumentos em Redes Sociais 
+No contexto do Projeto Heiwa, a construção de um corpus anotado em português não 
+somente viabiliza o treinamento dos modelos para as tarefas de MA previstas (análise de
+
+sentimento, identificação de tópico, reconhecimento de entidades, detecção de ironia e 
+detecção de posição), mas também permite a adaptação de técnicas consolidadas na 
+literatura à realidade específica das redes sociais brasileiras, contribuindo com a oferta 
+de um corpus anotado para estimular o avanço das pesquisas nesta área. 
+​
+Conforme mencionado anteriormente, são escassos (ou inexistentes) os trabalhos 
+que abordem a anotação de corpus em português brasileiro visando especificamente a 
+tarefa de mineração de argumentos. Por outro lado, podemos identificar contribuições 
+distintas de anotação de dados para as diferentes tarefas que compõem a estratégia do 
+projeto que serviram como base para este trabalho. 
+​
+Por exemplo, trabalhos anteriores demonstram que tanto a anotação manual 
+quanto abordagens híbridas têm sido amplamente exploradas em tarefas como análise de 
+sentimentos e classificação de emoções [Arruda et al. 2015; Moraes et al. 2015; 
+Coutinho e Malheiros 2020]. Em Arruda et al. (2015), quatro anotadores classificaram 
+parágrafos de notícias políticas em português brasileiro quanto à entidade alvo e à 
+polaridade, identificando a ambiguidade e a subjetividade dos textos como os principais 
+fatores responsáveis pelas discordâncias entre os anotadores. Semelhantemente, Moraes 
+et al. (2015) empregam a anotação manual para classificar tweets relacionados à Copa 
+do Mundo de 2014, destacando que a linguagem informal característica da plataforma 
+representa um desafio significativo na identificação dos sentimentos expressos nos 
+textos. Em contraste, Coutinho e Malheiros (2020) adotam uma abordagem 
+semi-automatizada, combinando classificadores previamente desenvolvidos com 
+anotação humana. Mais recentemente, Törnberg (2024) propôs diretrizes para anotação 
+com modelos de linguagem grandes (LLMs), enfatizando a importância da engenharia 
+de prompts e da validação manual para garantir precisão e reprodutibilidade, 
+evidenciando a necessidade de equilibrar esforço humano e automação. Conclusão 
+similar é apontada por Maia (2024), que descreve um processo de anotação de corpus 
+para identificação de posicionamentos sobre projetos políticos em conteúdos na Internet. 
+4.​ Descrição do Dataset 
+Considerando o período de 27 de Abril de 2022 e 23 de Janeiro de 2023, o dataset 
+“Tweet_Eleições_2022” contém aproximadamente 9,5 milhões de tweets coletados 
+durante o período das eleições presidenciais de 2022 [Santos et. al. 2024b] [Silva et. al. 
+2024]. O processo de coleta utilizou a API do Twitter, e a seleção dos tweets foi 
+orientada pela identificação de notícias e acontecimentos relevantes ao longo do 
+período, buscando palavras-chave e hashtags específicas associadas aos eventos 
+monitorados. Os dados passaram por duas etapas de pré-processamento para garantir a 
+qualidade e a privacidade das informações. A primeira etapa consistiu na remoção de 
+linhas repetidas, e a segunda, na desidratação dos dados, removendo identificadores 
+diretos dos perfis dos usuários e o conteúdo dos tweets. 
+​
+Dentro desse contexto, o recorte temporal escolhido para análise foi o dia 8 de 
+janeiro de 2023, data marcada pela invasão aos Três Poderes em Brasília. Esse evento 
+não apenas representa um momento crítico na história política recente do Brasil, mas 
+também oferece um cenário rico para a análise de dinâmicas em redes sociais, como a 
+polarização e disseminação de informações [Silva, Araujo e Correa 2024][Bertanha e 
+Araujo 2024]. A escolha desse recorte permite explorar um evento de grande impacto
+
+político no Brasil, com alta participação e extremamente desafiadores do ponto de vista 
+da mineração de argumentos, por seu alto teor polarizado (extremos de posições), de 
+exacerbação de sentimentos e emoções, além do uso frequente de ironia. 
+​
+O dataset original conta com sete arquivos relacionados a esse evento. Cada 
+arquivo corresponde a um período do dia, em geral, com intervalos de 3 horas, iniciando 
+às 6 horas da manhã do dia 08 de janeiro até às 6 horas da manhã do dia 09 de janeiro. 
+Combinamos os arquivos disponíveis, resultando em um novo conjunto de 1.235.086 
+tweets. A partir desse arquivo consolidado, o processo de anotação foi realizado. 
+5.​ Processo de Anotação 
+O processo de anotação utilizado seguiu uma abordagem exploratória considerando 
+etapas usuais de anotação de corpus linguísticos [Hovy e Lavid 2010]: seleção dos 
+textos (vide seção 4), definição de rótulos e orientações de anotação, medição de 
+resultados, concordância/divergência entre anotadores e qualidade da anotação. 
+​
+Optamos por considerar parte das tarefas definidas pelo projeto para a 
+identificação de argumentos, suas relações e posicionamentos, sendo elas: análise de 
+sentimento, reconhecimento de entidades nomeadas (NER), detecção de ironia e 
+detecção de posição. Para os primeiros experimentos de desenvolvimento do pipeline de 
+MA pretendido, deixamos de lado a identificação de tópico, assumindo um tópico único 
+(a invasão dos Três Poderes em Brasília). Desta forma, a anotação de cada tweet 
+considerou quatro tarefas, apresentadas na Tabela 1. 
+Tabela 1. Tarefas de anotação e rótulos 
+Tarefa de anotação 
+Rótulos (classes) 
+Detecção de Ironia 
+“contém ironia” ou “não contém ironia” 
+Detecção de Posição 
+“a favor”, “contra” ou “neutro” 
+Detecção de Sentimento 
+“positivo”, “negativo” ou “neutro” 
+Reconhecimento de Entidade Nomeada (NER) 
+“Pessoa”, “Localização”, “Instituição”, “Data”, 
+“Produto”, “Trabalho Criativo”, “Grupo” 
+​
+O processo de anotação ocorreu em duas etapas, descritas nas subseções a 
+seguir. A primeira etapa envolveu o engajamento de anotadores humanos em um 
+processo coletivo de anotação. A segunda etapa combinou a participação de anotadores 
+humanos e o uso de um LLM. 
+5.1. Anotação Coletiva por Humanos 
+Na primeira etapa do processo de anotação, selecionamos aleatoriamente 800 tweets do 
+dataset, em diferentes períodos do dia 08 de janeiro. A ideia de selecionar tweets de 
+diferentes períodos ao longo do dia foi uma tentativa de minimizar o desbalanceamento 
+da amostra principalmente em relação à posição, haja vista que ao longo do dia foi 
+percebida uma concentração de posicionamentos: no início do dia, um número maior de 
+tweets de apoio e convocação à invasão; e, ao longo do dia, o aumento progressivo de 
+falas opostas [Silva, Araujo e Correa 2024][Bertanha e araujo 2024]. A anotação
+
+compreendeu as tarefas de detecção de ironia, posição e entidades nomeadas, 
+excluindo-se a detecção de sentimento, pois foi de interesse inicial desta pesquisa 
+experimentar a base anotada Portuguese Tweets for Sentiment Analysis2 contendo uma 
+grande quantidade de tweets em língua portuguesa já classificados, sendo parte dela 
+envolvendo conteúdo político. 
+​
+A anotação foi realizada em uma “Oficina de Anotação de Dados de Redes 
+Sociais” no tempo de duas horas oferecidas a alunos de graduação na área da 
+computação usando a ferramenta doccano [Nakayama et. al 2018]. Na oficina, 
+participaram aproximadamente 30 alunos. Considerando a quantidade de participantes, 
+foi necessário realizar a aquisição, instalação, configuração e cadastro desses 
+participantes na doccano com antecedência. No início da oficina, foi realizada uma 
+orientação sobre o processo, quais seriam as tarefas de anotação a serem realizadas, 
+reflexões sobre a conscientização e importância de uma anotação correta, além de 
+instruções sobre o uso da ferramenta3. A oficina teve duas horas de duração, sendo que 
+os primeiros 30 minutos compreenderam a apresentação de orientações gerais a respeito 
+do processo de anotação e da ferramenta, bem como exemplos. Dúvidas pontuais dos 
+anotadores foram sendo resolvidas individualmente ao longo da oficina. 
+​
+Os 800 tweets foram divididos em grupos de tamanhos menores para cada tarefa 
+e distribuídos entre os participantes. Essa separação em grupos menores foi considerada 
+na tentativa de obter ao menos duas anotações de uma mesma tarefa por tweet e permitir 
+a sua validação posterior. Além disso, a separação permitiu que os grupos de anotadores 
+trabalhassem com tweets diferentes e maximizassem a quantidade de dados anotados. A 
+organização de grupos de tweets por tarefa e a quantidade de anotadores em cada uma 
+delas pode ser vista na Tabela 2. Ao longo da oficina, os alunos que terminaram a 
+anotação de um conjunto de tweets para uma tarefa e expressaram desejo de continuar 
+os trabalhos foram alocados em outras. Por conta disso, há sobreposição de anotadores 
+entre tarefas e a quantidade de anotadores de cada uma delas não é congruente com a 
+anotação em duplas.​ Os resultados desta etapa de anotação para a detecção de posição 
+e ironia envolvendo todos os grupos de tweets combinados e avaliados são ilustrados na 
+Figura 2. Na detecção de posição, dos 780 tweets anotados, 340 (44%) foram 
+discordantes, indicando a necessidade de outro anotador. Na detecção de ironia, 113 
+(16%) dos 686 tweets anotados foram contraditórios e demandaram um anotador 
+adicional. 
+Tabela 2. Quantidade de Grupos de Tweets e anotadores por tarefa 
+ 
+Tarefa 
+NER 
+Detecção de Posição 
+Detecção de Ironia 
+Quantidade de Grupos de Tweets 
+7 
+7 
+6 
+Anotadores Ativos 
+9 
+13 
+17 
+3 As orientações utilizadas na oficina podem ser encontradas em: 
+https://github.com/ciberdem/ProjetoHEIWA-FAPESP/tree/main/CuradoriaExtracaoDados/BRASNAM2025
+-MaterialSuplementar 
+2 Disponível em: <https://www.kaggle.com/datasets/augustop/portuguese-tweets-for-sentiment-analysis>. 
+Data do acesso: 10/09/2024.
+
+​
+Considerando a anotação de NER, foi realizado o agrupamento dos tweets, 
+resultando em um total de 679, e, após avaliados, a quantidade encontrada para cada 
+uma das classes pode ser vista na Figura 3. Dessa figura, observa-se que a classe 
+“Localização” foi a mais incidente e obteve um total de 1125. Esse fato ocorreu, pois 
+em um dado tweet podemos ter mais de uma referência a uma determinada classe, por 
+exemplo, localização pode ter “Brasil”, “Brasília” e “São Paulo” presente em um 
+mesmo tweet. 
+ 
+Figura 2. Estatísticas da anotação da primeira etapa para Posição (gráfico à 
+esquerda) e Ironia (gráfico à direita) 
+​
+ 
+Figura 3. Estatísticas da anotação da primeira etapa para NER 
+​
+Ao concluir a primeira etapa, foi possível observar: baixa qualidade das 
+anotações; dificuldades na classificação de um tweet, considerando a natureza subjetiva 
+da interpretação do seu texto; tempo previsto insuficiente para a anotação, levando em 
+conta a quantidade de tarefas e tweets selecionados; e necessidade de maior 
+conscientização dos participantes em relação a importância do processo de anotação. A 
+partir disso, foi planejada uma segunda etapa de anotação, descrita a seguir. 
+5.2 Anotação com Apoio de LLM 
+Na segunda etapa, foram selecionados cerca de 1000 tweets, também de forma aleatória 
+em variados períodos do dia. As anotações foram realizadas por membros da equipe do 
+projeto de pesquisa Heiwa em conjunto com alguns alunos voluntários, totalizando 8 
+pessoas. No processo de anotação, não foi utilizada a ferramenta doccano e os tweets
+
+foram anotados manualmente usando planilhas do Excel. Os participantes foram 
+organizados em duplas para cada um dos quatro tipos de anotação (Tabela 2). Cada 
+membro da dupla anotou os mesmos tweets individualmente para uma mesma tarefa 
+durante o período de duas semanas, e o resultado foi comparado posteriormente para 
+garantir a concordância. A tarefa de detecção de sentimento foi incluída nesta etapa de 
+anotação, pois a base citada na seção anterior, Portuguese Tweets for Sentiment 
+Analysis, foi experimentada previamente para a geração de modelos, mas os resultados 
+obtidos não foram satisfatórios. 
+​
+Simultaneamente, 
+utilizamos 
+um 
+Large 
+Language 
+Model 
+(LLM), 
+especificamente o modelo Llama3 [Meta AI, 2024], pela sua capacidade de 
+processamento à época e disponibilidade gratuita, para anotar os mesmos 1000 tweets4. 
+Quando as anotações das duplas coincidiam, elas eram consideradas válidas. Em casos 
+de discrepância, comparamos com as anotações geradas pelo LLM: se a anotação do 
+LLM concordasse com a de um dos membros da dupla, essa anotação era considerada 
+válida. Se todas as anotações divergiam, o tweet era separado para outro anotador 
+avaliar. Um resumo das regras de validação utilizadas nesse processo e seus resultados 
+pode ser visto na Tabela 3. Nota-se que na tarefa de anotação de posição foram 
+utilizados somente um anotador humano e o LLM e na tarefa de NER temos somente 
+98 tweets com dois anotadores humanos. 
+Tabela 3 - Regras de validação utilizadas e resultados do processo de anotação 
+ 
+ 
+ 
+ 
+ 
+​
+Observamos que o LLM produziu resultados satisfatórios para tarefas como 
+análise de sentimento, detecção de posicionamento e detecção de ironia. Entretanto, o 
+uso do LLM para a tarefa de NER não gerou resultados aceitáveis, levando à exclusão 
+desta tarefa do processo de anotação. 
+​
+Na anotação desses 1000 tweets 
+foi observado um 
+desbalanceamento 
+considerável no dataset resultante. A Figura 4 mostra os percentuais de classificação 
+obtidos para detecção de ironia, sentimento e posição. Esse desbalanceamento pode ser 
+explicado pelo conteúdo inflamado dos tweets, que envolve sentimentos negativos e, em 
+sua maioria, uma postura contrária ao tópico da discussão. 
+4 Os prompts utilizados para esta tarefa podem ser encontrados em: 
+https://github.com/ciberdem/ProjetoHEIWA-FAPESP/tree/main/CuradoriaExtracaoDados/BRASNAM2025
+-MaterialSuplementar 
+ 
+ 
+Regras de Validação 
+ 
+Todos 
+concordam 
+2 anotadores 
+concordam 
+Anotador e LLM 
+concordam 
+Todos 
+discordam 
+Detecção de Ironia 
+296 
+469 
+446 
+389 
+Detecção de Posição 
+0 
+0 
+2214 
+782 
+Detecção de Sentimento 
+757 
+43 
+187 
+13 
+NER 
+0 
+15 
+0 
+83
+
+Figura 4. Percentuais de classificação para cada tipo de anotação 
+​
+Para abordar essa questão e equilibrar as classes da base, utilizamos o bom 
+desempenho do LLM nessas tarefas para gerar anotações em um novo conjunto de 
+tweets do dia 8 de janeiro de 2023. Mantivemos o mesmo prompt previamente adotado e 
+aplicamos o modelo a mais de 20 mil tweets desse período. As anotações geradas foram 
+validadas por uma pessoa integrante da equipe, que revisou os rótulos atribuídos e 
+selecionou as instâncias necessárias até que se atingisse a quantidade ideal de cada 
+classe antes de sua incorporação ao dataset anotado. Essa etapa adicional teve como 
+objetivo criar um dataset balanceado, com distribuição mais uniforme entre as classes, 
+visando o treinamento de modelos futuros menos enviesados [Santos et. al. 2024]. 
+5.3 Desafios e Divergências no Processo de Anotação 
+O processo de anotação revelou uma série de desafios, principalmente devido à natureza 
+subjetiva e informal dos textos presentes nas redes sociais. A seguir, descrevemos as 
+principais dificuldades encontradas em cada tarefa, bem como as divergências que 
+surgiram entre os anotadores (Tabela 4). 
+​
+A identificação de ironia mostrou-se particularmente desafiadora devido à sua 
+dependência do contexto e do tom do texto. Em muitos casos, a ironia era sutil e não 
+explícita, levando a interpretações divergentes entre os anotadores. A subjetividade à 
+identificação de sarcasmo e humor em textos curtos e informais interferiu na 
+concordância desta tarefa. A classificação de posicionamentos foi afetada pela 
+ambiguidade presente nos tweets. Em alguns casos, os textos continham críticas 
+indiretas ou elogios ambíguos, dificultando a distinção clara entre apoio e oposição. A 
+análise de sentimento enfrentou desafios relacionados à ambiguidade linguística e ao 
+uso de expressões informais. Textos que misturavam palavras positivas e negativas, ou 
+que utilizavam sarcasmo, geraram discordância nas classificações. A falta de contexto 
+adicional em tweets curtos também dificultou a interpretação precisa do sentimento 
+pretendido pelo autor. 
+​
+As divergências observadas destacam a importância de diretrizes claras e 
+detalhadas para orientar os anotadores. Além disso, a necessidade de um processo de 
+validação robusto, envolvendo múltiplos anotadores e, quando possível, o uso de 
+modelos de linguagem para auxiliar na tomada de decisão, mostrou-se essencial para 
+melhorar a consistência das anotações.
+
+Tabela 4 - Divergências na Classificação dos Tweets 
+Caso 
+Exemplo 
+Divergências 
+Ironia 
+“Ônibus de mercernários chegam em Brasília 
+financiados por organizações criminosas. Na 
+visão dos golpistas, a vida (deles) é melhor na 
+mãos de militares, dóceis (com eles) e 
+submissos(a eles) mediante a sua "justa" parte 
+no saque da nação. E terroristas fazem seus 
+"jobs". 😐” 
+A dependência do contexto e do 
+tom torna a identificação de ironia 
+desafiadora. 
+Anotador 1: “Contém Ironia” 
+Anotador 2: “Não Contém 
+Ironia” 
+LLM: “Contém Ironia” 
+Posição 
+“QUE INCRIVEL VC DIZER ISSO: EM 1917 
+O PROPRIO DINO,APOIO QD 
+INCENDIARAM ÓRGÃO EM BRASILIA, SÓ 
+PQ ERA A ESQUERDA, AI TD BE NÉ. NÃO 
+SOU A FAVOR DISSO. MAS VC É UM 
+TRAIDOR DA NAÇÃO. DEEM O CÓDIGO 
+FONTE E O PROBLEMA ACABA. VC TB É 
+RESPONSAVEL POR ISSO.” 
+A ambiguidade na linguagem e a 
+falta de contexto dificultam a 
+classificação clara de apoio ou 
+oposição. 
+Anotador 1: “Contra” 
+Anotador 2: “A Favor” 
+LLM: “Contra” 
+Sentimento 
+“Acho que o que está acontecendo em Brasília 
+é muito pouco por tudo que já fizeram com o 
+povo... E usaram tudo que podiam para trazer 
+ele de volta o descondenado... A revolta do 
+povo é clara, e não é a primeira fez e não é só 
+no Brasil que o povo esta acordando 
+assim...Impeachment” 
+A mistura de palavras positivas e 
+negativas gera divergências na 
+interpretação do sentimento. 
+Anotador 1: “Negativo” 
+Anotador 2: “Neutro” 
+LLM: “Negativo” 
+6. Qualidade da Anotação 
+A qualidade de anotação é fundamental para garantir a precisão e a utilidade dos dados 
+em projetos que dependem da anotação. Para garantir a confiabilidade desses dados, é 
+essencial utilizar métricas de concordância que avaliem a consistência entre diferentes 
+anotadores. O coeficiente Kappa de Fleiss [Fleiss, 1981] é uma das principais métricas 
+usadas nesse contexto, especialmente quando há mais de dois anotadores. Outra métrica 
+amplamente utilizada é o Kappa de Cohen [Cohen, 1960], que mede a concordância 
+entre apenas dois anotadores. Ao contrário de outras métricas que somente observam a 
+porcentagem de concordância, o Kappa de Cohen leva em consideração a probabilidade 
+de concordância ocorrer. Os valores de ambos os Kappas são interpretados conforme a 
+seguinte escala: valores acima de 0,8 indicam uma concordância quase perfeita, entre 
+0,6 e 0,8 sugerem uma concordância substancial, entre 0,4 e 0,6 indicam uma 
+concordância moderada, entre 0,2 e 0,4 uma concordância fraca ou nenhuma 
+concordância [Landis & Koch, 1977]. Essas estatísticas são essenciais para identificar 
+ambiguidade ou subjetividade nas anotações, permitindo ajustes nas orientações. 
+​
+A análise da concordância entre os anotadores humanos para os dados de 
+sentimento, posição e ironia revelou níveis baixos de consistência, como mostrado na 
+Tabela 5. A concordância para a detecção de sentimento foi considerada baixa, 
+indicando variação nas interpretações dos anotadores. A detecção de posição apresentou 
+uma variabilidade significativa entre os anotadores, sugerindo dificuldades na 
+identificação de posicionamentos. Já a detecção de ironia, embora tenha mostrado um
+
+nível de concordância um pouco superior em comparação às outras categorias, ainda 
+apresentou desafios consideráveis devido à subjetividade envolvida. 
+Tabela 5. Coeficientes de Kappa de Cohen e Fleiss para cada tarefa 
+Tipo de Anotação 
+Kappa de Cohen 
+Kappa de Fleiss 
+Detecção de Ironia 
+0.2659 
+0 
+Detecção de Posição 
+0.2029 
+0 
+Detecção de Sentimento 
+0.1834 
+0.2326 
+​
+Apesar dos valores baixos nas métricas de concordância, é relevante observar 
+que houve concordância observada entre os anotadores. Por exemplo, na detecção de 
+sentimento, de 987 casos analisados, 802 mostraram concordância. No entanto, desses 
+802 casos, 778 pertenciam à mesma categoria: negativo. Esses dados sugerem que, 
+apesar das dificuldades em manter uma alta consistência geral, os anotadores foram 
+capazes de identificar o sentimento de forma efetiva. 
+​
+Uma prática eficaz para melhorar a qualidade da anotação é a verificação em 
+pares. Nesse modelo, as anotações feitas por um anotador são revisadas por outro, 
+promovendo uma segunda validação. A verificação em pares ajuda a identificar erros ou 
+inconsistências. Nos processos de anotação apresentados na seção anterior, foi analisada 
+a concordância entre dois anotadores humanos e, caso discordantes, a LLM em conjunto 
+com um outro humano verificou a validação. 
+7. Conclusão 
+Este artigo apresenta o processo de anotação de uma base de dados de tweets em 
+português brasileiro extraídos ao longo do período eleitoral em 2022, em particular, 
+sobre a invasão dos Três Poderes em Brasília, em 08 de janeiro de 2023. A anotação 
+teve como objetivo preparar um recorte da base de dados para o treinamento de modelos 
+de mineração de argumentos em conteúdos de redes sociais. Como resultado principal, 
+foi obtido um dataset balanceado contendo aproximadamente 1000 tweets classificados 
+envolvendo a detecção de posição, ironia e sentimento. Esperamos que este trabalho 
+contribua com a área de análise de redes sociais com a geração e registro de 
+conhecimento sobre o processo de anotação de dados para mineração de argumentos e 
+com a disponibilização futura de bases em português para esta comunidade de pesquisa. 
+​
+O processo permitiu a identificação de um conjunto de desafios logísticos e 
+técnicos. Um dos obstáculos enfrentados foi a montagem da infraestrutura necessária 
+para o processo de anotação. Isso envolveu a disponibilização de recursos 
+computacionais e de ferramentas apropriadas para a tarefa, e a coordenação e orientação 
+de voluntários. Outro desafio relevante foi o desbalanceamento da base de dados. A 
+prevalência desproporcional de certas classes pode interferir no treinamento de modelos 
+futuros. Para solucionar essa questão, utilizamos um LLM, complementado por uma 
+validação manual feita por um integrante da equipe. 
+​
+A natureza do texto encontrado no dataset, muitas vezes bastante informal (com 
+a falta de regras gramaticais e estruturas convencionais), e repleto de ironias, sarcasmos
+
+e gírias, introduziu dificuldades adicionais. A interpretação correta do tom e da intenção 
+por parte dos anotadores foi crucial, mas nem sempre foi uma tarefa fácil. Em relação ao 
+NER, como os resultados da anotação não foram satisfatórios, foi identificada uma 
+necessidade de melhorar o seu processo, com definições mais claras para cada uma das 
+classes, além de considerar o uso de uma ferramenta que automatiza o processo de 
+anotação, como a doccano. 
+​
+Coordenar os voluntários para a oficina foi um desafio significativo. O 
+não-comparecimento de alguns participantes comprometeu o processo de anotação 
+inicialmente planejado, levando a ajustes na distribuição de tarefas durante a oficina. 
+Além disso, a comunicação sobre a importância dos objetivos da anotação para os 
+voluntários foi essencial, mas nem sempre fácil de realizar de maneira eficaz. Esses 
+desafios evidenciam a relevância de uma preparação adequada e do uso de ferramentas 
+flexíveis quando se trabalha com equipes e tarefas diversas. ​ 
+​
+Como próximos passos, na expectativa de obter modelos mais robustos, a equipe 
+planeja realizar uma nova anotação com um corpus maior de dados, de forma híbrida, 
+envolvendo humanos e LLM, com a verificação por pares; e refletir e definir novas 
+estratégias para abordar a anotação de NER. Além disso, pretende-se avançar na 
+consolidação de um processo definido para a anotação de dados voltados 
+especificamente à MA em redes sociais e a realização de experimentos de treinamento 
+de diferentes modelos [Santos et. al. 2024a] com o uso do corpus anotado. 
+Agradecimentos 
+Pesquisa apoiada pela FAPESP (#2021/14772-1) e pelo Fundo Mackenzie de Pesquisa e 
+Inovação. Renata Araujo é bolsista DT-CNPq (#305645/2022-6). Livia dos Santos e 
+Vitor dos Santos foram bolsistas TT1 da FAPESP (#2023/04042-1 e #2023/04752-9). 
+ 
+Referências 
+Arruda, G. D., Roman, N. T. e Monteiro, A. M. (2015). “An Annotated Corpus for 
+Sentiment Analysis in Political News”. Em: Proc. of the 10th Brazilian Symposium in 
+Information and Human Language Technology. Natal/RN. SBC. pp. 101-110. 
+Bertanha, M. C.; Araujo, R. M. (2024). “Linha do Tempo Eleições Presidenciais 2022: 
+evolução da rede social Twitter durante o 8 de janeiro de 2023”. In: Trilha de Temas, 
+Ideias e Resultados Emergentes em Sistemas de Informação - Simpósio Brasileiro de 
+Sistemas de Informação. Juiz de Fora/MG. SBC. pp. 339-344. 
+Bosc, T., Cabrio, E. e Villata, S. (2016). “Tweeties Squabbling: Positive and Negative 
+Results in Applying Argument Mining on Social Media”. Frontiers in Artificial 
+Intelligence and Applications, v. 287. pp. 21–32. 
+Bosc, Tom, Cabrio, E. e Villata, S. (2016a). “DART: a Dataset of Arguments and their 
+Relations on Twitter” Em: Proceedings of the 10th edition of the Language 
+Resources and Evaluation Conference. Portoroz, Slovenia. pp.1258-1263. 
+Cohen, J. (1960). “A coefficient of agreement for nominal scales”. Educational and 
+Psychological Measurement, v. 20, n. 1. pp. 37-46.
+
+Coutinho, V. M. de M. S., e Malheiros, Y. (2020). "Detecção de Mensagens 
+Homofóbicas em Português no Twitter usando Análise de Sentimentos". Em: Anais 
+do IX Brazilian Workshop on Social Network Analysis and Mining. SBC. pp. 1-12. 
+Demszky, D., Movshovitz-Attias, D., Ko, J., Cowen, A.S., Nemade, G., & Ravi, S. 
+(2020) 
+“GoEmotions: 
+A 
+Dataset 
+of 
+Fine-Grained 
+Emotions”. 
+arXiv. 
+arXiv:abs/2005.00547. 
+Fleiss, J. L. (1971). “Measuring nominal scale agreement among many raters”. 
+Psychological Bulletin, v. 76, n. 5. pp. 378-382. 
+Landis, J. R.; Koch, G. G. (1977) The measurement of observer agreement for 
+categorical data. Biometrics, v. 33, n. 1. pp. 159-174. 
+Lawrence, J., Bex, F., Reed, C. e Snaith, M. (2012) “AIFdb: Infrastructure for the 
+Argument Web.” Em: Proceedings of the 6th International Conference on 
+Computational Models of Argument. IOS Press. pp. 515-516. 
+Lawrence, J. e Reed, C. (2020) “Argument mining: A survey”. Computational 
+Linguistics, v. 45(4), pp. 765-818. 
+Lytos, A., Lagkas, T., Sarigiannidis, P., Bontcheva, K. (2019). “The evolution of 
+argumentation mining: From models to social media and emerging tools”. Em: 
+Information Processing & Management, v. 56 (6). 
+Maia. D. F. (2024). “Detecção de Posicionamento do Cidadão em Projetos de Lei”. 
+Dissertação de Mestrado. Programa de Pós-Graduação em Ciência da Computação, 
+Instituto de Informática, Universidade Federal de Goiás, Goiânia. 
+Meta AI. (2024, abril 18). "Introducing Meta Llama 3: The most capable openly 
+available LLM to date". https://ai.meta.com/blog/meta-llama-3/ 
+Moraes, S. M. W., Manssour, I. H., e Silveira, M. S. (2015). “7x1-PT: um Corpus 
+extraído do Twitter para Análise de Sentimentos em Língua Portuguesa”. Em: 
+Proceedings of the 10th Brazilian Symposium in Information and Human Language 
+Technology, Natal/RN. SBC. pp 21–25. 
+Nakayama, H., Kubo, T., Kamura, J., Taniguchi, Y., Liang, X. (2018). “doccano: Text 
+annotation tool for human”. https://github.com/doccano/doccano. 
+Neto, Francisco A. R., Anchiêta, R. T., Moura, R. S., Santana, A. M. (2024). 
+“Abordagem Semi-Supervisionada para Anotação de Linguagem Tóxica”. Em: Anais 
+do XIII Brazilian Workshop on Social Network Analysis and Mining. SBC. pp. 
+116-129. 
+Palau, R. M. e Moens, M. F. (2009). “Argumentation mining: the detection, 
+classification and structure of arguments in text”. Em: Proceedings of the 12th 
+International Conference on Artificial Intelligence and Law. pp. 98-107. 
+Salles, G. T., Coelho, O. B. (2022). “Reconhecimento de Emoções em Mineração de 
+Argumentos com Deep Learning”. Trabalho de Conclusão de Curso. Universidade 
+Presbiteriana Mackenzie. 
+Schaefer, R. e Stede, M. (2021). “Argument Mining on Twitter: A survey”. Information 
+Technology, v. 63, n. 1. pp. 45–58.
+
+Santos, V. B., Santos, L. A., Coelho, O. B., Araujo, R. M., Oliveira, I. C. A. (2024a). 
+“Mineração de Argumentos em Textos de Redes Sociais no Idioma Português”. Em: 
+Anais do XV Simpósio Brasileiro de Tecnologia da Informação e da Linguagem 
+Humana. SBC. pp. 306-316. 
+Santos, L. A., Araujo, R. M., Silva, L. J., Correa, A. G. D., Coelho, O. B., Oliveira, I. C. 
+A. (2024b). “Tweet_Eleições_2022: Um dataset de tweets durante as eleições 
+presidenciais 
+brasileiras 
+de 
+2022” 
+[Data 
+set]. 
+Zenodo. 
+https://doi.org/10.5281/zenodo.11206577. 
+Silva, L. J., Araujo, R. M., Correa, A. G. D. (2024) “Pipeline para monitoramento de 
+discussões políticas no Twitter: estudo de caso com o evento político de 8 de janeiro 
+de 2023”. In: Em: Anais do XIII Brazilian Workshop on Social Network Analysis and 
+Mining. pp. 35-46. 
+Silva, L. J., Santos, L. A., Araujo, R. M., Coelho, O. B., Correa, A. G. D., Oliveira, I. C. 
+A. (2024). “Tweet_Eleições_2022: Um dataset de tweets durante as eleições 
+presidenciais brasileiras de 2022”. Em: Anais do XIII Brazilian Workshop on Social 
+Network Analysis and Mining. SBC. pp. 193-199. 
+Sousa, J.P.S., Nascimento, R. C. U., Araujo, R. M., Coelho, O. B. (2021). “Não se perca 
+no debate! Mineração de Argumentação em Redes Sociais”. Brazilian Workshop on 
+Social Network Analysis and Mining. SBC. pp. 139-150. 
+Stede, M. e Schneider, J. (2019). “Argumentation Mining”. Springer. Synthesis Lectures 
+on Human Language Technologies. 
+Tokuda, N. H., Coelho, O. B., Araujo, R.M. (2021). “Análise de Sentimento por meio de 
+Deep Learning aplicada à Mineração de Argumentos”. Trabalho de Conclusão de 
+Curso. Universidade Presbiteriana Mackenzie. 
+Törnberg, P. (2024). Best practices for text annotation with large language models. arXiv 
+preprint arXiv:2402.05129. 
+Vecchi, E. M., Falk, N., Jundi, I., Lapesa, G. (2021). “Towards Argument Mining for 
+Social Good: A Survey”. Em: Proc. of the 59th Annual Meeting of the Association 
+for Computational Linguistics and the 11th Int. Joint Conf. on Natural Language 
+Processing. .Online. Association for Computational Linguistics. pp. 1338–1352. 
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, T. 
+e Polosukhin, I. (2017). “Attention is All you Need”. Em: Advances in Neural 
+Information Processing Systems. Curran Associates, Inc. 30. 
+Walker, M. A., Tree, J. E. F., Anand, P., Abbott, R. e King, J. (2012). “A Corpus for 
+Research on Deliberation and Debate”. Em: Proc. of the 8th Int. Conference on 
+Language Resources and Evaluation. v. 12. Istanbul, Turkey. pp. 812–817. 
+Zhang, T., Wu, F., Katiyar, A., Weinberger, K. Q., & Artzi, Y. (2020) “Revisiting 
+few-sample BERT fine-tuning”. arXiv preprint arXiv:2006.05987.

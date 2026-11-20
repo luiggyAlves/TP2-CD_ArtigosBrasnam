@@ -1,0 +1,1265 @@
+Exploring Brazilian Cultural Identity
+Through Reading Preferences
+Mariana O. Silva1, Clarisse Scofield1, Gabriel P. Oliveira1,
+Danilo B. Seufitelli1, Mirella M. Moro1
+1Department of Computer Science
+Universidade Federal de Minas Gerais (UFMG) – Belo Horizonte, MG – Brazil
+{mariana.santos,clarissescofield,gabrielpoliveira}@dcc.ufmg.br
+{daniloboechat,mirella}@dcc.ufmg.br
+Abstract. In Brazil, each region has its own cultural identity regarding accent,
+gastronomy, traditions, all of which may reflect in its literature. Specially, we
+believe that country’s background and contextual features are directly related to
+what people read. Hence, we perform a cross-state comparison analysis based
+on Brazilian reading preferences through a multipartite network model. Also,
+we explore the effects of socioeconomic and demographic factors on favorite
+books and literary genres. Such cross-state analyses highlight how the country
+is culturally wealthy, where each region has its own distinctive personality. Our
+findings offer great opportunities for the Brazilian book industry by enhancing
+current knowledge on social indicators related to reading preferences.
+1. Introduction
+Brazil is the largest country in Latin America and the fifth-largest nation in the world.
+It is also known as one of the most diversified countries, and such a diverse background
+highlights its cultural wealth. Indeed, the Brazilian states have their own vocabulary,
+accent, gastronomy, fashion, music, and literature preferences.
+Especially in literature, reading books is a cultural behavior shaped by social,
+economic, and local backgrounds. People choose what to read according to their ideas
+and intellectual realizations, plus their surrounding influence from a social perspective.
+From an economic perspective, cultural access and consumption are directly affected by
+socioeconomic status. Then, from a location perspective, each state or region within a
+country has characteristics that may interfere with reading preferences.
+As a practical example, Figure 1 shows cross-state information regarding the top
+three most-read genres and books in Brazil (dataset in Section 3). Romance, fantasy and
+classic are the preferred genres in the country for regions northeast, southeast and south;
+whereas mystery and adventure are preferred in north and central-west regions. For the
+two main genres, the most read books are the same. However, the south elects “1984” as
+the most read of the classic genre.
+Studying if and how cultural and socioeconomic factors influence reading prefer-
+ences is a valuable tool for book-selling and understanding current cultural trends. More-
+over, such insights may improve recommendation systems of books, sales projections,
+and customer relationship management. With so many perspectives, the book market is
+
+Mystery
+Fantasy
+Romance
+Romance
+Adventure
+Fantasy
+Northeast 
+Romance
+Fantasy
+Classics
+The Fault in Our Stars
+Harry Potter and the Sorcerer's Stone
+The Little Prince
+Fantasy
+Classics
+Romance
+Southeast 
+The Fault in Our Stars
+Harry Potter and the Sorcerer's Stone
+The Diary of a Young Girl
+Central-West
+NORTH
+Romance
+Fantasy
+Classics
+South 
+The Fault in Our Stars
+Harry Potter and the Sorcerer's Stone
+1984
+Angels & Demons
+Harry Potter and the Sorcerer's Stone
+Twilight
+Twilight
+Harry Potter and the Sorcerer's Stone
+Harry Potter and the Prisoner of Azkaban
+Figure 1. Brazilian Literary map with the top-3 most read genres by region.
+bound to prosper. In this context, we analyze similarities and differences among the 26
+Brazilian states and the Federal District based on reading preferences by using data from
+Goodreads.1 We also use a bipartite configuration and a community detection model to
+explore cross-state relationships based on their book and genre preferences. After Related
+Work (Section 2), our contributions are summarized as follows.
+• We build a dataset for genre and book preferences in Brazilian states (Section 3);
+• We model a multipartite network and propose two metrics to assess the cross-state cul-
+tural identity (Section 4); and
+• We analyze the networks from three different perspectives regarding reading prefer-
+ences (Section 5): differences between Brazilian states and regions, demographic and
+socioeconomic relationships, and state identities.
+2. Related Work
+As the world becomes more connected with the Internet and other technological ad-
+vances, people are frequently in touch with foreign cultures. Such a multicultural en-
+vironment is studied by mainly focusing on how cultural differences affect how people
+interact with new technologies, such as social media [Nascimento et al. 2018], online mu-
+sic [Liu et al. 2018, Mondelli et al. 2018], and e-learning [Zhao et al. 2021]. Nonethe-
+less, even a single country may have different cultural aspects within it. For instance,
+although Brazil has a strong cultural identity, it contains several cultural differences be-
+tween its states and regions due to its continental dimensions. Digiampietri et al. assessed
+this regional factor by analyzing the relationships between Brazilian scientists using a
+cross-state social network [Digiampietri et al. 2014]. In addition, Borges de Souza et al.
+identify a significant correlation between cultural differences and how Brazilians from the
+five geographical regions interact with Web interfaces [Borges de Souza et al. 2015].
+Reading preferences are also affected by cultural identities because what peo-
+ple choose to read is highly connected to their language, background, and personal
+beliefs. In such a context, Goodreads is one of the leading social networks for book
+readers.
+Current research on such a platform includes using book reading behav-
+ior to predict best-sellers [Maity et al. 2017], measuring book impact by user reviews
+1Goodreads: https://www.goodreads.com/
+
+[Wang et al. 2019], and using such reviews to extract meaningful characters and their
+relationships [Shahsavari et al. 2020]. Data extracted from Goodreads is also used to un-
+derstand cultural differences between countries. Sabri et al. use a bipartite network model
+to explore cross-country relationships, grouping them in communities based on reading
+preferences [Sabri et al. 2020]. The results indicate that such preferences are highly as-
+sociated with factors such as geographical distance, language, and individualism.
+This paper represents an important step towards understanding the relationship be-
+tween cultural differences and reading habits in the face of all such related work. Brazil’s
+continental nature is a perfect setup for different cultural practices across the 26 states
+and the Federal District. Hence, we wonder if such cultural diversity may also influence
+Brazilians’ reading habits. To the best of our knowledge, we are the first to study book
+preferences and cultural identity in Brazil through a network-based model. Overall, our
+cross-state and cross-region analysis may improve the existing knowledge on Brazilian
+reading preferences, providing benefits for both the academy and the book industry.
+3. Brazilian Readers’ Data at Goodreads
+In this exploratory study, we present an enhanced dataset comprising cultural, geograph-
+ical, and socioeconomic information. We chose the Goodreads website as our principal
+data source due to the sheer volume of data available, as well as its organized and easy-
+access API. We collect Brazilian readers’ data through the goodreads2 library, which pro-
+vides a Python interface for the Goodreads API.3 Specifically, we collect members of two
+of the largest Brazilian reading groups: the “Clube de Leitores em Português” – “Club of
+Readers in Portuguese” (4,229 members), and “Goodreads Brasil” (3,222 members). For
+all members of both groups, we also collect data from their friends. Then, we filter only
+those containing Brazil as the location information from the final users’ set. Finally, with
+the same library, we gather users’ bookshelves to assess their reading preferences.
+To investigate the Brazilian reading identity, we consider a medley of demographic
+and socioeconomic data from the Brazilian Institute of Geography and Statistics (IBGE):4
+territorial area, population estimate, demographic density, Human Development Index
+(HDI), Gross Domestic Product (GDP), and monthly household income per capita. All
+indicators refer to the year 2020, except the HDI that refers to 2017. The data was col-
+lected from February 23 to March 04, 2021. Our final dataset is publicly available and
+comprises 38,231 Brazilian Goodreads users, containing 75,093 distinct books belonging
+to 80 literary genres and six IBGE indicators regarding the 27 federative units of Brazil
+[Silva et al. 2021]. Next, we describe the data cleansing process (Section 3.1) and present
+a condensed exploratory analysis of our final dataset (Section 3.2).
+3.1. Data Cleansing
+In Goodreads, a book’s genre is determined by crowd-sourcing users’ bookshelves. For
+example, if multiple users shelve a book as Science, then that genre is assigned to the book
+by the algorithm. Such a system may include fuzzy and/or noisy tags in the genre list for
+a particular book. Hence, we apply a data cleansing process to consider only meaningful
+2goodreads package: https://github.com/sefakilic/goodreads/
+3Goodreads API: https://www.goodreads.com/api
+4IBGE: https://www.ibge.gov.br/en/cities-and-states
+
+16
+25
+26
+32
+151
+297
+312
+121
+190
+228
+241
+700
+832
+948
+1217
+1316
+51
+69
+442
+3944
+364
+2647
+5217
+13049
+1348
+2151
+2297
+Roraima
+Rondônia
+Amapá
+Acre
+Tocantins
+Pará
+Amazonas
+Sergipe
+Piauí
+Maranhão
+Alagoas
+Paraíba
+Rio Grande do Norte
+Bahia
+Pernambuco
+Ceará
+Mato Grosso do Sul
+Mato Grosso
+Goiás
+Distrito Federal
+Espírito Santo
+Minas Gerais
+Rio de Janeiro
+São Paulo
+Santa Catarina
+Paraná
+Rio Grande do Sul
+Number of readers (log scale)
+North
+South
+Southeast
+Northeast
+Central-West
+A
+0.00
+0.25
+0.50
+0.75
+1.00
+Number of readers
+Non-Capital
+Capital
+B
+North
+Southeast
+Central-West
+Northeast
+South
+75% (642)
+25% (217)
+68% (3956)
+32% (1837)
+97% (4357)
+3% (149)
+66% (14039)
+34% (7238)
+57% (3304)
+43% (2492)
+0.00
+0.25
+0.50
+0.75
+1.00
+Number of readers
+C
+North
+Southeast
+Central-West
+Northeast
+South
+68% (15)
+32% (7)
+59% (87)
+41% (61)
+51% (33)
+49% (32)
+47% (255)
+53% (284)
+54% (91)
+46% (78)
+Female 
+Male
+100
+101
+102
+103
+104
+Figure 2. Goodread readers-related statistics grouped by Brazilian region. (A)
+Number of readers ranked by federative unit within each region. (B) Per-
+centage of readers in state capitals. (C) Percentage of readers by gender.
+tags for each book. To do so, we filter the book’s tag list to contain only genres related to
+Fiction and Nonfiction (see Figure 3). Next, we manually detect and remove inaccurate
+records from the user’s dataset’s location field to keep only Brazilian readers.
+3.2. Exploratory Data Analysis
+We now present a brief Exploratory Data Analysis (EDA) to investigate our processed
+dataset and summarize its main characteristics. Although Goodreads remains a valuable
+source of information on reading habits, we can determine through EDA the best means to
+manipulate and discover patterns in such data. Specifically, we start by analyzing the data
+related to the collected Brazilian readers, and next, we investigate the genres present in
+the dataset. In both analyses, we work with multivariate visualizations for describing data
+and mapping interactions between different variables. There are varied techniques for
+graphical EDA, including histograms, scatter and box plots. However, the most common
+approach used to describe categorical variables is bar plots.
+Figure 2A ranks a grouped bar chart where each group represents a Brazilian
+region, and bars within a group (i.e., region) represent the total number of Brazilian read-
+ers. Figures 2B and 2C show the percentage of readers who live in state capitals and by
+readers’ gender, respectively. Such analyses reveal an evident dominance of the South-
+east region, with the state of São Paulo leading the ranking. Such a region compresses
+approximately 56% of the collected readers, followed by the South and Central-West re-
+gions corresponding to 15% each. Moreover, the vast majority of readers reside in capital
+cities. Such behavior is present in all regions, mainly in the Central-West, where the cap-
+itals are equivalent to 97% of the data. Finally, regarding gender information, there is a
+balanced outcome in general.
+We now focus on the collected book-related information. With more than seven
+thousand distinct books, our dataset includes 80 different genres. Each genre is classified
+into Fiction or Nonfiction categories. Figure 3 breaks down all the collected books by
+category then genre. Within Fiction, most books fall into the Novels genre (125,907
+books), making it the most popular genre. Indeed, in literature, fiction usually refers
+
+Number of books
+1722
+2527
+3369
+3652
+3781
+8352
+11393
+13879
+16196
+22662
+26412
+27352
+27757
+29119
+29193
+30845
+31028
+31490
+38760
+48247
+48639
+57385
+59601
+68459
+70270
+84605
+87001
+87650
+91908
+96522
+96742
+102105
+110103
+125907
+1777
+1873
+2161
+2183
+2202
+2581
+2803
+3214
+4526
+5056
+5737
+5740
+8092
+8120
+8230
+8423
+10063
+10699
+12151
+13896
+13964
+14759
+17712
+17837
+22004
+22373
+23629
+25665
+25951
+28990
+31051
+35076
+52221
+58657
+Fiction
+Nonfiction
+0
+25000
+50000
+75000
+100000
+125000
+0
+25000
+50000
+75000
+Gardening
+Crafts
+Cookbooks
+Humanities
+Folklore
+Environment
+Law
+Marriage
+Architecture
+True-story
+Parenting
+Criticism
+Social-issues
+How-to
+Christianity
+Anthropology
+Music
+Health
+Design
+Travel
+Cultural
+Social-science
+Academic
+Spirituality
+Economics
+Art
+Leadership
+Sociology
+Education
+Reference
+Religion
+Business
+Self-help
+Biography
+Politics
+Science
+Psychology
+Philosophy
+History
+Realisticfiction
+Folk-tales
+Westerns
+Pulp
+Media-tie-in
+Christian-fiction
+Tragedy
+Womens-fiction
+Plays
+Retellings
+Gothic
+Epic
+Magical-realism
+Juvenile
+Short-stories
+Speculative-fiction
+Family
+Chick-lit
+Horror
+Action
+Suspense
+Childrens
+Humor
+Thriller
+Sci-fi
+Literary-fiction
+Mystery
+Historical
+Adventure
+Drama
+Adult-fiction
+Literature
+Young-adult
+Classics
+Fantasy
+Romance
+Contemporary
+Book-club
+Novels
+2061
+4
+66
+248
+730
+1329
+160
+290
+1399
+954
+Figure 3. Breakdown of collected books into genre categories of (left) Fiction and
+(right) Nonfiction.
+to a novel, one of the longest forms of literary prose. In the second place, Book-club has
+110,103 books, which is more than twice the number of books in Sci-fi, the 15th place with
+48,247 books. Previous research shows the growing popularity of the Fiction category
+[Yucesoy et al. 2018]. Likewise, there is explicit predominance of such a category in
+our dataset, comprising about 76% of the books. To conclude, among nonfiction books,
+approximately 45% of the collected books belong to History, Philosophy, Psychology,
+Science, Politics, and Biography.
+4. Methodology
+Having collected the data, our methodology follows by modeling two bipartite networks
+to assess the cross-state reading identity (Section 4.1). Then, we apply a graph-level
+statistic test to explore the significance of demographic and socioeconomic indicators on
+reading preferences (Section 4.2).
+4.1. Multipartite Network Modeling
+To investigate reading preferences between Brazilian states, we need to calculate cross-
+state cultural distances. To do so, we create a u×b matrix (denoted by UB) in which each
+row represents a Goodreads user, and each column represents a unique book. UB[i][j]
+is set to one if book j is present in the bookshelf of user i. As previously mentioned,
+each book includes multiple tags that its readers assign. Therefore, after performing the
+cleansing steps specified in Section 3.1, we connect each book in the user-book bipartite
+network to the list of its Top-3 genres5. In addition, we connect each user to its Brazilian
+state, finally creating a state-user-book-genre multipartite network, as illustrated by a
+generic example in Figure 4.
+The multipartite network connects a Brazilian state to a Goodreads user, and each
+user is connected to one or more books. In turn, each book is connected to a list of gen-
+res. Such a complete composition can be projected into six different bipartite networks,
+5The length of the genres list ranges from one to three items.
+
+g1
+g2
+g3
+...
+gn
+b1
+b2
+b3
+...
+bn
+u1
+u2
+u3
+...
+un
+s1
+s2
+s3
+...
+sn
+Books
+Genres
+Users
+States
+Figure 4. The state-user-book-genre multipartite network diagram.
+each generated by omitting one node type from the multipartite projection. Here, we are
+interested only in two bipartite networks: one connecting states and books and another
+connecting states and genres. We then create the s × b adjacency matrix (denoted by
+SB), with rows and columns representing the states and books, respectively. SB[i][j] is
+set to one if book j is present in the users’ bookshelves residing in the Brazilian state i.
+Likewise, we also create the state-genre matrix SG.
+Finally, after creating the adjacency matrices, we proceed to calculating the cross-
+cultural distances: book and genre distances. To do so, we compute the cosine similarity
+for each adjacency matrix created. The cosine similarity between two states i and i′ is
+given by 1 −
+u·v
+∥u∥2∥v∥2, where u · v is the dot product of vectors u and v, which represent
+two 1-D arrays [i][ : ] and [i′][ : ] of the respective adjacency matrix (SB or SG).
+4.2. Cross-state distances
+In order to examine the significance of the relationship between the Brazilian socioeco-
+nomic and demographic landscape and the reading preferences (cultural distances), we
+define the following cross-state distance measures:
+• Geographical Distance: considers the latitude and longitude of each state capital and
+measures the geodesic distance between pairs of states.
+• Demographic and Socioeconomic Distances: calculated between state pairs using the
+Canberra distance [Lance and Williams 1966, Lance and Williams 1967], a weighted
+version of the Manhattan distance. Such distances are separately calculated for each
+IBGE indicator listed in Section 3.
+Having calculated all the cross-state distances, we apply the Quadratic Assign-
+ment Procedure (QAP) [Simpson 2001] test to examine whether such measures are sig-
+nificantly associated with the reading preferences.
+The QAP test is commonly used
+in social network analysis and achieves high statistical powers when performed on
+different types of complex networks [Krackardt 1987, Choi et al. 2006, Liu et al. 2018,
+Fredrickson and Chen 2019]. Moreover, it is a useful tool for analyzing dyadic datasets,
+i.e., datasets where pairs of entities are analyzed, which is our case. To perform the QAP
+test, we employ the qaptest function provided in R’s SNA package [Butts 2020].
+5. Results
+In this section, our main goal is to provide meaningful insights into the Brazilian reading
+identity and associations between socioeconomic and demographic indicators. In partic-
+ular, we are interested in the following research questions (RQs):
+
+Central−West
+North
+Southeast
+Northeast
+South
+Central−West
+North
+Southeast
+Northeast
+South
+Regions of Brazil
+0
+0.78
+0.69
+0.68
+0.68
+0
+0.81
+0.78
+0.79
+0
+0.67
+0.67
+0
+0.68
+0
+A
+DF
+MS
+GO
+MT
+DF
+MS
+GO
+MT
+Central−West Region, Brazil
+D
+PA
+TO
+AM
+RR
+AP
+AC
+RO
+PA
+TO
+AM
+RR
+AP
+AC
+RO
+North Region, Brazil
+B
+RJ
+MG
+ES
+SP
+RJ
+MG
+ES
+SP
+Southeast Region, Brazil
+E
+CE
+PE
+RN
+PB
+BA
+MA
+SE
+AL
+PI
+CE
+PE
+RN
+PB
+BA
+MA
+SE
+AL
+PI
+Northeast Region, Brazil
+C
+RS
+PR
+SC
+RS
+PR
+SC
+South Region, Brazil
+F
+0
+0.88
+0.87
+0.94
+0.92
+0.91
+0.98
+0
+0.9
+0.94
+0.95
+0.91
+0.97
+0
+0.93
+0.92
+0.92
+0.97
+0
+0.96
+0.98
+0.96
+0
+0.96
+0.99
+0
+0.99
+0
+0
+0.76 0.77 0.78 0.78 0.83 0.89 0.85 0.88
+0
+0.79 0.78 0.79 0.83 0.88 0.85 0.87
+0
+0.79 0.79 0.84 0.89 0.85 0.88
+0
+0.8 0.82 0.89 0.85 0.88
+0
+0.84 0.88 0.84 0.88
+0
+0.88 0.87 0.89
+0
+0.89 0.91
+0
+0.91
+0
+0
+0.7
+0.84
+0.66
+0
+0.82
+0.7
+0
+0.86
+0
+0
+0.73
+0.75
+0
+0.75
+0
+0
+0.91
+0.82
+0.91
+0
+0.87
+0.87
+0
+0.89
+0
+0.00
+0.25
+0.50
+0.75
+1.00
+distance
+Figure 5. Cross-state Cultural Distance based on shared books.
+RQ1. Are there significant differences between Brazilian states/regions concerning read-
+ing preference? (Section 5.1)
+RQ2. Is there a demographic or socioeconomic relationship in the reading preference
+in the Brazilian population? (Section 5.2)
+RQ3. Is it possible to identify distinct cultural identities in Brazil based on the states’
+reading preferences? (Section 5.3)
+5.1. Cross-state Cultural Analysis
+Initially, we perform a cross-state comparison to explore the similarities and differences
+based on people’s favorite books and genres. To avoid bias results, we grouped the Brazil-
+ian states into regions. Figures 5 and 6 present the cross-cultural distance (cosine distance)
+of books and genre preferences, respectively. The cosine distance is bounded within [0, 1],
+where a small value indicates a smaller distance between the respective pairs of states. In
+both figures, shades of green suggest cultural proximity, whereas orange tones indicate a
+cross-cultural distance. Overall, book-based distances are considerably larger than those
+based on genres, as the preference for books is naturally more specific. Besides, the
+available book search space is more extensive (75,093 books versus 80 genres).
+From an inter-cluster perspective, the north region is more distant from the others
+regarding personal bookshelves (Figure 5A). Being the most extensive region in Brazil,
+covering approximately 45% of the entire national territory, its demographic indicators
+may be directly related to such a wide area. On the intra-cluster scale, the north (0.94 on
+average), central-west (0.88 on average), and northeast (0.84 on average) regions are the
+most diverse. The south and southeast regions have a milder level of diversity compared
+to an average cosine distance equal to 0.76 and 0.74, respectively. Even so, the state of
+Espírito Santo (ES) is notably more distant than other states within the southeast region.
+
+South
+Northeast
+Central-West
+North
+Southeast
+South
+Northeast
+Central-West
+North
+Southeast
+Regions of Brazil
+A
+GO
+MT
+DF
+MS
+GO
+MT
+DF
+MS
+Central−West Region, Brazil
+D
+0
+0.33
+0.33
+0.46
+0.34
+0
+0.33
+0.45
+0.35
+0
+0.44
+0.37
+0
+0.53
+0
+0
+0.63
+0.52
+0.65
+0
+0.71
+0.63
+0
+0.77
+0
+PA
+RO
+RR
+TO
+AC
+AM
+AP
+PA
+RO
+RR
+TO
+AC
+AM
+AP
+North Region, Brazil
+B
+RJ
+MG
+ES
+SP
+RJ
+MG
+ES
+SP
+Southeast Region, Brazil
+E
+0
+0.72
+0.73
+0.56
+0.65
+0.5
+0.71
+0
+0.8
+0.69
+0.71
+0.71
+0.66
+0
+0.74
+0.74
+0.72
+0.76
+0
+0.64
+0.58
+0.65
+0
+0.68
+0.68
+0
+0.72
+0
+0
+0.36
+0.57
+0.33
+0
+0.53
+0.38
+0
+0.62
+0
+MA
+PE
+PI
+BA
+RN
+PB
+AL
+CE
+SE
+MA
+PE
+PI
+BA
+RN
+PB
+AL
+CE
+SE
+Northeast Region, Brazil
+C
+RS
+PR
+SC
+RS
+PR
+SC
+South Region, Brazil
+F
+0
+0.53 0.54 0.51 0.5
+0.5 0.51 0.52 0.55
+0
+0.56 0.42 0.41 0.43 0.52 0.41 0.62
+0
+0.53 0.54 0.52 0.55 0.57 0.55
+0
+0.43 0.43 0.5 0.42 0.59
+0
+0.43 0.5 0.43 0.6
+0
+0.52 0.43 0.59
+0
+0.53 0.55
+0
+0.62
+0
+0
+0.36
+0.38
+0
+0.39
+0
+0.00
+0.25
+0.50
+0.75
+1.00
+distance
+Figure 6. Cross-state Cultural Distance based on shared genres.
+Regarding distances based on genres, Figure 6 reports similar results, although not
+as pronounced as in book preferences. The north region remains the most distant among
+all. Also, on the intra-cluster scale, north (0.68 on average), central-west (0.65 on aver-
+age), and northeast (0.51 on average) regions are the most diverse. Such results support
+the presence of differences (and similarities) between Brazilian states and regarding read-
+ing preference (RQ1). Next, we assess which factors may significantly contribute to the
+cross-state cultural discrepancy by applying statistical tests.
+5.2. Cross-state Demographic and Socioeconomic Analysis
+To answer our second research question, we perform QAP tests to investigate the sig-
+nificance of socioeconomic and demographic factors on reading preferences in differ-
+ent states. In particular, the QAP test is commonly used in social network analysis to
+determine whether there is any statistical association between two adjacency matrices
+[Krackardt 1987]. Here, the dependent variables are matrices of cross-state cultural dis-
+tances in book and genre preferences. The independent variables are matrices of cross-
+state geographical, demographic, and socioeconomic distances. Table 1 reports the QAP
+correlation coefficients among each adjacency matrix.
+To evaluate the correlation results, we use Cohen’s convention [Cohen 2013] to
+interpret the effect size: small (0.1 to 0.3), medium (0.3 to 0.5), and large (0.5 to 1.0). As
+expected, we confirm a strong and significant association between the cross-state cultural
+distances. Consequently, both analyses resulted in similar relationships between the vast
+majority of indicators analyzed, except for the GDP and the population estimate, which
+is stronger in the genre-based relationship. We also performed the same statistical analy-
+sis for each Brazilian region separately.6 However, the outcomes revealed no significant
+6Full results are available in Project Bàde homepage: https://bit.ly/proj-bade
+
+Table 1. The QAP correlation results. Cross-marked values indicate the correla-
+tion is not statistically significant (p ≥0.05).
+Factors
+corr
+Books
+Genre distance
+0.914
+Geographical locations
+0.313
+Gross Domestic Product
+0.276
+Demographic density
+0.200
+Human Development Index
+×
+Monthly household income
+×
+Territorial area
+×
+Population estimate
+0.337
+Factors
+corr
+Genres
+Book distance
+0.914
+Geographical locations
+0.344
+Gross Domestic Product
+0.453
+Demographic density
+0.291
+Human Development Index
+×
+Monthly household income
+×
+Territorial area
+×
+Population estimate
+0.409
+association at the regional level. A possible explanation is that there may be distinct so-
+cial contexts within each region and, therefore, the cross-region socioeconomic distances
+cannot explain the diversity in reading preference.
+Overall, most of the significant relationships are positive and moderate, including
+the geographical distance (0.313 and 0.344), the GDP (0.453), and the population estimate
+(0.337 and 0.409). Such findings support that demographic and socioeconomic factors
+can directly impact the literary choices of the Brazilian population (RQ2), as given by
+Goodread users. However, the remaining indicators (demographic density, HDI, monthly
+household income, and territorial area) showed non-significant associations, with weak
+or insubstantial effect sizes. Considering some indicators individually (as a unique fac-
+tor) may explain such a lack of solid and significant correlations. Perhaps studying the
+combination of certain external factors could reflect an improved association.
+5.3. Brazilian Reading Identities
+To explore the Brazilian cultural identity through reading preferences, we first model two
+unimodal projections based on the state-book and state-genre bipartite networks. In both
+graphs, two states have a weighted edge when shared books/genres are in their popula-
+tion’s bookshelves. Next, with the unipartite networks modeled, we can apply a com-
+munity detection algorithm to identify clusters of states with their own cultural identities.
+However, to do so, we need a method for determining significant associations in the state’s
+projection network.
+A simple approach to finding significant edges in unimodal projections is to pre-
+serve only links for which the weight beats a specific threshold. This approach, however,
+systematically overlooked nodes with a small strength (the sum of weights attached to ties
+belonging to a node). As a result, compelling features and structures below the cut-off
+scale are drastically removed. To address such a problem, we use the disparity filter pro-
+posed by [Serrano et al. 2009]. The filtering method extracts the relevant backbone from
+a weighted network and, at the same time, retains most of its nodes, total weight, global
+connectedness, small-world property, heterogeneous degree distribution, and clustering.
+Figure 7 shows the pre-filtering and post-filtering of the book-based unipartite network.
+We use the ‘backbone’ function provided in R’s disparityfilter package7 to apply
+the disparity filter algorithm in both unipartite networks. Specifically, the ‘backbone’
+function identifies the “backbone structure” of a weighted graph using the disparity filter
+7disparityfilter: https://CRAN.R-project.org/package=disparityfilter
+
+A
+B
+Bahia
+Distrito Federal
+Espírito Santo
+Goiás
+Mato Grosso
+Mato Grosso do Sul
+Minas Gerais
+Paraná
+Alagoas
+Amazonas
+Ceará
+Maranhão
+Paraíba
+Pará
+Pernambuco
+Piauí
+Rio Grande do Norte
+Acre
+Amapá
+Rondônia
+Roraima
+Tocantins
+Rio de Janeiro
+Rio Grande do Sul
+Santa Catarina
+Sergipe
+São Paulo
+Bahia
+Distrito Federal
+Espírito Santo
+Goiás
+Mato Grosso
+Mato Grosso do Sul
+Minas Gerais
+Paraná
+Alagoas
+Amazonas
+Ceará
+Maranhão
+Paraíba
+Pará
+Pernambuco
+Piauí
+Rio Grande do Nort
+Acre
+Amapá
+Rondônia
+Roraima
+Tocantins
+Rio de Janeiro
+Rio Grande do Sul
+Santa Catarina
+Sergipe
+São Paulo
+Figure 7. Comparison of the book-based unipartite network in (A) the pre-filtering
+and (B) the post-filtering.
+AM
+PA
+AC
+RR
+MT
+AP
+TO
+GO
+MS
+RO
+MA
+RS
+SC
+PR
+PI
+CE
+RN
+PB
+PE
+AL
+SE
+BA
+MG
+SP
+ES
+RJ
+DF
+A
+AM (2)
+PA (2)
+AC (1)
+RR (2)
+MT (5)
+AP (2)
+TO (1)
+GO (6)
+MS (7)
+RO (2)
+MA (2)
+RS (15)
+SC (14)
+PR (13)
+PI (2)
+CE (2)
+RN (2)
+PB (2)
+PE (2)
+AL (2)
+SE (3)
+BA (4)
+MG (9)
+SP (12)
+ES (10)
+RJ (11)
+DF (8)
+B
+AM (2)
+PA (2)
+AC (1)
+RR (2)
+MT (5)
+AP (2)
+TO (1)
+GO (6)
+MS (7)
+RO (2)
+MA (2)
+RS (15)
+SC (14)
+PR (13)
+PI (2)
+CE (2)
+RN (2)
+PB (2)
+PE (2)
+AL (2)
+SE (3)
+BA (4)
+MG (9)
+SP (12)
+ES (10)
+RJ (11)
+DF (8)
+C
+Figure 8. Groupings of Brazilian states: (A) regions, (B) book-based, and (C)
+genre-based unipartite network communities. Shades of gray indicate iso-
+lated communities.
+algorithm. In the algorithm, the preserved edges (i.e., relevant edges) have weights statis-
+tically different from what is expected by chance at the significance level alpha. Thus, we
+chose an alpha that maximizes the number of remaining nodes in the network and mini-
+mizes the average node degree. Finally, we performed the Louvain community detection
+algorithm [Blondel et al. 2008] on the resulting networks.
+Figure 8 shows three different groupings of the Brazilian states: (A) regions, (B)
+and (C) communities detected on the unipartite projections after removing statistically in-
+significant edges. The states with identical colors belong to the same community. For both
+book and genre resulting networks, the Louvain algorithm returned 15 different commu-
+nities. Both grouping results reported a union of most of the north and northeast regions
+(except for the states of Bahia and Sergipe), as opposed to previous results. Moreover,
+some northern states gathered into a separate community, while the other Brazilian states,
+on the other hand, appear in unique communities. The disparity filter and, as a result, the
+statistical connections explain such controversial classification.
+Answering our RQ3, we can assume it is possible to classify distinct reading iden-
+tities in Brazil based on the states’ reading preferences. However, the grouping of states
+depends directly on how cross-state connections are explored. By relying exclusively
+
+on the cultural distances, the northern region stands out culturally, whereas the others
+are more similar to each other. On the other hand, by evaluating the statistically signif-
+icant connections, the north and northeast regions form two distinct communities, with
+the other states forming unique communities. Overall, according to our findings, most
+Brazilian states do have their characteristics in the form of reading preferences.
+6. Conclusion
+In this paper, we explored the diverse Brazilian cultural identities through reading prefer-
+ences. We shed light on cross-state differences and similarities based on their book and
+genre preferences. Additionally, through QAP tests, we revealed significant relationships
+between cultural distances and geographical, demographic, and socioeconomic indica-
+tors. Finally, we also used a bipartite projection and a community detection method to
+assess statistical significance relationships between states based on their reading prefer-
+ences. Overall, our findings reinforce the cultural richness of Brazil, emphasizing that
+each state and region holds its own culture when it comes to what people chose to read.
+Such results provide insights into the driving forces behind Brazilian reading choices,
+indicating great opportunities for both the academy and the book industry.
+From an academic view, this work represents a step further in interdisciplinary
+research fields involving Computer Science, Anthropology, and Sociology. For instance,
+knowledge from cultural behavior patterns may improve the accuracy of recommenda-
+tion systems and prediction models. Besides understanding regional reading preferences,
+the Brazilian editorial market could properly direct its efforts to promote specific book
+releases for each region and state. Similarly, the government could benefit from such
+knowledge by investing in tax incentive policies to encourage reading habits since Brazil
+has lost more than 4.6 million readers from 2015 to 2019.8 Overall, such investments
+directly impact the population by guaranteeing easy access to culture as well as raising
+literacy and other educational indicators.
+Limitations and Future Work. Although Goodreads remains a valuable source of in-
+formation on reading habits, our findings can be biased since our final dataset does not
+reflect the preferences of the whole Brazilian population (See Figure 2). Therefore, as fu-
+ture work, we plan to expand our data collection to better cover readers from all Brazilian
+regions, enhancing future analysis. Furthermore, we plan to explore other social indica-
+tors and consider combinations of such factors, aiming at stronger and more significant
+associations between cultural distances.
+Acknowledgments. The work is supported by CNPq and CAPES, Brazil.
+References
+Blondel, V. D. et al. (2008). Fast unfolding of communities in large networks. Journal of
+Statistical Mechanics: Theory and Experiment, 2008(10):P10008.
+Borges de Souza, T. R. C. et al. (2015). Brazilian cultural differences and their effects
+on the web interfaces user experience. In Int’l Conf Cross-Cultural Design Methods,
+Practice and Impact, pages 209–220.
+8Agência Brasil, (April 15, 2021). https://bit.ly/34EijlY
+
+Butts, C. T. (2020). sna: Tools for Social Network Analysis. R package version 2.6.
+Choi, J. H. et al. (2006). Comparing world city networks: a network analysis of internet
+backbone and air transport intercity linkages. Global Networks, 6(1):81–99.
+Cohen, J. (2013). Statistical power analysis for the behavioral sciences. Academic press.
+Digiampietri, L. et al. (2014). Análise da rede dos doutores que atuam em computação
+no brasil. In BraSNAM, pages 33–44.
+Fredrickson, M. M. and Chen, Y. (2019). Permutation and randomization tests for network
+analysis. Social Networks, 59:171–183.
+Krackardt, D. (1987). Qap partialling as a test of spuriousness. Social networks, 9(2):171–
+186.
+Lance, G. N. and Williams, W. T. (1966). Computer Programs for Hierarchical Polythetic
+Classification (“Similarity Analyses”). The Computer Journal, 9(1):60–64.
+Lance, G. N. and Williams, W. T. (1967). Mixed-data classificatory programs i - agglom-
+erative systems. Australian Computer Journal, 1(1):15–20.
+Liu, M. et al. (2018). The relation of culture, socio-economics, and friendship to music
+preferences: A large-scale, cross-country study. PloS one, 13(12):e0208186.
+Maity, S. K. et al. (2017). Book reading behavior on goodreads can predict the amazon
+best sellers. In ASONAM, pages 451–454.
+Mondelli, M. L. B. et al. (2018). O que os países escutam: Analisando a rede de gêneros
+musicais ao redor do mundo. In BraSNAM. SBC.
+Nascimento, M. L. et al. (2018). Uma análise do fator cultural em tecnologias persuasivas:
+um estudo de caso da rede social facebook. In BraSNAM. SBC.
+Sabri, N. et al. (2020).
+A cross-country study on cultural similarities based on book
+preferences. Soc. Netw. Anal. Min., 10(1):86.
+Serrano, M. Á. et al. (2009). Extracting the multiscale backbone of complex weighted
+networks. Proceedings of the National Academy of Sciences, 106(16):6483–6488.
+Shahsavari, S. et al. (2020). An automated pipeline for character and relationship extrac-
+tion from readers literary book reviews on goodreads.com. In WebSci, pages 277–286.
+Silva, M. O., Scotfield, C., Oliveira, G. P., Seufitelli, D. B., and Moro, M. M. (2021).
+BraCID: Brazilian Cultural Identity Information Through Reading Preferences.
+Simpson, W. (2001). Qap: The quadratic assignment procedure. North American Stata
+Users’ Group Meetings 2001 1.2.
+Wang, K. et al. (2019). Exploring goodreads reviews for book impact assessment. J.
+Informetrics, 13(3):874–886.
+Yucesoy, B., Wang, X., Huang, J., and Barabási, A. (2018). Success in books: a big data
+approach to bestsellers. EPJ Data Sci., 7(1):7.
+Zhao, Y. et al. (2021). Do cultural differences affect users’ e-learning adoption? A meta-
+analysis. Br. J. Educ. Technol., 52(1):20–41.

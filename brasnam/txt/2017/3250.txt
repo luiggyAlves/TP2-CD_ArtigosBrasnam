@@ -1,0 +1,867 @@
+Construção e Análise das Redes Sociais de Personagens dos
+Filmes da Franquia O Senhor dos Anéis
+Victoria Patrícia Aires, Paulo Rodrigo Martins, Fabiola Nakamura
+Instituto de Computação – Universidade Federal do Amazonas (UFAM)
+69077-000 – Manaus – AM – Brasil
+{vpsa,prom,fabiola}@icomp.ufam.edu.br
+Abstract. This article focuses on character networks, which are social networks
+that presents complex network properties. The strategy to build the network of
+characters of a movie is using the same script, that contains information such
+as the beginning of a scene, the characters that appear and dialogues. Usu-
+ally, algorithms to build the social network considers only characters who have
+speeches in scene. In this paper, we present a metodology that also considers
+the characters that were quoted or just appear in the scene. We use the Lord of
+the Rings franchise to apply the metodology, building and analysing the charac-
+ter networks, answering who are the protagonists according to three centrality
+measures: weighted degree, betweeness and PageRank.
+Resumo. Este artigo tem como foco as redes de personagens, que são um tipo
+de rede social, apresentando propriedades de redes complexas. Para construir a
+rede de personagens de um filme, uma estratégia é usar o script do mesmo, que
+contém informações como o início de uma cena, os personagens que aparecem
+e diálogos. Em geral, a construção da rede social leva em conta apenas os
+personagens que possuem falas em cada cena. Neste trabalho, apresentamos
+uma metodologia que leva em consideração também personagens citados ou
+que apenas aparecem nas cenas. Utilizamos os filmes da franquia O Senhor dos
+Anéis para a aplicação da metodologia, construindo a rede de personagens e
+posteriormente analisando, respondendo quem são os protagonistas de acordo
+com três medidas de centralidade: grau ponderado, intermediação e PageRank.
+1. Introdução
+Redes sociais são redes que modelam relacionamentos e interações sociais, tais como
+amizades, trabalho e colaboração em artigos. Neste contexto, existem as redes de perso-
+nagens, um tipo particular de rede social. Elas representam os relacionamentos entre per-
+sonagens de um filme. Sendo um tipo de rede social, elas possuem características de redes
+complexas, como atributos de mundo pequeno (small world), comunidades bem definidas
+e distribuição desigual de grau [Bonato et al. 2016]. Além disso, possuem a particulari-
+dade de refletir o enredo do filme, ao tornar explícitas as conexões entre personagens, des-
+tacando núcleos formados ao longo da história através de suas comunidades. Estas redes
+encontram correlações com situações no mundo real, como a representação de uma rede
+de criminosos, uma rede de políticos, ou outras situações onde existem relacionamentos
+documentados que possuem dinamicidade e evolução temporal [Spadon et al. 2016].
+Na literatura, existem trabalhos que extraem redes sociais de personagens de obras
+literárias e cinematográficas. No caso específico dos filmes, a extração é feita a partir
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+599
+
+do script do filme. O site Movie Galaxies [Kaminski et al. 2012] contém redes sociais
+extraídas de diversos filmes. Porém, a extração é feita observando apenas os personagens
+que falam em cada cena. Assim, personagens importantes, mas que não possuem falas,
+não são representados na rede social e o resultado final pode não ser uma modelagem
+adequada.
+Neste trabalho, o objetivo é propor uma metodologia para construção de redes de
+personagens de filmes, dados o script e a lista de personagens. Esta construção leva em
+conta os personagens que dialogam nas cenas ou apareceram, porém sem falar. Desta
+forma, é possível construir uma rede de personagens mais abrangente, incluindo perso-
+nagens sem falas (como animais e robôs, por exemplo). Aplicamos a estratégia aos três
+filmes da franquia O Senhor dos Anéis e também à trilogia como um todo, e após análise,
+responde-se quem são os protagonistas do filme de acordo com as medidas de centralidade
+(grau, intermediação e PageRank). A franquia O Senhor dos Anéis foi escolhida devido
+à estrutura de seu enredo, uma jornada onde as interações e influência dos personagens
+mudam através dos filmes. Acreditamos que, devido a esta dinamicidade, é interessante
+analisar de que forma os filmes são modelados em redes complexas e verificar o quanto
+estas redes refletem o enredo dos filmes.
+As principais contribuições deste trabalho são: apresentação de uma metodolo-
+gia para extração da rede social de personagens de filmes, utilizando o script e a lista de
+personagens do mesmo. Diferente de outros trabalhos presentes na literatura, esta me-
+todologia leva em consideração tanto personagens que possuem falas quanto os que são
+apenas citados ou aparecem em uma cena. Ao final, a metodologia é aplicada aos três
+filmes da franquia O Senhor dos Anéis para construção das redes de personagens e pos-
+terior análise por meio de medidas de centralidade em redes complexas, revelando quem
+são os personagens protagonistas de cada filme e da trilogia como um todo.
+O restante do artigo está organizado da seguinte forma: a Seção 2 apresenta uma
+visão geral dos trabalhos relacionados. A Seção 3 aponta como foi feita a modelagem das
+redes de personagens. A Seção 4 traz as métricas utilizadas durante o trabalho. Já a Seção
+5 contém os resultados obtidos e, por fim, a Seção 6 traz as considerações finais, seguida
+das referências.
+2. Trabalhos Relacionados
+Esta seção sumariza alguns trabalhos que realizam extração de redes de personagens de
+filmes. Eles se diferenciam principalmente pela técnica utilizada, envolvendo conceitos
+de aprendizagem de máquina, reconhecimento facial e expressões regulares.
+Em [Park et al. 2012] o foco está em construir a rede de personagens levando
+em conta aqueles que falam em cada cena e classificá-los quanto a papéis principais,
+secundários e extras. É realizada a sincronização entre o script do filme e as legendas. O
+lado positivo desta abordagem está no uso da centralidade de grau (degree centrality) para
+classificar os personagens em papéis. O lado negativo é que alguns foram incorretamente
+classificados, até mesmo personagens importantes, pois o contexto dos diálogos e ações
+não é levado em conta, o que acabou causando uma falha no método.
+O trabalho de [Weng et al. 2007] também é baseado em papéis (roles). A rede so-
+cial de papéis é usada para identificar comunidades e detectar suas relações com o enredo.
+XXXVII Congresso da Sociedade Brasileira de Computação
+600
+
+São usadas técnicas de reconhecimento facial para determinar os nós (roles) da rede. O
+cenário escolhido compreende apenas filmes bilaterais, geralmente com comunidades que
+representam o bem e o mal. São identificados nós determinantes (leading roles) na rede
+de papéis através de medidas de centralidade de grau. Então, determina-se as comunida-
+des que circundam cada uma das leading roles. O artigo possui certo viés, uma vez que
+analisa apenas filmes bilaterais, com uma estrutura praticamente pré-determinada. Por
+exemplo, filmes que contam com o lado do bem e do mal bem definidos, onde o caráter
+dos personagens é explícito. Além disso, a detecção de cenas e reconhecimento facial
+foram feitas manualmente, sendo assim inapropriadas ao presente contexto.
+Já em [Agarwal et al. 2014], a estratégia é receber um script e assinalar à cada
+linha uma tag indicando se a mesma é o início de uma cena, uma descrição de cena, o
+nome de um personagem, um diálogo ou um meta-dado sobre o script. Isto é utilizado
+para a construção da rede social de personagens de um filme. A abordagem escolhida é
+aplicar uma técnica de aprendizagem de máquina para realizar esta marcação no script,
+comparando com o método de expressões regulares. A rede foi construída ao adicionar
+um link a dois personagens que aparecem em uma mesma cena. Esta técnica não leva
+em conta personagens que foram apenas citados ou não possuem falas, o que pode levar
+a uma representação incorreta da importância de um personagem. Outro problema está
+no fato de personagens aparecerem no script com apelidos ou pseudônimos. Estes pontos
+serão tratados no presente trabalho.
+3. Modelagem da Rede
+Uma rede social é uma espécie de rede complexa. Estas redes possuem as seguintes
+características [Shen 2013]:
+• A distribuição de grau dos vértices é desigual e segue a lei de potência: há muitos
+vértices de grau pequeno, e poucos vértices com muitas conexões. Isto faz com
+que a importância (ou centralidade) dos vértices varie na rede.
+• Existe a propriedade small-world (mundo pequeno): a distância entre quaisquer
+dois vértices na rede é pequena em relação ao número total de vértices e arestas
+total.
+• Há estrutura de comunidades bem definida: alguns elementos são mais conectados
+entre si do que com outros na rede, formando agrupamentos ou clusters.
+No contexto de redes sociais, que modelam interações sociais entre um grupo
+de indivíduos, estas características podem indicar quais os indivíduos mais influentes na
+rede; o quanto duas pessoas que não se conhecem estão próximas; e quais os indivíduos
+associados, direta ou indiretamente, por meio de interesses em comum ou similaridades
+entre si.
+A extração da rede social de cada filme tem como base o script ou screenplay
+do mesmo. Um script contém a descrição de cada cena, bem como os personagens que
+aparecem e as falas daqueles que se manifestam nela. Estas informações estão dispostas
+seguindo um formato semi-regular, permitindo o uso de um programa baseado em ex-
+pressões regulares para extrair os dados necessários para a construção da rede social. A
+Figura 1 apresenta um exemplo de uma cena em um script.
+Neste trabalho, fazemos uso do script e da lista de personagens do filme para
+compor a rede social de personagens. Para a execução dos experimentos, foram utiliza-
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+601
+
+EXT. ISENGARD VALLEY -- DAY
+Gandalf gallops through the gate, into 
+the fortress of ISENGARD...a great 
+ring-wall of stone, a mile from rim to 
+rim, encloses beautiful trees and 
+gardens, watered by streams that flow 
+down from the mountains.
+ SARUMAN (V.O.)
+ Smoke rises once more from the 
+mountain of doom...the shadow takes 
+shape in the darkness of Mordor; the 
+hour grows late...and Gandalf the 
+Grey rides to Isengard seeking my 
+counsel...
+indicador de 
+nova cena
+nome de 
+personagem
+nome de 
+personagem
+Figura 1. Trecho de um script do filme A Sociedade do Anel. Em destaque, a
+marcaç ão EXT, indicadora de início de cena, além dos personagens que falam
+ou estão sendo mencionados.
+dos scripts da franquia O Senhor dos Anéis, obtidos do site IMSDb [IMSDb 2017], que
+disponibiliza os roteiros de um grande número de filmes. Neste contexto, foi utilizada a
+lista de personagens de cada filme da franquia, obtida do site IMDb [IMDb 2017], que
+cataloga grande parte da produção cinematográfica mundial. Em resumo, a lógica é pro-
+curar uma nova cena, e acrescentar arestas entre os personagens que aparecem (ou foram
+citados) nela. Caso já exista aresta, o peso da mesma é incrementado.
+Algoritmo 1: Parser para extração da rede de personagens de filmes
+Entrada: Script e lista de personagens do filme.
+Saída: Rede social de personagens.
+Dados: cenaAtual
+início
+cenaAtual ←∅;
+para cada linha do script faça
+se linha começa com INT|EXT então
+//se existe uma cena anterior, adicionar relações
+para cada personagem p em cenaAtual faça
+para cada personagem q em cenaAtual faça
+se p̸ = q então
+adiciona aresta entre p e q (ou incrementa o peso da aresta
+existente);
+fim se
+fim para cada
+fim para cada
+//prepara o conjunto para nova cena
+cenaAtual ←∅;
+fim se
+senão
+para cada personagem na lista de personagens faça
+se personagem aparece na linha & personagem /∈cenaAtual então
+cenaAtual ←cenaAtual + {personagem};
+fim se
+fim para cada
+fim se
+fim para cada
+fim
+XXXVII Congresso da Sociedade Brasileira de Computação
+602
+
+4. Medidas de Centralidade
+Para analisar as redes sociais de cada filme como redes complexas, são aplicadas medi-
+das de centralidade. Estas respondem quem são os nós principais ou mais influentes da
+rede, cada uma seguindo um critério específico. As medidas escolhidas para análise neste
+trabalho são [Perra and Fortunato 2008]:
+• Centralidade de grau ponderado (weighted degree centrality): considera que os
+nós de maior grau são mais centrais. O grau de um vértice é a soma dos pesos
+das arestas a que ele está conectado. No contexto deste trabalho, considera que os
+personagens mais importantes são os que possuem mais interações com os demais.
+• Centralidade de intermediação (betweenness centrality): indica o número de ve-
+zes que um vértice está no caminho mínimo entre dois outros vértices quaisquer
+na rede. Isso significa que a importância aumenta conforme ele funciona como
+ponte para conectar outros vértices na rede. Assim, um personagem é mais central
+quando conecta personagens de diversos núcleos diferentes da história.
+• Centralidade de PageRank (PageRank centrality): considera o número e a qua-
+lidade de conexões de um vértice para determinar a importância do mesmo.
+Vértices mais importantes são os que recebem mais conexões de outros vértices
+importantes. No caso dos filmes, os personagens centrais interagem com persona-
+gens importantes na história.
+5. Resultados Obtidos
+Para realizar os experimentos da estratégia proposta, foram feitos testes utilizando o soft-
+ware Gephi [Gephi 2017], que calcula as medidas de centralidade e permite a modelagem
+visual dos grafos que representam as redes e implementação em Python 3 para o parser do
+script. As redes de personagens construídas foram as dos três filmes da franquia O Senhor
+dos Anéis: A Sociedade do Anel, As Duas Torres e O Retorno do Rei. Além disso, foi
+construída uma quarta rede de personagens, representando os três filmes. A franquia O
+Senhor dos Anéis foi escolhida devido à dinamicidade do enredo: os personagens iniciam
+uma caminhada juntos no primeiro filme, separam-se em diferentes enredos no segundo
+e, por fim, juntam-se no último filme. Também é interessante o fato dos personagens ad-
+quirirem importâncias diferentes no decorrer dos três filmes, devido aos enredos em que
+se envolvem.
+A história de Senhor dos Anéis conta a saga de vários habitantes de um mundo
+fictício denominado Terra Média, que está sob ameaça de um poderoso mago chamado
+Sauron, o Senhor dos Anéis. Sauron criou um anel muito poderoso, o Anel do Poder, ca-
+paz de prover a seu mestre o domínio completo sobre os outros seres deste mundo. Porém,
+Sauron não detém o anel, que está em posse de Frodo, um hobbit (um ser semelhante aos
+humanos, porém de estatura muito menor).
+Os resultados levam em conta apelidos e pseudônimos que aparecem durante a
+história: por exemplo, o personagem Aragorn é chamado, durante parte dos filmes, de
+Passolargo. Samwise, Meriadoc e Peregrin são os nomes próprios dos personagens Sam,
+Merry e Pippin, que são chamados pelos apelidos durante a maior parte dos filmes. Há
+um caso especial: o personagem Gollum era chamado no passado de Smeagol, e o perso-
+nagem sofre um distúrbio de personalidade, em uma luta interna entre Gollum e Smeagol.
+Pelo fato de um dialogar com o outro, mantivemos os vértices Gollum e Smeagol como
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+603
+
+distintos. Além disso, o fato do vilão Sauron não possuir uma forma corpórea e, deste
+modo, não possuir falas, não o impede de ser representado na rede social, pois ele é ci-
+tado por outros personagens. Esta é uma fraqueza encontrada em outros trabalhos, que
+incluem apenas personagens com fala explícita e não levam em consideração apelidos e
+nomes próprios, criando vértices excedentes.
+5.1. A Sociedade do Anel
+No primeiro filme da saga, Frodo inicia sua caminhada em direção a Mordor, o lugar onde
+o Anel do Poder de Sauron foi feito e o único onde pode ser destruído. Em sua companhia,
+vão seus melhores amigos, Sam, Merry e Pippin (todos hobbits), além de Gandalf (um
+mago), Legolas (um elfo), Gimli (um anão), Aragorn (chamado também de Passolargo,
+um homem) e Boromir (também homem). Juntos, estes personagens formam a Socie-
+dade do Anel. Observa-se nas redes construídas que a interação entre os personagens da
+Sociedade do Anel é de fato muito forte.
+Há três comunidades identificadas, representadas através das cores dos vértices
+na Figura 2. Cada uma representa uma parte do enredo do filme, com destaque para a
+comunidade em laranja, contendo quase toda a Sociedade do Anel e outros hobbits. A
+comunidade em roxo inclui personagens do núcleo de Valfenda e Lórien (elfos), o vilão
+Sauron e outros relacionados à história do anel, como a criatura Gollum, que possuiu o
+anel por muitos anos. Já a comunidade em verde destaca os membros da sociedade do
+anel mais envolvidos em batalha: Boromir, Legolas e Gimli, que lutaram contra os orcs
+Uruk-Hai, liderados pelo mago Saruman e o orc Lurtz. As medidas de centralidade foram
+utilizadas para classificar os personagens do modo apresentado na Tabela 1.
+Elendil
+Gil-Galad
+Isildur
+Sauron
+Gollum
+Elrond
+Galadriel
+Bilbo
+Sam
+Gandalf
+Frodo
+Rosie Cotton
+Merry
+Pippin
+Saruman
+Farmer Maggot
+Aragorn
+Lurtz
+Uruk-Hai
+Arwen
+Gimli
+Boromir
+Legolas
+Haldir
+Celeborn
+Figura 2. Rede de personagens de A Sociedade do Anel classificados de acordo
+com a centralidade de grau ponderado.
+Analisando os resultados da Tabela 1, verificamos que segundo o grau ponderado
+e PageRank, os personagens Frodo, Gandalf e Sam são os principais destaques. Isto
+significa que estes personagens possuem alto número de conexões. Além disto, estes per-
+sonagens estão conectados com outros de grande importância. Isto faz sentido, pois são
+os três personagens principais da Sociedade do Anel, interagindo com outros personagens
+XXXVII Congresso da Sociedade Brasileira de Computação
+604
+
+Tabela 1. Classificaç ão de personagens segundo as medidas de centralidade
+aplicadas à rede social do filme A Sociedade do Anel.
+Personagem
+Grau
+ponderado
+Frodo
+148.0
+Gandalf
+128.0
+Sam
+110.0
+Pippin
+91.0
+Merry
+75.0
+Aragorn
+75.0
+Gimli
+63.0
+Boromir
+58.0
+Legolas
+50.0
+Sauron
+40.0
+Personagem
+Betweenness
+Sam
+0.15485
+Gandalf
+0.05249
+Galadriel
+0.04168
+Merry
+0.03906
+Aragorn
+0.03271
+Isildur
+0.02399
+Pippin
+0.02365
+Frodo
+0.02365
+Gimli
+0.02012
+Sauron
+0.01667
+Personagem
+PageRank
+Frodo
+0.11629
+Gandalf
+0.10391
+Sam
+0.09349
+Pippin
+0.07268
+Merry
+0.06273
+Aragorn
+0.06272
+Gimli
+0.05347
+Boromir
+0.04917
+Legolas
+0.04274
+Sauron
+0.03696
+importantes do mesmo núcleo. Outra observação interessante é o fato de Sam possuir o
+maior betweenness: isto significa que ele é um personagem intermediador de núcleos.
+Podemos perceber isto na história ao verificar que Sam é a ponte de conexão entre os de-
+mais hobbits comuns e o núcleo de Frodo. Gandalf e Galadriel também conectam núcleos
+diferentes: o dos hobbits com o de Valfenda e Lórien, respectivamente, núcleos de elfos.
+Assim, podemos considerar como protagonistas Frodo, Gandalf e Sam.
+5.2. As Duas Torres
+No segundo filme, Frodo e Sam decidem prosseguir sozinhos, encontrando depois Gol-
+lum, um ser interessado no anel. Enquanto isso, Merry e Pippin são sequestrados. Le-
+golas, Gimli e Aragorn vão para o reino de Rohan. Lá, conhecem Theoden (o rei) e
+Eowyn (sobrinha do rei). Neste filme, o mago Saruman, aliado de Sauron, inicia um ata-
+que a Rohan, enviando seu exército de Uruk-Hai (orcs). O rei Theoden defende o reino
+contando com a ajuda de Aragorn, Gandalf, Gimli e Legolas.
+A rede social do filme, representada na Figura 3, possui três comunidades bem
+definidas e relacionadas ao roteiro. A comunidade em laranja mostra o núcleo de Frodo,
+Sam e Gollum em sua caminhada para Mordor. Em roxo, encontram-se os personagens
+em Rohan. Em verde, o núcleo de Merry e Pippin, que estavam próximos ao antagonista
+Saruman.
+Tabela 2. Classificaç ão de personagens segundo as medidas de centralidade
+aplicadas à rede social do filme As Duas Torres.
+Personagens
+Grau
+ponderado
+Aragorn
+112.0
+Sam
+81.0
+Theoden
+77.0
+Legolas
+66.0
+Frodo
+64.0
+Gimli
+62.0
+Saruman
+59.0
+Uruk-Hai
+56.0
+Gandalf
+55.0
+Gollum
+40.0
+Personagens
+Betweenness
+Saruman
+0.14261
+Aragorn
+0.11561
+Uruk-Hai
+0.09188
+Sauron
+0.07877
+Sam
+0.05352
+Gandalf
+0.04741
+Gimli
+0.03791
+Theoden
+0.03789
+Faramir
+0.02659
+Legolas
+0.01770
+Personagens
+PageRank
+Aragorn
+0.08583
+Sam
+0.06013
+Theoden
+0.05938
+Saruman
+0.05065
+Legolas
+0.04994
+Gimli
+0.04803
+Uruk-Hai
+0.04778
+Frodo
+0.04759
+Gandalf
+0.04316
+Sauron
+0.03304
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+605
+
+Gandalf
+Frodo
+Sam
+Galadriel
+Sauron
+Gollum
+Smeagol
+Uruk-Hai
+Ugluk
+Merry
+Mauhur
+Saruman
+Grishnakh
+Aragorn
+Pippin
+Legolas
+Gimli
+Morwen
+Eothain
+Freda
+Rohan Soldier
+Eomer
+Theodred
+Eowyn
+Theoden
+Wormtongue
+Snaga
+Treebeard
+Hama
+Gamling
+Isildur
+Faramir
+Arwen
+Elrond
+Sharku
+Aldor
+Madril
+Boromir
+Denethor
+Figura 3. Rede de personagens de As Duas Torres classificados de acordo com
+a centralidade de grau ponderado.
+A classificação de acordo com as medidas de centralidade, presente na Tabela 2,
+mostra que Aragorn, Sam e Theoden são os personagens com maiores valores de centra-
+lidade segundo grau ponderado e PageRank. Neste filme, os núcleos de maior destaque
+são os da batalha do reino de Rohan e o de Frodo e Sam caminhando para Mordor. Desta
+forma, faz sentido que os personagens principais façam parte destes núcleos, onde estão
+presentes outros personagens importantes como Legolas e Gimli. Um fato interessante
+é Sam obter destaque maior que Frodo. Embora estejam caminhando juntos, neste filme
+há um número maior de cenas envolvendo apenas Sam e Gollum, justificando a interação
+mais intensa entre os dois personagens capturada pela rede social.
+A pontuação de betweenness indica que Saruman é o personagem intermediador.
+Mais uma vez, isto é equivalente ao roteiro, pois este personagem age em favor de Sauron,
+sendo responsável pela batalha em Rohan. Assim, ele conecta núcleos importantes: o de
+Isengard e o de Rohan. Pelo mesmo motivo, os Uruk-Hai (exército de Sauron) aparecem
+em terceiro. Aragorn em segundo lugar indica seu papel de intermediador entre os per-
+sonagens da realeza de Rohan, os remanescentes da Sociedade do Anel e os de Valfenda.
+Por fim, podemos considerar como protagonistas Aragorn, Sam e Theoden.
+5.3. O Retorno do Rei
+No último filme acontece a batalha pelo anel e pela proteção do reino de Gondor, do qual
+Aragorn se mostra herdeiro ao trono. Merry e Pippin participam de núcleos diferentes.
+Aragorn, Legolas, Gimli e Gandalf possuem papel importante na guerra. Enquanto isso,
+Frodo, Sam e Gollum chegam a Mordor, onde o anel é finalmente destruído, para a derrota
+de Sauron.
+XXXVII Congresso da Sociedade Brasileira de Computação
+606
+
+Smeagol
+Deagol
+Gollum
+Frodo
+Sam
+Legolas
+Theoden
+Aragorn
+Gimli
+Gandalf
+Saruman
+Treebeard
+Merry
+Pippin
+Eowyn
+Sauron
+Elendil
+Elrond
+Arwen
+Denethor
+Boromir
+Uruk-Hai
+Witchking
+Faramir
+Gothmog
+Eomer
+Gamling
+Madril
+Grimbold
+Rohan Soldier
+Isildur
+King Of The Dead
+Galadriel
+Shagrat
+Gorbag
+Witch-King
+Rosie Cotton
+Bilbo
+Celeborn
+Figura 4. Rede de personagens de O Retorno do Rei classificados de acordo
+com a centralidade de grau ponderado.
+A Figura 4 apresenta a rede social do filme, com os vértices classificados de acordo
+com a centralidade de grau. Desta vez, foram identificadas quatro comunidades: em azul,
+os personagens do núcleo dos elfos em Valfenda. Em verde, os personagens relacionados
+à Mordor e o anel. Em laranja, o núcleo do regente de Gondor, Denethor, envolvendo
+Gandalf e Pippin. Em roxo, os personagens que lutaram na batalha de Gondor, com
+destaque para Aragorn, Merry, Legolas e Gimli.
+Tabela 3. Classificaç ão de personagens segundo as medidas de centralidade
+aplicadas à rede social do filme O Retorno do Rei.
+Personagens
+Grau
+ponderado
+Frodo
+153.0
+Aragorn
+97.0
+Pippin
+97.0
+Sam
+96.0
+Merry
+90.0
+Gandalf
+89.0
+Legolas
+80.0
+Theoden
+55.0
+Gimli
+54.0
+Denethor
+46.0
+Personagens
+Betweenness
+Frodo
+0.18196
+Merry
+0.08323
+Sam
+0.07273
+Gandalf
+0.06315
+Aragorn
+0.05734
+Faramir
+0.05321
+Pippin
+0.05310
+Legolas
+0.05137
+Uruk-Hai
+0.03941
+Theoden
+0.03511
+Personagens
+PageRank
+Frodo
+0.10697
+Aragorn
+0.06769
+Sam
+0.06721
+Pippin
+0.06680
+Merry
+0.06325
+Gandalf
+0.06149
+Legolas
+0.05638
+Theoden
+0.04088
+Gimli
+0.03877
+Denethor
+0.03360
+A Tabela 3 mostra a classificação dos personagens de acordo com as medidas de
+centralidade. Observa-se que Frodo foi o personagem que obteve maior pontuação nas
+três. Este é um fato interessante, pois diferente dos outros dois filmes, Frodo é o perso-
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+607
+
+nagem com maior número de conexões (e com mais qualidade) e o intermediador. Há
+uma correlação com o enredo, pois neste filme, Frodo é altamente citado pelos perso-
+nagens envolvidos na batalha de Gondor. Assim, ele conecta os núcleos de Mordor e
+Rohan/Gondor, e simultaneamente, adquire muitas conexões.
+Aragorn teve alta classificação em duas métricas, assim como Sam. Aragorn tem
+papel de liderança na batalha de Gondor, interagindo com diversos personagens. Sam, por
+sua vez, é fundamental no núcleo de Mordor, auxiliando Frodo a destruir o Anel. Desta
+forma, as medidas indicam que Frodo, Aragorn e Sam são os protagonistas da história.
+É interessante observar que outros personagens como Pippin e Merry também obtiveram
+pontuações parecidas, o que corresponde à participação dos mesmos no filme. Cada um
+destes personagens possui um papel chave em seus determinados pontos da história.
+5.4. A Trilogia Completa
+A rede social que reúne os três filmes é apresentada na Figura 5. Esta rede foi construída
+ao unir em uma única rede as obtidas de cada filme individualmente. Nesta rede social,
+percebemos três comunidades. A comunidade em roxo é composta pelos personagens do
+núcleo das guerras de Rohan e Gondor. Em verde, personagens envolvidos na questão do
+regente de Gondor, que se recusava a sair do trono e tomou Pippin como um servo. Em
+laranja, o núcleo do anel, incluindo Frodo, Sam, Gollum e o vilão Sauron.
+Deagol
+Smeagol
+Gollum
+Sam
+Frodo
+Gimli
+Legolas
+Theoden
+AragornGandalf
+Treebeard
+Merry
+Pippin
+Saruman
+Eowyn
+Sauron
+Elendil
+Arwen
+Elrond
+Denethor
+Boromir
+Uruk-Hai
+Witchking
+Faramir
+Gothmog
+Eomer
+Gamling
+Madril
+Grimbold
+Rohan Soldier
+Isildur
+King Of The Dead
+Galadriel
+Gorbag
+Shagrat
+Witch-King
+Rosie Cotton
+Bilbo
+Celeborn
+Ugluk
+Mauhur
+Grishnakh
+Morwen
+Eothain
+Freda
+Theodred
+Wormtongue
+Snaga
+Hama
+Sharku
+Aldor
+Figura 5.
+Rede de personagens da trilogia completa de O Senhor dos Aneis
+classificados de acordo com a centralidade de grau ponderado.
+A classificação geral dos personagens na trilogia é exibida na Tabela 4. Os re-
+sultados indicam que os personagens Frodo, Aragorn e Gandalf são os protagonistas da
+história. Sam teve a maior pontuação em intermediação, devido à seu papel de ponte,
+conectando personagens de diferentes núcleos.
+Ele também obteve boas pontuações
+XXXVII Congresso da Sociedade Brasileira de Computação
+608
+
+nas outras duas métricas, podendo ser considerado também um dos protagonistas. Esta
+classificação é condizente com a história dos três filmes: Frodo e Sam, os responsáveis
+pela destruição do anel; Aragorn, o rei; e Gandalf, o mago que possui papel de líder. É
+interessante observar que o fato de Sam ter se destacado é uma informação relevante e
+não esperada, pois durante grande parte das cenas, apesar de Sam estar presente, o foco é
+sempre Frodo. No entanto, as medidas indicam que o personagem também possui prota-
+gonismo na história.
+Tabela 4. Classificaç ão de personagens segundo as medidas de centralidade
+aplicadas à rede social da trilogia O Senhor dos Anéis.
+Personagens
+Grau
+ponderado
+Frodo
+254.0
+Aragorn
+232.0
+Gandalf
+212.0
+Sam
+182.0
+Pippin
+181.0
+Gimli
+171.0
+Merry
+162.0
+Legolas
+151.0
+Theoden
+143.0
+Eomer
+89.0
+Personagens
+Betweenness
+Sam
+0.08574
+Uruk-Hai
+0.07858
+Frodo
+0.07234
+Aragorn
+0.07179
+Merry
+0.06798
+Gandalf
+0.06624
+Theoden
+0.0455
+Gimli
+0.04192
+Saruman
+0.03919
+Pippin
+0.03681
+Personagens
+PageRank
+Frodo
+0.07530
+Aragorn
+0.07099
+Gandalf
+0.06271
+Sam
+0.05479
+Pippin
+0.05434
+Gimli
+0.05223
+Merry
+0.05172
+Theoden
+0.04613
+Legolas
+0.04567
+Uruk-Hai
+0.02996
+6. Considerações finais
+Neste trabalho, introduzimos uma proposta para construção das redes sociais de persona-
+gens de um filme, e aplicamos especificamente nos três filmes da franquia O Senhor dos
+Anéis. A construção foi feita utilizando o script dos filmes, e considerando a participação
+de personagens que aparecem ou foram citados nas cenas com o auxílio da lista de perso-
+nagens dos mesmos.
+Após a construção das redes sociais, foi feita análise através de três medidas de
+centralidade: grau ponderado, intermediação e PageRank. Cada medida classifica os
+personagens que considera mais importantes de acordo com um critério específico. O
+objetivo foi verificar, segundo as métricas, quem são os protagonistas do filme e se a rede
+social obtida, bem como as comunidades identificadas e os personagens mais influentes
+são condizentes com o enredo do filme.
+A classificação obtida das três medidas de centralidade aponta os personagens
+mais centrais na rede social de cada filme. Em A Sociedade do Anel, os protagonistas são
+Frodo, Sam e Gandalf. Em As Duas Torres, os destaques são Aragorn, Theoden e Sam.
+Já em O Retorno do Rei, Frodo, Aragorn e Sam são os personagens mais influentes. Ao
+analisar os três filmes em conjunto, Frodo, Sam, Aragorn e Gandalf são os protagonistas
+apontados pelas medidas de centralidade.
+Os resultados obtidos são condizentes com a história de cada filme, inclusive
+quando analisada a trilogia como um todo. As comunidades detectadas refletem também
+parte do roteiro, destacando núcleos que estão presentes na história. Desta forma, acredi-
+tamos que a abordagem escolhida é adequada para a modelagem da rede de personagens e
+pode ser aplicada a outros filmes. Como trabalhos futuros, pretendemos aplicar a técnica
+a filmes de outros gêneros e verificar se os vértices centrais de acordo com as medidas
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+609
+
+de centralidade são de fato os protagonistas, e se há alguma relação entre as redes sociais
+construídas a partir de filmes do mesmo gênero.
+Referências
+Agarwal, A., Balasubramanian, S., Zheng, J., and Dash, S. (2014). Parsing screenplays
+for extracting social networks from movies. EACL 2014, pages 50–58.
+Bonato, A., D’Angelo, D. R., Elenberg, E. R., Gleich, D. F., and Hou, Y. (2016). Mining
+and modeling character networks. Algorithms and Models for the Web Graph, pages
+100–114.
+Gephi (2017). Open graph viz platform. Disponível em: https://gephi.org/.
+Acessado em: 02/2017.
+IMDb (2017). Internet movie database (imdb). Disponível em: http://www.imdb.
+com/. Acessado em: 02/2017.
+IMSDb (2017). Internet movie script database (imsdb). Disponível em: http://www.
+imsdb.com/. Acessado em: 02/2017.
+Kaminski, J., Schober, M., Albaladejo, R., Zastupailo, O., and Hidalgo, C. (2012). Mo-
+viegalaxies - social networks in movies.
+Park, S.-B., Oh, K.-J., and Jo, G.-S. (2012). Social network analysis in a movie using
+character-net. Multimedia Tools and Applications, 59(2):601–627.
+Perra, N. and Fortunato, S. (2008). Spectral centrality measures in complex networks.
+Physical Review E, 78(3):036107.
+Shen, H.-W. (2013). Community structure of complex networks. Springer Science &
+Business Media.
+Spadon, G., Scabora, L. C., Araujo, M. V. S., Oliveira, P. H., Machado, B. B., de Sousa,
+E. P. M., Jr., C. T., and Jr., J. F. R. (2016). Complex network tools to understand the
+behavior of criminality in urban areas. CoRR, abs/1612.06115.
+Weng, C.-Y., Chu, W.-T., and Wu, J.-L. (2007). Movie analysis based on roles’ social
+network. In Multimedia and Expo, 2007 IEEE International Conference on, pages
+1403–1406. IEEE.
+XXXVII Congresso da Sociedade Brasileira de Computação
+610

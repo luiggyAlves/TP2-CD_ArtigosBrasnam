@@ -1,0 +1,365 @@
+Análise de Sentimentos em Vídeos do Youtube sobre
+Polarização Política: Uma Abordagem Híbrida Baseada em
+Reconhecimento de Entidades
+Iury M. Pereira1, Juan Pablo A. Avelar1, Cláudio B. Silva1, Daniel M. Barbosa1
+1Instituto de Ciências Exatas e Tecnológicas – Universidade Federal de Viçosa (UFV)
+Florestal – MG – Brasil
+{iury.m.pereira,juan.avelar,claudio.barbosa,danielmendes}@ufv.br
+Abstract. In this work, sentence-level sentiment analyzes are used with the
+BERTimbau model, in order to compare the content of YouTube videos, con-
+sidering political polarization in Brazil in two periods: during and after the
+2022 Brazilian presidential elections. Top candidates were identified as entities
+from the video transcripts. The Score metric was also proposed to normalize
+the results. The data indicated a greater presence of candidate Bolsonaro on
+YouTube, mainly on journalistic channels, and it was also possible to identify
+changes in positioning on these channels between the two periods.
+Resumo. Neste trabalho, análises de sentimentos em nível de sentença são em-
+pregadas com o modelo BERTimbau, a fim de comparar o conteúdo de videos
+do Youtube, considerando a polarização política no Brasil em dois períodos:
+durante e após as eleições presidenciais brasileiras de 2022. Os dois princi-
+pais candidatos foram identificados como entidades a partir das transcrições
+dos vídeos. Foi proposta ainda a métrica Score para normalizar os resulta-
+dos. Os dados indicaram uma maior presença do candidato Bolsonaro no You-
+Tube, principalmente em canais jornalísticos, e também foi possível identificar
+mudanças de posicionamento nestes canais entre os dois períodos.
+1. Introdução
+O consumo de informações no Brasil é cada vez mais dinâmico e intenso1, com as redes
+sociais sendo uma das principais fontes de acesso à informação. As redes sociais tem
+sido amplamente utilizadas em campanhas políticas, justificadas pelo fato de o Brasil ser
+o segundo país onde as pessoas mais passam tempo na internet2. Em média, os brasileiros
+passam 154 dias por ano online, com 56 desses dias dedicados às redes sociais.
+Uma pesquisa do Reuters Institute mostrou que YouTube é a rede mais utili-
+zada para buscar informações (43%), seguida por WhatsApp (41%) e Facebook (40%)
+[Newman et al. 2022]. As redes sociais oferecem uma conexão permanente, especial-
+mente explorada durante períodos eleitorais quando o tempo de exposição na mídia con-
+vencional é limitado pelo Tribunal Superior Eleitoral (TSE)3. As eleições presidenciais
+1https://www.em.com.br/app/noticia/tecnologia/2021/09/28/internatecnologia,1309670/brasil-e-o-
+terceiro-pais-do-mundo-que-mais-usa-rede-sociais-diz-pesquisa.shtml
+2https://www.sortlist.com/blog/your-digital-year/
+3https://www.cnnbrasil.com.br/politica/tse-confirma-tempo-de-propaganda-de-candidatos-a-
+presidencia-na-tv-e-no-radio/
+
+de 2022, marcadas pela polarização entre Luís Inácio Lula da Silva (PT) e Jair Messias
+Bolsonaro (PL), exemplificam esse contexto.
+Este trabalho propõe uma abordagem híbrida de análise de sentimentos, combi-
+nando a análise ao nível de sentença com a proximidade léxica das palavras com as enti-
+dades reconhecidas para identificar a posicionamento de vídeos no YouTube com base em
+suas transcrições. Foram coletados vídeos de dois períodos: durante e após as eleições
+de 2022. Foi utilizado um modelo de Processamento de Linguagem Natural (PLN) base-
+ado no BERTimbau, para categorizar as entidades presentes nas transcrições e aplicar a
+análise de sentimentos em nível de sentença, conforme definido por [Liu et al. 2012].
+Este artigo está organizado da seguinte forma: na seção 2 são discutidos alguns
+dos trabalhos relacionados; a seção 3 abrange os principais conceitos teóricos; a seção 4
+apresenta os materiais e métodos utilizados; os resultados e suas implicações são descritos
+na seção 5; e, na seção 6, constarão as considerações finais e possibilidades para trabalhos
+futuros.
+2. Trabalhos Relacionados
+Videos
+ainda
+são
+muito
+pouco
+explorados
+na
+literatura
+de
+redes
+sociais.
+[Kubin and von Sikorski 2021] realizaram uma revisão sistemática sobre polarização
+em redes sociais, destacando que o Twitter é a rede mais utilizada. Mas no contexto
+brasileiro, [Silva and Barbosa 2019] investigaram o comportamento dos usuários em
+canais do YouTube e analisaram comentários políticos para determinar polaridade e
+correlacionar com a aprovação de candidatos. Já o estudo de [Buder et al. 2021] sugere
+que a maior interação com discursos negativos intensifica a polarização política.
+O
+modelo
+BERTimbau,
+utilizado
+neste
+trabalho,
+foi
+originado
+em
+[Souza et al. 2019] e apresentou como resultado uma performance melhor que o
+Multilingual BERT ocupando o status de estado da arte em reconhecimentos de entidades
+na língua portuguesa.
+3. Fundamentação Teórica
+Nessa seção tratam-se os conceitos e fundamentos responsáveis pela condução do pre-
+sente trabalho: reconhecimento de entidades nomeadas e análise de sentimentos em nível
+de sentença. O reconhecimento de Entidades Nomeadas ou Named Entity Recognition
+(NER) é uma área do Processamento de Linguagem Natural (PLN) que é responsável
+pela identificação e classificação de Entidades Nomeadas (EN) em um determinado texto
+ou sentença [Sharnagat 2014]. De acordo com [Mohit 2014], a definição das EN passa por
+palavras que são categorizadas em domínios e contextos específicos, normalmente carre-
+gando informações que dizem respeito a algo, em específico e que servirão como alvo
+para o sistema de PLN utilizado. Ou seja, uma única entidade pode englobar diversas
+palavras.
+Este trabalho utiliza o contexto polarizado para entidades nomeadas da classe
+“Pessoa”, correspondentes aos principais candidatos. Para proporcionar uma análise di-
+recionada para o contexto desejado, foi elaborada uma abordagem híbrida que utiliza
+conceitos de análise léxica baseadas em posicionamento presentes no trabalho feito por
+[Gu et al. 2018], juntamente com o reconhecimento prévio das entidades. O estudo apre-
+
+Tabela 1. Vídeos obtidos na busca
+08/2022 a 11/2022
+12/2022 a 09/2023
+Termo
+Resultados
+da busca
+Válidos
+Resultados
+da busca
+Válidos
+Lula
+656
+479
+2725
+2218
+Bolsonaro
+631
+513
+2649
+2107
+Eleições presidenciais 2022
+689
+563
+2361
+1606
+Segundo turno 2022
+676
+609
+2168
+1385
+Total
+2652
+2164
+9903
+7316
+sentado por [Salas-Zárate et al. 2017] indica que, utilizando-se trigramas em uma abor-
+dagem com o método N-gram around obteve-se uma maior precisão na classificação de
+sentimentos. A utilização dessa abordagem foi detalhada na seção 4, fazendo-se a análise
+de sentimentos em nível de sentença.
+4. Materiais e métodos
+Nesta seção estão descritos os materiais utilizados e os métodos que foram seguidos para
+a execução deste trabalho.
+4.1. Base de Dados
+A base de dados4 considera um contexto de polarização em uma disputa presidencial com
+direcionamento para o conteúdo em que os principais candidatos estão presentes, que a
+partir desta seção são tratados como Lula (o candidato Luís Inácio da Silva) e Bolsonaro (o
+candidato Jair Messias Bolsonaro). Os dados foram coletados de dois períodos distintos:
+o primeiro entre agosto e novembro de 2022, que compreende todo período eleitoral; já
+o segundo entre dezembro de 2022 a setembro de 2023, referente a todo o período pós-
+eleicão até o momento de fechamento da base de dados. A tabela 1 indica a quantidade
+de vídeos coletados para cada termo de busca e os vídeos em que foi possível realizar a
+extração das transcrições, que nem sempre está disponível.
+A linguagem escolhida para a coleta e tratamento de dados foi o Python5. O You-
+Tube fornece acesso a uma API (YouTube Data API6) para extração de dados, pela qual
+foi possível obter os identificadores únicos para os vídeos retornados em cada pesquisa
+das palavras-chaves, com os quais foi possível a coleta das transcrições por meio de uma
+API de terceiros: YouTube Transcript API7.
+4.2. Pré-processamento dos dados
+Inicialmente foram removidas as stop words e para a utilização do BERTimbau, no re-
+conhecimento das entidades, foi realizada uma simplificação de expressões e termos que
+remetiam aos candidatos. Desta forma, os nomes dos candidatos e alguns apelidos foram
+substituídos pelos rótulos “Lula” ou “Bolsonaro”.
+4Disponivel em: https://github.com/Iurymartins46/BDVYRE
+5https://insightlab.ufc.br/por-que-o-python-e-a-linguagem-mais-adotada-na-area-de-data-science
+6YouTube Data API - https://developers.google.com/youtube/v3
+7YouTube Transcript API - https://pypi.org/project/youtube-transcript-api/
+
+Utilizando os resultados propostos em [Salas-Zárate et al. 2017] e considerando-
+se que a análise de sentimentos em nível de sentença ainda é um campo aberto para
+descobertas [Poria et al. 2020], elaborou-se uma abordagem alternativa para a produção
+das sentenças analisadas a partir de trigramas, considerando 3 palavras anteriores e poste-
+riores, o que pode ser observado na Figura 1. Essa abordagem diminui a chance de erros
+em que a sentença classificada não corresponda à entidade alvo.
+Figura 1. Representaç ão do modelo de trigramas (3-around).
+4.3. BERTimbau - Portuguese BERT
+O BERT (Bidirectional Encoder Representations from Transformers) desenvolvido pela
+Google 8, foi apresentado ao mundo em 2018. Ele representa o estado da arte em PLN
+utilizando aprendizado de máquina e redes neurais. Já o BERTimbau, modelo treinado
+pela NeuralMind [Souza et al. 2019] apresenta uma alternativa interessante para a língua
+portuguesa. O BERTimbau foi utilizado em dois momentos: aplicação de NER e, poste-
+riormente, classificação de sentimentos das entidades reconhecidas.
+No reconhecimento de entidades foi utilizado o BERTimbau selective, capaz de
+identificar as classes pessoa, organização, local, tempo e valor. Como o objetivo é iden-
+tificar pessoas, ele foi utilizado como fornecido pelos criadores, sem ajustes ou novos
+treinamentos. Além disso, essa opção do BERTimbau foi a que obteve melhor resultado
+no benchmark realizado pelos autores [Souza et al. 2019]. Eles utilizaram para treino o
+BrWaC (Brazilian Web as Corpus), um grande corpus resultante do trabalho apresentado
+por [Wagner Filho et al. 2018]. E, para o treino específico dos modelos de reconhecimen-
+tos de entidades, utilizou-se o corpus presente na coleção MiniHAREM9.
+Já na classificação de sentimentos foi necessário fazer um refinamento do modelo
+BERTimbau. Para tal, foi realizada uma raspagem de dados, buscando por reviews de
+aplicativos da Google Play, utilizando uma API chamada Google-Play-Scraper10, em que
+foram coletados dados dos nove maiores aplicativos da categoria “Food and Drinks”. A
+escolha dessa base de dados se justifica por possuir um valor de 1 a 5 estrelas com um
+conteúdo em Português, tornando possível considerar 5 sentimentos possíveis: negativo,
+parcialmente negativo, neutro, parcialmente positivo e positivo. Geralmente as bases ro-
+tuladas possuem apenas 3 sentimentos: negativo, neutro e positivo.
+No processo do BERTimbau para fine-tunning (refinamento) foram utilizados os
+hiper parâmetros recomendados pelos criadores, sendo eles: Batch size:16; Learning rate
+8https://ai.googleblog.com/2018/11/open-sourcing-bert-state-of-art-pre.html
+9https://www.linguateca.pt/primeiroHAREM/harem miniharem.html
+10https://github.com/JoMingyu/google-play-scraper
+
+(Adam): 2e-5; Number of epochs: 10. Os dados foram divididos da seguinte forma: 90%
+para treino; 5% para validação; 5% para teste. Dessa forma o modelo apresentou uma
+acurácia de 62%. O fluxo das etapas seguidas no processo é demonstrado na Figura 2.
+Figura 2. Fluxo completo do processo.
+4.4. Validação e normalização dos resultados
+Grande parte das transcrições obtidas tem origem em canais jornalísticos, normalmente
+mais objetivos, resultando em muitas classificações neutras.
+Devido a isso e a uma
+diferença da quantidade de ocorrências de cada entidade, observou-se a necessidade de
+normalizar os resultados, possibilitando uma equivalência entre os candidatos, de forma
+a permitir uma análise comparativa que possa indicar tendências. A estratégia adotada foi
+propor uma nova métrica denominada Score (eq. 1) para esta normalização, que consiste
+na soma de todas as ocorrências de um sentimento (En), multiplicado pelo peso atribuído
+(Wn) àquele sentimento e pela precisão (Pn) apresentada pelo modelo de classificação,
+com o somatório dividido pela quantidade total de entidades avaliadas (Et).
+Como posicionamentos parcialmente positivos e negativos geram pouco impacto
+nas redes, eles foram definidos como 1 para parcialmente positivo e -1 para parcialmente
+negativo, ao passo que o sentimentos positivo e negativo ficaram com os pesos 2 e -2 res-
+pectivamente. As precisões apresentadas pelo modelo de classificação foram: 0,71 para
+sentimentos positivos e negativos, 0,51 para parcialmente positivos e 0,49 para parcial-
+mente negativos.
+Score =
+ 
+n
+X
+n=1
+(En ∗Wn ∗Pn)
+!
+/Et
+(1)
+5. Resultados e Discussão
+Foram classificadas 48222 sentenças: 33455 da primeira coleta e 14767 da segunda. A
+entidade Bolsonaro apareceu mais frequentemente em ambas as coletas, com 52,8% na
+
+Tabela 2. Entidades identificadas por canais entre 08/2022 a 11/2022.
+Canal
+Nº vídeos
+Nº de entidades
+Score-Bolsonaro
+Score-Lula
+UOL
+109
+5700
+0.30
+0.34
+CNN Brasil
+103
+3982
+0.41
+0.46
+Jovem Pan News
+62
+957
+0.28
+0.23
+SBT News
+27
+1206
+0.49
+0.48
+Jornalismo TV Cultura
+27
+430
+0.26
+0.16
+Tabela 3. Entidades identificadas por canais entre 12/2022 a 09/2023.
+Canal
+Nº vídeos
+Nº de entidades
+Score-Bolsonaro
+Score-Lula
+UOL
+234
+1630
+0.11
+0.37
+CNN Brasil
+172
+1371
+0.22
+0.34
+Jovem Pan News
+49
+414
+0.30
+0.36
+Política Brasil
+41
+316
+0.51
+0.74
+Rádio BandNews FM
+34
+276
+0.13
+0.35
+primeira e 56,3% na segunda. Nas Tabelas 2 e 3 estão descritos os canais com os maiores
+números de vídeos coletados e a quantidade de entidades analisadas, sendo UOL e CNN
+Brasil os maiores destaques, além dos resultados da métrica Score. Um Score próximo a
+0 indica um balanceamento entre as opiniões expressas no conteúdo das transcrições, ou
+seja, esse valor seria um indicativo de neutralidade com relação aos candidatos.
+Um distanciamento entre valores de Score indica um sentimento mais positivo do
+canal em relação a um dos candidatos, o que pode ser observado na primeira coleta nos
+canais Jovem Pan News e Jornalismo TV Cultura a favor de Bolsonaro e nos canais CNN
+Brasil e UOL a favor de Lula. Já o canal SBT News registrou pontuação similar para am-
+bos. Por fim, foi possível notar ainda mudanças de posicionamento entre os dois períodos
+analisados: o canal Jovem Pan News mudou de uma postura favorável ao Bolsonaro para
+uma postura favorável ao Lula; nos canais CNN Brasil e UOL o Score do Bolsonaro di-
+minuiu significativamente, o que mostra que ficaram ainda mais favoráveis ao Lula. Uma
+explicação possível para estes resultados talvez seja o fato de Lula ter vencido as eleições.
+6. Considerações Finais e Trabalhos Futuros
+Neste trabalho, apresentamos uma abordagem híbrida de análise de sentimentos, combi-
+nando a análise em nível de sentença com o reconhecimento de entidades, e obtivemos
+resultados satisfatórios, considerando a escassez de trabalhos com estas características:
+língua portuguesa, Youtube como fonte de dados e polarização do cenário político brasi-
+leiro. Apresentamos ainda a métrica Score, como uma métrica para comparar o compor-
+tamento para cada entidade em um mesmo cenário de análise, que permitiu, por exemplo,
+que observássemos mudanças de comportamento em canais jornalísticos em relação aos
+dois principais candidatos das eleições de 2022, antes e depois do pleito.
+Como trabalhos futuros, identificamos a importância de melhorar o pré-
+processamento dos dados, evitando assim o desperdício de dados coletados e a redução
+de classificações equivocadas. Outra possível melhoria é a criação de uma base própria
+de treinamento, com dados rotulados sobre política.
+
+Referências
+Buder, J., Rabl, L., Feiks, M., Badermann, M., and Zurstiege, G. (2021). Does negatively
+toned language use on social media lead to attitude polarization? Computers in Human
+Behavior, 116:106663.
+Gu, S., Zhang, L., Hou, Y., and Song, Y. (2018). A position-aware bidirectional attention
+network for aspect-level sentiment analysis. In Proceedings of the 27th international
+conference on computational linguistics, pages 774–784.
+Kubin, E. and von Sikorski, C. (2021). The role of (social) media in political polariza-
+tion: a systematic review. Annals of the International Communication Association,
+45(3):188–206.
+Liu, K., Xu, L., and Zhao, J. (2012). Opinion target extraction using word-based trans-
+lation model. In Proceedings of the 2012 Joint Conference on Empirical Methods in
+Natural Language Processing and Computational Natural Language Learning, page
+1346–1356.
+Mohit, B. (2014). Named entity recognition. In Natural language processing of semitic
+languages, pages 221–245. Springer.
+Newman, N., Fletcher, R., Robertson, C. T., Eddy, K., and Nielsen, R. K. (2022). Reuters
+institute digital news report 2022. In Reuters Institute Digital News Report 2022, pages
+116–117.
+Poria, S., Hazarika, D., Majumder, N., and Mihalcea, R. (2020). Beneath the tip of the
+iceberg: Current challenges and new directions in sentiment analysis research. IEEE
+Transactions on Affective Computing.
+Salas-Zárate, M. d. P., Medina-Moreira, J., Lagos-Ortiz, K., Luna-Aveiga, H., Rodriguez-
+Garcia, M. A., and Valencia-Garcia, R. (2017). Sentiment analysis on tweets about
+diabetes: an aspect-level approach. Computational and mathematical methods in me-
+dicine, 2017.
+Sharnagat, R. (2014). Named entity recognition: A literature survey. Center For Indian
+Language Technology, pages 1–27.
+Silva, C. A. and Barbosa, D. M. (2019). Analyzing the acceptance of the 2018 brazilian
+presidential election’main candidates based on youtube comments. In Proceedings of
+the 25th Brazillian Symposium on Multimedia and the Web, pages 377–384.
+Souza, F., Nogueira, R., and Lotufo, R. (2019). Portuguese named entity recognition
+using bert-crf. arXiv preprint arXiv:1909.10649.
+Wagner Filho, J. A., Wilkens, R., Idiart, M., and Villavicencio, A. (2018). The brwac
+corpus: a new open resource for brazilian portuguese. In Proceedings of the eleventh
+international conference on language resources and evaluation (LREC 2018).

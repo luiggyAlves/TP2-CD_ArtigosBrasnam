@@ -1,0 +1,517 @@
+Utilização de Redes Sócio-Técnicas no apoio à alocação de 
+Recursos Humanos 
+Victor V. Ribeiro1, Andréa M. Magdaleno1 Cláudia M. L. Werner1 
+1COPPE/UFRJ – Universidade Federal do Rio de Janeiro (UFRJ) 
+Caixa Postal 68511 – 21.945-970 – Rio de Janeiro – RJ – Brasil 
+{vidigal, andrea, werner}@cos.ufrj.br
+Abstract. This work proposes a procedure that explores sociotechnical 
+networks to support the allocation of tasks to available human resources in a 
+team. The procedure considers the interaction history between employees and 
+artifacts, skills required to perform tasks and workload assigned to employees. 
+Resumo. Este trabalho propõe um procedimento que explora redes sócio-
+técnicas para apoiar a alocação de tarefas aos recursos humanos disponíveis 
+em uma equipe. O procedimento considera o histórico de interação entre 
+colaboradores e artefatos, as habilidades requeridas para execução de tarefas 
+e a carga de trabalho atribuída aos colaboradores. 
+1. Introdução 
+O sucesso de um projeto de software está diretamente relacionado às habilidades das 
+pessoas que participam e de como as tarefas são distribuídas para serem executadas 
+[Laplante, 2003]. Dessa forma, a decisão de alocação de tarefas deve ser realizada de 
+forma criteriosa. Uma ferramenta que pode ser utilizada para apoiar essa atividade são 
+as redes sócio-técnicas, que podem ser consideradas uma extensão das redes sociais 
+[BARABÁSI, 2003], incluem informações sobre artefatos de software e apoiam o 
+estabelecimento, combinação, dependência, controle e evolução dos artefatos e 
+colaboradores [SANTOS e WERNER, 2012]. 
+ 
+As características das redes sócio-técnicas, confrontadas às necessidades de 
+apoio à alocação de tarefas, deram origem a esse trabalho que apresenta um 
+procedimento para apoiar a alocação de tarefas. O procedimento proposto considera o 
+histórico de interação de cada colaborador (ocorrência de interação dos colaboradores 
+com determinados artefatos e a quantidade de vezes que essas interações aconteceram) 
+com os artefatos relacionados à tarefa, as habilidades necessárias para a execução de 
+cada tarefa, e a carga de trabalho atribuída a cada colaborador. 
+ 
+Dessa forma, é proposto que as redes sócio-técnicas sejam utilizadas para obter o 
+histórico de interação de cada colaborador. O fator habilidade é calculado através do 
+cruzamento entre as habilidades requeridas para a execução de uma tarefa e as 
+habilidades do colaborador. Além disso, a carga de trabalho atribuída a um determinado 
+colaborador também é considerada para evitar que tarefas sejam atribuídas a um mesmo 
+colaborador e que colaboradores fiquem sem tarefas. 
+ 
+O procedimento foi criado com base em trabalhos como Laplante 
+(2003), 
+Barreto et al. (2005) e Singh (2013). Esses trabalhos relacionados tratam da alocação de
+
+recursos humanos, porém não utilizam as redes sócio-técnicas nas suas abordagens. 
+ 
+O restante do artigo está estruturado da seguinte forma: A próxima seção 
+apresenta o diagrama conceitual do procedimento proposto. Em seguida, a Seção 3 
+descreve o procedimento criado e a Seção 4 apresenta uma demonstração de utilização 
+do procedimento proposto. Na Seção 5, são discutidos os trabalhos futuros e conclusões. 
+2. Diagrama Conceitual 
+O diagrama conceitual foi criado utilizando a notação de classes da UML e apresenta os 
+conceitos relacionados ao procedimento criado e as associações entre eles (Figura 1). 
+ 
+Figura 1. Diagrama Conceitual 
+ 
+Um Employee representa um recurso humano ou um colaborador da empresa 
+para o qual Issues podem ser alocados. Employees possuem um conjunto de habilidades 
+que foram denominadas Skills. A relação entre Employee e Skill possui dois atributos: 
+Potential, que é um número que pode variar de 0 a 1 e representa a capacidade do 
+Employee trabalhar com determinado Skill; e Preference, que também pode variar de 0 a 
+1 e representa a preferência que um Employee tem para trabalhar com determinado Skill. 
+Employees interagem com diversos Artifacts e a quantidade de interações é representada 
+através da classe associativa Interaction. Um Issue requer diversos Skills para ser 
+executado e pode estar relacionado com diversos Artifacts. 
+3. Descrição do Procedimento 
+O procedimento criado pode ser dividido em 3 grandes passos. A Caracterização dos 
+Employees consiste na definição, para cada Employee, de quais são seus Skills e qual é a 
+Preference e o Potential em relação a cada um dos Skills relacionadas. 
+ 
+O Cálculo do Grau de Adequação que quantifica (em uma escala entre 0 e 1) o 
+quanto um Employee é adequado para a execução de um Issue. 
+ 
+Na Alocação dos Issues, ordena-se cada um dos Employee de forma decrescente
+
+pelo grau de adequação e, para cada Issue, é alocado o Employee com maior grau de 
+adequação. Ao direcionar a alocação dos Employees aos Issues, o procedimento está 
+gerando implicitamente uma nova rede sócio-técnica. Esta rede poderia ser visualizada e 
+analisada com o apoio de ferramentas de redes sociais, como a EvolTrack-
+SocialNetwork [MAGDALENO et al., 2012]. 
+ 
+O procedimento proposto considera três fatores para a alocação de tarefas: Skills 
+necessárias para a execução de cada Issue, o histórico de interação de cada Employee 
+com os Artifacts relacionados ao Issue e a carga de trabalho atribuída a cada Employee 
+A Figura 2 demonstra as fórmulas utilizadas no cálculo de cada um desses fatores e o 
+texto a seguir explica cada um dos parâmetros das fórmulas. 
+ 
+Figura 2. Grau de Adequação 
+ 
+(1) α – Grau de Adequação – número que pode variar de 0 a 1 e representa o 
+quanto um Employee está habilitado para realizar determinada Issue. O α utiliza os 
+pesos P1, P2, P3 para balancear a equação. Os pesos podem variar de 0 a 1 e sua soma 
+deve ser sempre 1. 
+ 
+(2) SMS (Skill Match Score) representa a relação entre os Skills de um Employee 
+e os Skills requeridos para a execução de um Issue. #ES – Number of Equivalent Skills 
+– representa o número de Skills equivalentes entre o Employee e os Skills requeridos 
+para a execução de um Issue. #RS – Number of Required Skills – representa o número 
+total de Skills requeridos para a execução de um Issue. O parâmetro #LS – Number of 
+Left Skills – representa o número de Skills do Employee que ficaram subutilizados. A 
+utilização do #LS tem por finalidade evitar que um Employee que possui diversos Skills 
+seja alocado a um Issue que requer poucos Skills. ϪPr – Mean Preference – valor que 
+pode variar de 0 a 1 e representa a média aritmética das Preferences que um Employee 
+possui para trabalhar com cada um dos Skills relacionados ao Issue. ϪPo – Mean 
+Potential – valor que pode variar de 0 a 1 e representa a média aritmética do Potential 
+que um Employee possui para trabalhar com cada um dos Skills relacionados ao Issue. 
+Por exemplo, se determinado Issue requer os Skills Java e UML e o Potential de um 
+Employee para Java é 0,1 e para UML é 0,5, logo ϪPo é (0,1 + 0,5) / 2 = 0,3. 
+ 
+(3) AMS (Artifact Match Score) representa a relação entre os Artifacts já 
+trabalhados pelo Employee e os Artifacts requeridos para a execução do Issue, relação 
+que pode ser extraída de redes sócio-técnicas. Também é possível extrair a quantidade 
+de vezes com que um Employee se relacionou com determinado Artifact. Algumas 
+ferramentas como EvolTrack-SocialNetwork [MAGDALENO et al., 2012] podem ser 
+utilizadas para extrair essas medidas. A primeira parte do cálculo do AMS (peso=0,7) 
+expressa se determinado Employee teve relação com determinados Artifacts. A segunda 
+parte (peso=0,3) expressa o grau de interação que um Employee teve com os Artifacts 
+requeridos para realização do Issue. O parâmetro #EA – Number of Equivalent
+
+Artifacts – representa o número de Artifacts equivalentes entre o Employee e os 
+Artifacts requeridos para a execução de um Issue. #RA – Number of Required Artifacts 
+– representa o número total de Artifacts requeridos para a realização de um Issue. #LA – 
+Number of Left Artifacts – representa o número de Artifacts que o Employee já teve 
+contato, mas não são requeridos para execução do Issue. 
+ 
+(4) O WL (Work Load) é utilizado para evitar que a maioria dos Issues seja 
+atribuída para um mesmo Employee, fazendo com que os outros fiquem sem tarefas para 
+executar. Isso ocorre devido a tendência de atribuição de Issue para Employees que 
+possuem mais Skills e Artifacts relacionados. Assim, o WL faz com que quanto mais 
+Issues são atribuídos a um Employee menor é a chance de o próximo ser atribuído a ele. 
+O parâmetro #i – Number of Issues – representa o número total de Issues. #AI – 
+Assigned Issues – representa o número de Issues já atribuídos ao Employee. 
+ 
+(5) IF – Issue Familiarity – representa a familiaridade que um Employee tem 
+com todos os Artifacts necessários para a execução do Issue. 
+ 
+(6) Fea – Familiarity Employee – representa a familiaridade que um Employee 
+possui com um Artifact em específico requerido para a execução de um Issue. #a – 
+Number of Artifacts – representa o número de Artifacts requeridos para a execução de 
+um Issue. #Wea – Number of Work – representa o número de vezes que um Employee 
+trabalhou com determinado Artifact (Esse valor pode ser extraído de redes sócio-
+técnicas). #WMea – Number of Max Work – representa o número máximo de vezes que 
+qualquer um dos Employees já tenha trabalhado com o Artifact em questão. 
+4. Prova de Conceito 
+Esta seção apresenta uma prova de conceito utilizando dados fictícios e demonstra a 
+viabilidade de execução dos cálculos. A Figura 3a apresenta os 4 Employees utilizados 
+no estudo, os Skills de cada um deles e, para cada Skill, o Potential e a Preference que o 
+Employee possui. Um exemplo de leitura dessa tabela é que o Employee Bryan possui o 
+Skill SQL e tem a Preference de 1 e o Potential de 0,4 para trabalhar com essa Skill. A 
+Figura 3b demonstra quais artefatos cada Employee já trabalhou e a quantidade de vezes 
+que esse trabalho ocorreu. Um exemplo de leitura é que o Employee John trabalhou com 
+o Artifact a4 5 vezes. 
+ 
+(a) 
+Employee
+Skills
+Preference
+Potential
+Java
+1
+1
+UML
+1
+1
+DER
+1
+1
+DER
+1
+1
+SQL
+1
+1
+SQL
+1
+0,4
+Requirements
+1
+1
+Java
+1
+1
+UML
+0,5
+0,5
+John
+Mary
+Bryan
+Evelyn
+ 
+(b) 
+Figura 3. Caracterização Employee x Skills
+
+Depois disso, é preciso ter os Issues que precisam ser executados e saber quais 
+Skills e quais Artifacts são requeridos para a execução do Issue. Através da Figura 4 é 
+possível visualizar quais Skills e Artifacts são requeridos para realizar cada um dos 
+Issues (i1..10). 
+Issue
+i1
+i2
+i3
+i4
+i5
+i6
+i7
+i8
+i9
+i10
+Skills
+Java, UML, DER, 
+Requirements
+UML
+UML, SQL
+Java, 
+DER, SQL
+UML, SQL
+DER, SQL
+UML
+UML, DER
+DER, 
+Requirements Java, UML, DER
+Artifacts
+a1, a3
+a3, a5
+a2, a5
+a2
+a4, a5, a6, a7
+a7
+a6
+a4, a6
+a1, a6
+a1, a2, a3, a4 
+Figura 4. Issue e Artifacts x Skills 
+ 
+Em seguida, o cálculo do grau de adequação é realizado. A Figura 5 apresenta os 
+cálculos realizados e o resultado final. Cabe ressaltar que, para chegar nesses resultados, 
+os seguintes pesos foram utilizados: P1 = 0,34, P2 = 0,33, P3 = 0,33. 
+ 
+No resultado apresentado, as linhas marcadas em negrito representam os 
+Employees que ficaram responsáveis pela execução de cada Issue e as linhas em itálico 
+são os Employees que podem ajudar o responsável na execução. Dessa forma, é possível 
+perceber que o Employee John ficou responsável pelos Issues i1, i2, i3,i8 e i10. Mary ficou 
+responsável por i6 e i9, Bryan por i5 e Evelyn por i4 e i7. O resultado da execução 
+mostrou que foi atribuída uma quantidade maior de tarefas para os colaboradores mais 
+experientes, porém nenhum colaborador ficou improdutivo. 
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+i1
+John
+0,3815
+0
+0,7115
+i2
+John
+0,264583333
+1
+0,564583333
+Evelyn
+0,191325
+0
+0,521325
+Bryan
+0,2172115
+0
+0,5472115
+Mary
+0,17525
+0
+0,50525
+Evelyn
+0,1382
+0
+0,4682
+Bryan
+0,1142
+0
+0,4442
+Mary
+0
+0
+0,33
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+i3
+John
+0,23625
+2
+0,51125
+i4
+Evelyn
+0,24175
+0
+0,57175
+Evelyn
+0,124033333
+0
+0,454033333
+Mary
+0,226666667
+0
+0,556666667
+Bryan
+0,113511333
+0
+0,443511333
+John
+0,258
+3
+0,511846154
+Mary
+0,113333333
+0
+0,443333333
+Bryan
+0,034
+0
+0,364
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+i5
+Bryan
+0,244422333
+0
+0,574422333
+i6
+Mary
+0,4665
+0
+0,7965
+Mary
+0,226770833
+0
+0,556770833
+Evelyn
+0,15675
+1
+0,45675
+John
+0,2324605
+3
+0,486306654
+Bryan
+0,045333333
+1
+0,345333333
+Evelyn
+0,151739583
+1
+0,451739583
+John
+0,085
+3
+0,338846154
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+i7
+Evelyn
+0,186875
+1
+0,486875
+i8
+John
+0,351087667
+3
+0,604933821
+Bryan
+0,15675
+1
+0,45675
+Bryan
+0,2145
+1
+0,5145
+John
+0,164208333
+3
+0,418054487
+Mary
+0,183458333
+1
+0,483458333
+Mary
+0,10175
+1
+0,40175
+Evelyn
+0,117845833
+2
+0,392845833
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+Issue
+E
+Adequação Bruta
+#AI
+Adequação
+i9
+Mary
+0,232958333
+1
+0,532958333
+i10
+John
+0,55174175
+4
+0,787456036
+Bryan
+0,209033333
+1
+0,509033333
+Evelyn
+0,254
+2
+0,529
+John
+0,1929375
+4
+0,428651786
+Mary
+0,14825
+2
+0,42325
+Evelyn
+0,0895125
+2
+0,3645125
+Bryan
+0,12236675
+1
+0,42236675 
+Figura 5. Resultado da Execução 
+5. Conclusões e Trabalhos Futuros 
+Este trabalho apresentou um procedimento para a alocação de tarefas a recursos 
+humanos no qual redes sócio-técnicas são utilizadas para obter informações relacionadas 
+à interação de colaboradores com artefatos. São consideradas as habilidades requeridas 
+para a execução de uma tarefa e as habilidades dos colaboradores, a relação entre os 
+artefatos requeridos para a execução de uma tarefa e os artefatos que os colaboradores já 
+tiveram contato. Além disso, o procedimento considera também a carga de trabalho dos 
+colaboradores, que diz respeito ao quanto um colaborador já possui tarefas para realizar.
+
+As habilidades de cada colaborador devem ser registradas para executar o 
+procedimento. Além disso, no momento da criação das tarefas, o gerente deve informar 
+as habilidades e artefatos requeridos para a execução da tarefa. Já os artefatos com que 
+os colaboradores tiveram contato podem ser obtidos através de ferramentas de redes 
+sociais, como a EvolTrack-SocialNetwork. 
+ 
+Uma prova de conceito foi utilizada para avaliar a viabilidade de execução do 
+procedimento. Os resultados podem ser considerados satisfatórios para uma primeira 
+versão e demonstram a viabilidade do procedimento. 
+ 
+Ao longo da criação do procedimento e execução da prova de conceito, as 
+seguintes oportunidades de trabalhos futuros foram percebidas: (1) estudo de métodos 
+para diminuir a subjetividade dos atributos Preference e Potential, (2) estudo para 
+definição de pesos, (3) adaptação para considerar o fator “tempo desde a última 
+utilização do artefato”, (4) explorar a oportunidade de geração explícita da rede sócio-
+técnica de alocação dos colaboradores às tarefas, utilizando ferramentas de redes sociais 
+como a EvolTrack-SocialNetwork. Desta forma, a abordagem lidaria com duas redes 
+sócio-técnicas: a rede de artefatos manipulados anteriormente pelos colaboradores que 
+fornece informação de entrada; e a rede de alocação nas tarefas que seria um resultado 
+provido ao gestor para facilitar a sua visualização e tomada de decisão. Por fim, (5) 
+avaliação formal do procedimento proposto. 
+Agradecimentos 
+Os autores agradecem ao CNPq e CAPES pelo apoio financeiro para esta pesquisa. 
+Referências 
+Barreto, A. S., Barros, M. O. and Werner, C. M. L. (2005) “Apoio à Alocação de 
+Recursos Humanos em Projetos de Software: Uma Abordagem Baseada em 
+Satisfação de Restrições”, IV Simpósio Brasileiro de Qualidade de Software - SBQS. 
+Porto Alegre, Brasil. 
+Laplante, P. (2003) “Remember the human element in IT project management”, IT 
+Professional, Volume 5, Issue 1, Jan/Feb Page(s): 46 – 50. 
+Magdaleno, A.; Araujo, R. and Werner, C. (2012) “An Exploratory Study on 
+Collaboration Understanding in Software Development Social Networks”, 
+International Conference on Collaboration and Technology (CRIWG), Springer 
+Berlin Heidelberg, 113-120. 
+Singh, A., Sachdeva, A. and Chakraverty, S. (2013) "A collaborative software 
+development model based on formal concept analysis and stable matching", 
+International Conference on Informatics, Electronics & Vision (ICIEV), Dhaka, 1-6. 
+Barabási, A. L., (2003) “Linked: How Everything Is Connected to Everything Else and 
+What It Means for Business, Science, and Everyday Life”, Cambridge, Plume. 
+Santos, R. & Werner, C. (2012) “ReuseECOS: An Approach to Support Global 
+Software Development through Software Ecosystems”, In: ICGSE, VI WDDS, Porto 
+Alegre, 60-65.

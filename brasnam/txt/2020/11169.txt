@@ -1,0 +1,537 @@
+Mineração de Opiniões com LIWC: abordagem prática sobre
+sistemas judiciais eletrônicos brasileiros
+Rodolpho da Silva Nascimento1, Gabriel Nascimento1, Flavio Carvalho1,
+Gustavo Guedes1
+1CEFET/RJ - Centro Federal de Educação Tecnológica Celso Suckow da Fonseca
+Av. Maracanã, 229 - Rio de Janeiro - RJ - Brasil.
+{rodolpho.nascimento, gabriel.santos, flavio.carvalho}@eic.cefet-rj.br,
+gustavo.guedes@cefet-rj.br
+Abstract. Opinion Mining encompasses the computational study of opinions or
+evaluations that people express in relation to entities, products and services. The
+objective of this work is to evaluate and compare opinions, published on social
+networks, of users of electronic judicial systems such as Projudi, e-SAJ, PJe and
+e-Proc. To achieve this goal, it uses the most recent Brazilian Portuguese LIWC
+lexicon to obtain values referring to psycholinguistic features, observing emoti-
+ons and cognitive aspects present in the texts. Preliminary results indicate that
+the methodology adopted can bring relevant information about the users’ per-
+ception of these systems, which can be adopted in directing actions to improve
+them.
+Resumo. A Mineração de Opinião engloba o estudo computacional de opiniões
+ou avaliações que as pessoas expressam em relação a entidades, produtos e
+serviços. O objetivo deste trabalho é avaliar e comparar opiniões, publicadas
+em redes sociais, de usuários de sistemas de processos judiciais eletrônicos
+(Projudi, e-SAJ, PJe e e-Proc).
+Para isso, utiliza o mais recente léxico do
+LIWC em Português do Brasil para obter valores referentes a componentes
+psicolinguísticos, observando emoções e aspectos cognitivos presentes nos tex-
+tos. Resultados preliminares indicam que a metodologia adotada pode trazer
+informações relevantes sobre a percepção dos usuários acerca desses sistemas,
+podendo ser adotada no direcionamento de ações para aperfeiçoá-los.
+1. Introdução
+A forma de relacionamento entre os cidadãos e a Justiça tem mudado e crescido nas
+últimas décadas devido ao uso de novas tecnologias pelos tribunais, fornecendo maior
+transparência e melhor acesso às informações judiciais [Fabri, 2006]. Todavia, há uma
+pletora de serviços disponíveis de diversas naturezas, incluindo sistemas de gerencia-
+mento de base de dados, ferramentas para pesquisa online de decisões e jurisprudência,
+além de ferramentas para acesso às informações processuais, consulta do histórico de
+tramitação, disponibilização das decisões e de petição eletrônica.
+Recentemente, o
+próprio processo passou a existir apenas em formato digital [Velicogna, 2008; Löw, 2012].
+O desenvolvimento dos sistemas de processo eletrônico na Justiça do Trabalho
+brasileira pode ser classificado em três períodos [Sousa and Guimaraes, 2017]. O período
+
+anterior ao ano de 2006 é identificado como um “período embrionário”, iniciado pela
+utilização de computadores e por iniciativas específicas para o desenvolvimento de siste-
+mas para apoiar tais ações judiciais e outros sistemas administrativos. Logo após a Lei
+no 11.419 de 2006 [Brasil, 2006], iniciou-se o “período de incentivo”, formalizando o
+uso brasileiro do processo eletrônico, indo até o ano de 2011. O “período de esforço de
+padronização” é representado pela Resolução no 94 do Conselho Superior de Justiça do
+Trabalho (CSJT) de 2012 [do Trabalho, 2013], que determina obrigatoriamente a adoção
+de um sistema unificado de ações eletrônicas e metas de implementação a serem seguidas
+por todos os tribunais trabalhistas desse país.
+Atualmente, existem diversos sistemas de processos judiciais eletrônicos e de
+gestão da informação judicial que foram desenvolvidos de forma descentralizada no país,
+variando em porte e complexidade [Löw, 2012]. Por isso, o Conselho Nacional de Justiça
+(CNJ) lançou em 2011 o Processo Judicial Eletrônico (PJe), em uma ação estratégica
+para centralização no desenvolvimento de um único sistema para facilitar a troca de
+informações judiciais entre os órgãos [Löw, 2012]. Mudanças como essa afetam a ro-
+tina de trabalho de profissionais da área, evidenciando a necessidade de se atentar aos
+princípios que regem as relações jurídicas e como eles podem ser negativamente impac-
+tados pela escolha de um sistema eletrônico diferente ao anteriormente adotado [Parizi,
+2015].
+Conhecer “o que as pessoas pensam” é importante nos processos de tomada de
+decisões que afetam as pessoas [Pang et al., 2008], sendo que, idealmente, um levanta-
+mento abrangente deveria anteceder ações de grande porte. O cenário atual favorece esta
+tarefa ao se observar a existência de ambientes e pessoas amplamente conectados, em
+que plataformas de redes sociais oferecem comodidades para a exposição de pensamen-
+tos, sendo cada vez mais utilizadas como extensão da vida cotidiana [Jedrzejewski and
+Morzy, 2011]. Pelo mesmo motivo, favorece o compartilhamento de informações e torna
+conhecidas as opiniões de uma quantidade considerável de pessoas [Pang et al., 2008;
+IBGE, 2017], considerando que, cada vez mais, as pessoas estão disponibilizando suas
+opiniões via internet [Pang et al., 2008].
+O objetivo deste trabalho é realizar uma comparação das opiniões de usuários
+de sistemas de processos judiciais eletrônicos existentes no Brasil, tais como Projudi, e-
+SAJ, PJe e o e-Proc. Utilizando conteúdo textual publicado em redes sociais, é realizada
+uma análise no aspecto psicolinguístico e emocional dos usuários. Vale destacar que os
+usuários incluem os advogados e os próprios servidores públicos que utilizam os sistemas
+no cotidiano.
+Para se extrair informações de dados disponibilizados, são aplicadas técnicas da
+área de Mineração de Opiniões (MO) [Liu, 2012]. MO engloba o estudo computacional
+de opiniões ou avaliações de pessoas em relação a entidades, indivíduos, produtos, dentre
+outros [Liu, 2012; Jedrzejewski and Morzy, 2011]. Nesse trabalho, foi adotado o uso da
+MO com a abordagem baseada em léxicos, dado que essa abordagem não depende de um
+conjunto de dados rotulados, diferente da abordagem baseada em aprendizado de máquina
+[Medhat et al., 2014].
+Para este trabalho, optamos pelo uso de um software denominado Linguistic In-
+quiry and Word Count (LIWC) [Tausczik and Pennebaker, 2010], capaz de extrair carac-
+
+terísticas psicolinguísticas de textos com base em léxicos. Considerando que as opiniões
+sobre sistemas de processos judiciais eletrônicos existentes no Brasil correspondem a tex-
+tos em português, optou-se pela utilização do léxico do LIWC em português do Brasil
+(PT-BR) versão 2015 [Carvalho et al., 2019].
+As demais seções estão dispostas da seguinte maneira: na Seção 2, são levantados
+trabalhos semelhantes e relacionados ao tema; na Seção 3, são apresentados os passos
+utilizados para a criação do conjunto de dados proposto nesse estudo e é apresentada a
+metodologia para análise do conjunto de dados; na Seção 4, são discutidos os resultados
+encontrados; por último, a Seção 5 apresenta as conclusões e discussão sobre trabalhos
+futuros.
+2. Trabalhos relacionados
+O LIWC é um programa que se baseia em um léxico composto por palavras organizadas
+em categorias, cujo objetivo é analisar termos em um texto e extrair características psi-
+cológicas, sociais e de estruturas da língua [Tausczik and Pennebaker, 2010]. O LIWC
+processa arquivos de textos e cria representações utilizando valores associados à catego-
+rias de seu léxico, permitindo identificar emoções presentes no texto [Tausczik and Pen-
+nebaker, 2010]. Por isso, diversos trabalhos de MO utilizam o LIWC em uma abordagem
+psicolinguística, servindo como apoio em tarefas de classificação de polaridade.
+Os pesquisadores del Pilar Salas-Zárate et al. [2014] desenvolveram um estudo
+em que utilizam o LIWC como instrumento de apoio para classificação de sentimento
+em dois datasets na língua espanhola, rotulados em cinco categorias: positivo, negativo,
+neutro, altamente positivo e altamente negativo. O LIWC é utilizado para representação
+dos textos criando pesos com valores proporcionais das categorias relacionadas para cada
+termo. Esta representação é, então, utilizada como conjunto de dados para treino dos
+seguintes classificadores: J48, BayesNet e Sequential Minimal Optimization (SMO).
+O trabalho proposto por Narayan et al. [2018] consistiu na utilização de técnicas de
+Aprendizado de Máquina para reavaliar reviews fraudulentas sobre produtos. O LIWC foi
+utilizado em conjunto com n-gram feature para a classificação do conteúdo. O objetivo é a
+aplicação na detecção e eliminação de fraudes como forma preventiva de evitar decepções
+em clientes.
+Olagunju et al. [2020] desenvolveram um estudo para a avaliação de reviews em
+plataformas de compras de aplicativos para dispositivo móveis. Utilizaram o LIWC como
+instrumento de apoio para realizar a classificação positiva ou negativa de opiniões relata-
+das pelos usuários nas plataformas Apple Store e Google Play. Comparado com técnicas
+de Aprendizado de Máquina, conseguiram valores mais altos de F1-score utilizando o
+LIWC.
+Nenhum dos trabalhos supracitados aprofundaram a utilização do LIWC apro-
+veitando o resultado de subcategorias, ou mesmo de categorias relacionadas a aspectos
+sociais e cognitivos. Neste trabalho, as opiniões expressas sobre sistemas jurídicos são
+estudadas utilizando as categorias da versão de 2015 do LIWC em PT-BR. Considerando
+o ano de publicação do artigo que divulga a primeira avaliação realizada deste léxico, não
+são encontrados trabalhos que utilizam essa versão na compreensão de fatores expressos
+em opiniões públicas.
+
+3. Metodologia
+3.1. Aquisição dos dados
+Neste trabalho é realizada uma comparação das opiniões dos usuários a respeito de di-
+ferentes sistemas de processo judicial eletrônico. Para isso são coletadas publicações
+(tweets) dos usuários dos sistemas utilizando a application programming interface (API)1
+da rede social Twitter. São selecionados, para este trabalho, as comparações entre os
+sistemas Projudi, e-SAJ, PJe e o e-Proc.
+Para realizar a coleta de publicações, foi utilizado um script em Python. A string
+de busca utilizada corresponde a “PJe OR e-SAJ OR Projudi OR e-Proc”, considerando
+postagens entre janeiro de 2013 a abril de 2020. Essa busca totalizou 8.800 documentos.
+3.2. Pré-processamento dos dados
+Na etapa de pré-processamento, os textos foram convertidos para letras minúsculas (case
+folding). Em seguida, foi executada a remoção de pontuações, stopwords e hyperlinks.
+Houve então a separação de documentos, referentes aos sistemas avaliados nesse estudo,
+realizada utilizando regras manualmente estabelecidas, tais como (‘eproc’ or ‘e-proc’ or
+‘e proc’ = e-Proc).
+Esta separação de documentos é realizada considerando cada tweet coletado como
+um documento e buscando a relação com o sistema ao qual se refere. Para isso, foi uti-
+lizada a técnica de reconhecimento de entidades nomeadas (em inglês, Named Entity
+Recognition), valendo-se da abordagem baseada em regras (em inglês, Ruled-base ap-
+proach). Seguindo essa abordagem, o nome de cada sistema processual eletrônico foi
+considerado uma entidade: PJe, Projudi, e-SAJ ou e-Proc. De acordo com a presença
+das entidades nos documentos, eles foram elencados de acordo com as entidades detec-
+tadas. Para os casos de duas entidades detectadas no mesmo documento, como critério
+de escolha, foi selecionada primeira entidade detectada. A Tabela 1 apresenta a relação
+dos documentos por entidade. É possível observar que ainda existiam documentos não
+relacionados a nenhuma entidade conhecida, sendo descritos como “Sem entidade rela-
+cionada”. Os documentos “Sem entidade relacionada” foram descartados a partir dessa
+etapa.
+Tabela 1. Relaç ão de documentos por entidades nomeadas.
+Sistema
+Qtd. registros
+PJe
+6.240
+Projudi
+1.170
+e-SAJ
+322
+e-Proc
+114
+Sem entidade relacionada
+954
+3.3. Nuvem de palavras
+Nessa etapa é construída uma nuvem de palavras para uma breve análise exploratória
+dos dados. A Figura 1 ilustra a nuvem de palavras contendo as palavras mais frequentes
+1https://developer.twitter.com/en/docs/api-reference-index
+
+no conjunto de dados. Para elaboração dessa nuvem de palavras, foram desconsidera-
+das todas as stopwords (para o Português do Brasil) considerando a biblioteca nltk2 da
+linguagem de programação Python. A nuvem de palavras foi gerada com a biblioteca
+WordCloud3.
+Na nuvem de palavras, podemos observar a dupla presença da palavra “lixo”,
+pois a biblioteca WordCloud disponibiliza um recurso para verificar palavras que ocorrem
+juntas e de maneira frequente. Isso também ocorre em outras construções como “do pje”,
+“podia tá” e “certificado digital”. Desta maneira, podemos observar que a palavra “lixo”
+costuma ocorrer de forma frequente e mais de uma vez na mesma sentença, indicando
+usuários reclamando da qualidade de um dos sistemas.
+Ao observar a expressão “certificado digital”, a mesma poderia indicar algum pro-
+blema de acesso frequente com o certificado digital ou assinatura de documentos. Para
+exemplificar, pode-se destacar algumas mensagens que caracterizam problemas utilizando
+essa expressão: “Viu #PJe, é pra ferrar? Foi tanta coisa q atualizou q até meu certifi-
+cado digital bloqueou! Quase infartei pra desbloquear. Fim da picada!” e “Eu queria
+entender a razão pela qual o certificado digital do token de acesso ao PJe vence... É um
+negócio abstrato...”.
+Expressões como “pje ainda” vem de documentos que possuem sentimento ne-
+gativo, como: “ Ô gente, mas PJe ainda vai matar um de raiva” e “PJe ainda vai me
+matar, que sistema lixo!”. A expressão “do ar” pode indicar a indisponibilidade, como no
+seguinte documento: “Projudi fora do ar...”. Enquanto a expressão “podia tá” vem de um
+ditado popular, como no documento: “Eu podia tá matando, podia tá roubando, podia tá
+dormindo, mas tô aqui, protocolando no PJe.”.
+Figura 1. Nuvem de palavras contidas nos documentos.
+De maneira geral, podemos inferir que as palavras mais frequentes indicam pro-
+blemas frequentes que os usuários enfrentam nos sistemas judiciais. Pelo que foi obser-
+vado, o sistema mais citado é o PJe, muitas vezes de forma negativa. O segundo sistema
+mais citado é o Projudi.
+2https://www.nltk.org/
+3https://amueller.github.io/word cloud/
+
+3.4. Classificação dos documentos
+Os documentos foram submetidos ao processo iterativo utilizando o léxico do LIWC para
+identificar diferenças individuais de opinião de acordo com a frequência de palavras nas
+diversas categorias. Nesse trabalho foi utilizado o léxico do LIWC em português do
+Brasil na versão de 2015 (LIWC2015-BR) [Carvalho et al., 2019]. O LIWC2015-BR é
+baseado no léxico do LIWC em inglês, também de 2015. Dessa maneira, contém a mesma
+estrutura e referência numérica para as categorias. Por exemplo, a categoria 31 (posemo)
+se trata de “positive emotions” em inglês e de “emoções positivas” em português.
+Ao comparar a versão mais recente do léxico do LIWC (i.e., LIWC2015-BR) com
+a versão anterior, a literatura reporta que o LIWC2015-BR obtém melhores resultados
+no cálculo do percentual de palavras que são associadas às categorias de emoções ne-
+gativas e positivas [Carvalho and Guedes, 2019]. Além disso, o tempo necessário para
+processar textos utilizando o LIWC2015-BR é menor do que o tempo da versão anterior
+[Carvalho et al., 2019]. Estes fatores foram determinantes para esse léxico ser adotado na
+metodologia implementada para processar as opiniões sobre os sistemas jurídicos.
+As principais categorias do LIWC são divididas em subcategorias. Nesta versão,
+por exemplo, a Categoria 30 (“processos afetivos” - affect) é dividida em duas subcatego-
+rias: a Subcategoria 31 de “emoções positivas” (posemo) e a Subcategoria 32 de “emoções
+negativas” (negemo). A Subcategoria 32 é dividida em mais 3 subcategorias: 33 (“ansie-
+dade” - anx), 34 (“raiva” - anger) e 35 (“tristeza” - sad).
+Neste trabalho, primeiramente foram filtrados termos da Categoria 31 (posemo),
+criando um vetor com pesos calculados proporcionalmente à categoria relacionada e com-
+putando, em seguida, a soma dos pesos desse vetor, produzindo um score. Analogamente,
+o mesmo foi efetuado para a Categoria 32 (negemo) com os mesmos documentos. Os
+scores gerados foram submetidos às seguintes regras para classificação do documento: a)
+negemo>posemo: Classificação negativa; b) negemo<posemo: Classificação positiva; c)
+negemo = posemo: Classificação neutra.
+Com objetivo de extrair mais aspectos cognitivos após a classificação do docu-
+mento e aprofundar o conhecimento sobre o sentimento encontrado no mesmo, outras 20
+categorias do LIWC foram utilizadas e associadas à polaridade do documento. O número
+de identificação das categorias, nome e a quantidade de termos incluídos em cada uma de-
+las está indicado na Tabela 2. Os resultados foram agrupados pelas entidades (sistemas)
+que cada documento se referia.
+4. Resultados e discussão
+No corpus analisado, observa-se maior prevalência do sistema PJe, conforme resultados
+detalhados na Tabela 3. Por esta razão, os experimentos utilizam o PJe como referência
+para o detalhamento do aspecto cognitivo, analisando apenas documentos das classes
+negemo e posemo.
+Na literatura é comum encontrar trabalhos que utilizem o LIWC como apoio para
+extrair somente a polaridade de sentimento (negativo / positivo) presente no documento
+em análise [Olagunju et al., 2020] [Tadesse et al., 2019]. Aprofundar o conhecimento
+do documento após a sua classificação de polaridade por meio da combinação de outras
+categorias do LIWC (que extraiam aspectos cognitivos) contribui para um melhor enten-
+
+Tabela 2. Categorias do LIWC incluídas para associaç ão da polaridade dos tex-
+tos.
+Número
+Nome
+Abreviação
+Exemplos
+Quantidade
+33
+Ansiedade
+anx
+Horror, medo
+209
+34
+Raiva
+anger
+Irritada, mesquinho
+315
+35
+Tristeza
+sad
+Lamentável, sofri
+239
+41
+Família
+family
+Filho, tia
+93
+42
+Amigos
+friend
+Amada, chapa
+61
+54
+Tentativa
+tentat
+Confusa, quase
+483
+55
+Certeza
+certain
+Nunca, sempre
+425
+63
+Sensação
+feel
+Cãibra, ternura
+283
+72
+Saúde
+health
+Chagas, muscular
+1.296
+73
+Sexual
+sexual
+Acasalar, orgásmico
+146
+74
+Ingestão
+ingest
+Espaguete, laranja
+336
+83
+Poder
+power
+Gerenciar, vitória
+1.146
+84
+Recompensa
+reward
+Bônus, vencer
+394
+85
+Risco
+risk
+Defesa, perigo
+511
+90
+Foco passado
+focuspast
+Falou, passado
+3.159
+91
+Foco presente
+focuspresent
+Agora, atual
+1.416
+92
+Foco futuro
+focusfuture
+Amanhã, breve
+1.456
+113
+Dinheiro
+money
+Ações, pensão
+356
+114
+Religião
+relig
+Fé, santo, zen
+343
+115
+Morte
+death
+Funeral, morreu
+90
+dimento do fator motivacional que levou a construção da opinião. O método de análise
+proposto neste trabalho pode revelar aspectos interessantes, como o grau de insatisfação
+em documentos de polaridade negativa, ao computar e realizar a classificação de senti-
+mentos como “raiva”.
+Tabela 3. Classificaç ão dos documentos.
+Sistema
+Negativo
+Positivo
+Neutro
+PJe
+1.264
+1.444
+3.532
+Projudi
+230
+382
+768
+e-SAJ
+54
+100
+168
+e-Proc
+38
+14
+62
+A Tabela 4 exibe o resultado das categorias do LIWC que trazem um aspecto cog-
+nitivo referente aos documentos com polaridade negativa do sistema PJe. Observa-se que
+a Categoria 91 (Foco Presente) indica que as opiniões, em sua grande maioria, possuem
+termos que são mencionados com tempo verbal no presente, inferindo um contexto atual
+(e.g. estou, entendo). Seguidamente, a Categoria 34 (Raiva) indica que grande parte das
+opiniões possuem termos que apresentam um sentimento de raiva (e.g. odeio, raiva). A
+Categoria 85 (Risco) indicam termos com direcionamento de risco (e.g. cautela, apre-
+ensivo). A observação de valores elevados nestes três aspectos fornecem informações
+àqueles interessados em melhorias do sistemas, facilitando a identificação de que o sis-
+tema PJe necessita de ajustes visando mitigar a frustração de seus usuários para melhorar
+
+sua aceitação para a opinião pública.
+Tabela 4. Aspectos cognitivos PJe - negemo. O score aqui representa a soma
+dos valores apresentados pelo LIWC para cada categoria em todos os textos
+classificados como negativos.
+Categoria
+score
+91-Foco Presente
+100,2
+34-Raiva
+72,78
+85-Risco
+27,98
+83-Poder
+27,1
+90-Foco Passado
+25,04
+54-Tentativa
+24,66
+72-Saúde
+21,64
+35-Tristeza
+18,84
+55-Certeza
+18,66
+84-Recompensa
+17,04
+92-Foco Futuro
+14,12
+33-Ansiedade
+14,04
+114-Religião
+7,88
+63-Sensação
+5,86
+74-Ingestão
+5,32
+73-Sexual
+4,94
+113-Money
+4,02
+115-Morte
+3,9
+42-Amigos
+2,58
+A Tabela 5 apresenta exemplos de documentos classificados com emoções ne-
+gativas para o sistema PJe. Vale destacar que alguns dos exemplos possuem palavras
+relacionadas a categoria de raiva (e.g., odeio), indicando um descontentamento bastante
+acentuado.
+Tabela 5. Exemplos de documentos PJe - negemo.
+“odeio tanto o pje que nem sei”
+“odeio o pje do trt oh sistema de protocolo/consulta chatinho e complexo”
+“amaldiçoando de todas as formas o desenvolvedor do pje eu quero peticionar e
+não consigo”
+“estudos comprovam sistema pje causa depressão”
+“um sentimento chamado pje travado e um misto de angustia raiva e vontade
+de destruir o computador”
+“se vc ainda não passou raiva com pje você vai passar raiva com o pje”
+A Tabela 6 apresenta exemplos de documentos relacionados ao sistema PJe que
+foram classificados com emoções positivas. Uma análise subjetiva dessa amostra permite
+notar o uso de sarcasmo. Isto é, pode-se observar que o texto quer dizer o oposto do que
+se deseja.
+
+Tabela 6. Exemplos de documentos PJe - posemo.
+“que lindo dia para o pje sair do ar né meus amigos”
+“to aqui ouvindinho elvis presley enquanto espero a boa vontade do pje”
+“espero do fundo do meu coração que o pje tj-pi funcione tão legal quanto trt22 e
+trf1, mas vamos sonhando...”
+“muito bom o pje saindo do ar amanha, todos mundo tentando adiantar todos os
+protocolos e obvio q a internet caiu eh um game comigo”
+“maravilha não consigo enviar a petição pelo PJE, ainda bem que o prazo é só
+quarta feira”
+5. Conclusão
+Este trabalho foi desenvolvido de forma a comparar opiniões de usuários de sistemas
+de processos judiciais eletrônicos existentes no Brasil. Dessa maneira, o trabalho indica
+que é possível contribuir com informações sobre a percepção de usuários a respeito de
+entidades, produtos ou serviços obtidas com a utilização do léxico do LIWC, apoiando as
+tarefas de MO com base em dados provenientes de redes sociais. A abordagem adotada
+permite ir além de uma classificação de polaridade do tipo negativo/positivo, o que agiliza
+a identificação de qual ação pode ser adotada para ajustar um produto ou serviço de forma
+embasada, diminuindo custos e retrabalho.
+A utilização do mais recente léxico do LIWC em PT-BR para medir aspectos cog-
+nitivos favorece a construção de modelos mais complexos, melhorando a representação
+das opiniões expressas. Desta forma, esta metodologia subsidia tomadas de decisão obje-
+tivas (em larga escala) com base na opinião pública sobre um produto ou serviço. Em tra-
+balhos futuros, o LIWC poderá ser utilizado para detecção de sarcasmo e para a extração
+de aspectos de entidades, quando um documento contiver duas ou mais entidades nome-
+adas.
+6. Agradecimentos
+Os autores agradecem à CAPES (Código de Financiamento 001), FAPERJ e CNPq pelo
+financiamento parcial desta pesquisa.
+Referências
+Brasil (2006). Lei no 11.419, de 19 de dezembro de 2006. Dispõe sobre a informatização
+do processo judicial; altera a Lei no 5.869, de 11 de janeiro de 1973 - Código de
+Processo Civil; e dá outras providências. Presidência da República.
+Carvalho, F. and Guedes, G. P. (2019). Avaliação das categorias afetivas do dicionário
+PB-LIWC2015. In Proceedings of the 12th Brazilian Symposium in Information and
+Human Language Technology (STIL), pages 33–37.
+Carvalho, F., Rodrigues, R. G., Santos, G. d., Cruz, P., Ferrari, L., and Guedes, G. P.
+(2019). Evaluating the 2015 Brazilian Portuguese LIWC lexicon with sentiment analy-
+sis in social networks. In CSBC 2019 - 8o BraSNAM, Belém, Brazil.
+del Pilar Salas-Zárate, M., López-López, E., Valencia-García, R., Aussenac-Gilles, N.,
+Ángela Almela, and Alor-Hernández, G. (2014).
+A study on LIWC categories for
+opinion mining in Spanish reviews. Journal of Information Science, 40(6):749–760.
+
+do Trabalho, C. S. d. J. (2013). Resolução n. 94/CSJT, de 23 de março de 2012. Diário
+Eletrônico da Justiça do Trabalho, 1326.
+Fabri, M. (2006). Amministrare la giustizia: Governance, organizzazione, sistemi infor-
+mativi. Amministrare la giustizia.
+IBGE (2017). Pesquisa nacional por amostra de domicílios contínua - pnad contínua.
+Jedrzejewski, K. and Morzy, M. (2011). Opinion mining and social networks: A promi-
+sing match. In 2011 International Conference on Advances in Social Networks Analysis
+and Mining, pages 599–604.
+Liu, B. (2012). Sentiment analysis and opinion mining. Synthesis lectures on human
+language technologies, 5(1):1–167.
+Löw, M. M. (2012). Da automatização à virtualização: a criação do processo eletrônico
+no Brasil. Scire, pages 12–01.
+Medhat, W., Hassan, A., and Korashy, H. (2014). Sentiment analysis algorithms and
+applications: A survey. Ain Shams Engineering Journal, 5(4):1093–1113.
+Narayan, R., Rout, J. K., and Jena, S. K. (2018). Review spam detection using opinion
+mining. In Sa, P. K., Sahoo, M. N., Murugappan, M., Wu, Y., and Majhi, B., editors,
+Progress in Intelligent Computing Techniques: Theory, Practice, and Applications, pa-
+ges 273–279, Singapore. Springer Singapore.
+Olagunju, T., Oyebode, O., and Orji, R. (2020). Exploring key issues affecting african
+mobile ecommerce applications using sentiment and thematic analysis. IEEE Access,
+pages 1–1.
+Pang, B., Lee, L., et al. (2008). Opinion mining and sentiment analysis. Foundations and
+Trends R⃝in Information Retrieval, 2(1–2):1–135.
+Parizi, K. A. (2015). O PJe e o Jus Postulandi na Justiça do Trabalho: O problema do
+acesso à Justiça. Anais do V Simpósio Internacional de Análise Crítica do Direito (V
+SIACRID).
+Sousa, M. d. M. and Guimaraes, T. d. A. (2017). The adoption of innovations in Bra-
+zilian labour courts from the perspective of judges and court managers. Revista de
+Administração (São Paulo), 52:103 – 113.
+Tadesse, M. M., Lin, H., Xu, B., and Yang, L. (2019). Detection of depression-related
+posts in reddit social media forum. IEEE Access, 7:44883–44893.
+Tausczik, Y. R. and Pennebaker, J. W. (2010). The psychological meaning of words:
+LIWC and computerized text analysis methods. Journal of Language and Social Psy-
+chology, 29(1):24–54.
+Velicogna, M. (2008). Use of Information and Communication Technologies (ICT) in
+European Judicial Systems. CEPEJ Studies, 7:15.

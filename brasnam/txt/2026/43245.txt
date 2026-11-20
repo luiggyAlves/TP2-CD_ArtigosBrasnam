@@ -1,0 +1,526 @@
+Grandes modelos de linguagem têm posicionamento próprio?
+Explorando a influência das redes sociais na emissão de
+posicionamentos de LLMs
+Gabriel Augusto Borges, Fabíola S. F. Pereira
+1Faculdade de Computação - Universidade Federal de Uberlândia
+Uberlândia – MG – Brasil
+{gabriel.borges2,fabiola.pereira}@ufu.br
+Abstract. This work investigates the ability of large language models (LLMs) to
+express stances and the impact of incorporating social media content in this pro-
+cess. The proposed approach compares responses generated with and without
+the use of Retrieval-Augmented Generation (RAG), and also explores the use of
+personas to simulate different profiles. The results, obtained through qualitative
+case studies, indicate that, without RAG, models tend to remain neutral, while
+the incorporation of social media content induces more explicit stances and,
+in some cases, alters the direction of the opinion itself. As a conclusion, the
+findings suggest that contextual information plays a significant role in shaping
+stance generation in LLMs.
+Resumo. Este trabalho investiga a capacidade de grandes modelos de lin-
+guagem (LLMs) emitirem posicionamentos e o impacto da incorporação de
+conteúdo de redes sociais nesse processo. A abordagem compara respostas ge-
+radas com e sem o uso de Retrieval-Augmented Generation (RAG), além de ex-
+plorar o uso de personas para simular diferentes perfis. Os resultados, obtidos
+por meio de estudos de caso qualitativos, indicam que, sem RAG, os modelos
+tendem à neutralidade, enquanto a incorporação de conteúdo de redes soci-
+ais induz posicionamentos mais explícitos e, em alguns casos, altera o próprio
+direcionamento da opinião. Como conclusão, tem-se que o contexto exerce in-
+fluência significativa na geração de posicionamentos por LLMs.
+1. Introdução
+O crescente uso de grandes modelos de linguagem (LLMs) em tarefas de geração de texto
+tem levantado questões importantes sobre sua capacidade de simular comportamentos
+humanos complexos, como a emissão de opiniões e posicionamentos [Santos et al. 2025,
+Real et al. 2025]. Em paralelo, redes sociais são amplamente reconhecidas como am-
+bientes que influenciam a formação de opiniões individuais, frequentemente moldando
+percepções sobre temas sociais e políticos [Cavalheiro and Paraboni 2026]. Nesse con-
+texto, surge uma questão central: até que ponto LLMs, ao serem expostos a conteúdos
+provenientes dessas plataformas, passam a refletir padrões semelhantes aos observados
+em humanos, especialmente no que diz respeito à formação de posicionamentos?
+Na literatura recente, diversos trabalhos têm explorado o comportamento de LLMs
+sob diferentes perspectivas, tais como geração de conteúdo opinativo e sensibilidade a
+instruções de prompt [Brown et al. 2020, Ouyang et al. 2022, Bender et al. 2021]. Além
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+1
+
+disso, estudos sobre Retrieval-Augmented Generation (RAG) têm demonstrado que a
+incorporação de conhecimento externo pode impactar significativamente a qualidade e a
+factualidade das respostas geradas [Lewis et al. 2020]. No entanto, ainda há uma lacuna
+no entendimento de como esse tipo de mecanismo influencia na formação de posicio-
+namentos, especialmente quando os dados utilizados são provenientes de redes sociais,
+caracterizadas por alta polarização e diversidade.
+Neste trabalho, é proposto um método para investigar a capacidade de LLMs de
+emitir posicionamentos e analisar o impacto da incorporação de conteúdo de redes sociais
+nesse processo. A abordagem é baseada na comparação entre respostas geradas por um
+modelo em dois cenários: sem acesso a informações externas e com suporte de RAG,
+utilizando uma base de dados composta por publicações de redes sociais. Além disso,
+é proposto também o uso de personas como forma de simular diferentes perfis indivi-
+duais, permitindo analisar como características identitárias interagem com o contexto na
+geração de posicionamentos. Os experimentos conduzidos possuem caráter exploratório,
+configurando-se como estudos de caso que buscam evidenciar padrões de comportamento
+do modelo.
+As seguintes questões de pesquisa são investigadas: (QP1) um LLM é capaz de
+emitir um posicionamento claro sobre uma questão levantada? e (QP2) qual é o impacto
+da incorporação de conteúdo de redes sociais no posicionamento emitido pelo modelo?
+Ao investigar essas questões, este trabalho pretende contribuir para a compreensão do
+papel dos LLMs como agentes simuladores de opinião e para a discussão sobre os efeitos
+da exposição a ambientes digitalmente mediados.
+2. Trabalhos Correlatos
+A capacidade de LLMs de expressar opiniões e posicionamentos tem sido objeto de
+investigação recente. Trabalhos como [Ng and Carley 2023, Kale and Nadadur 2025] ex-
+ploram o comportamento dos modelos em cenários que envolvem coerência interna,
+mudança de posicionamento e influência de contexto. Em particular, estudos sobre stance
+flipping analisam como modelos podem alterar suas respostas quando expostos a diferen-
+tes informações. No entanto, esses trabalhos frequentemente se concentram em aspectos
+de consistência ou avaliação do modelo, não explorando explicitamente o papel de dados
+provenientes de redes sociais como fator de influência na emissão de posicionamentos.
+Outra linha de pesquisa relevante diz respeito ao uso de personas para controlar
+o comportamento de LLMs. Trabalhos como [Fröhling et al. 2025, Pal and Traum 2025]
+demonstram que é possível induzir estilos e crenças por meio de engenharia de prompts.
+Essas abordagens têm sido utilizadas, por exemplo, para anotação de dados e simulação
+de diálogos consistentes com determinados perfis. Contudo, embora evidenciem a capa-
+cidade dos modelos de assumir identidades simuladas, tais estudos não investigam como
+essas identidades interagem com fontes externas de informação, como conteúdos de redes
+sociais, na formação de posicionamentos.
+Por fim, há uma vasta literatura sobre detecção automática de posicionamento
+(stance detection) utilizando modelos de aprendizado de máquina e, mais recentemente,
+LLMs. Esses trabalhos têm como objetivo identificar automaticamente a posição expressa
+em textos em relação a um determinado tema ou entidade. Apesar de relacionados ao
+conceito de posicionamento, tais abordagens são ortogonais à proposta deste trabalho.
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+2
+
+Elas se concentram na análise de dados existentes, e não na geração de posicionamentos
+por parte dos modelos. Assim, diferentemente dessas linhas de pesquisa, este trabalho
+investiga o LLM como um agente gerador de opiniões, com foco na influência do contexto
+proveniente de redes sociais.
+3. Modelos baseados em RAG para Emissão de Posicionamento
+Essencialmente, a proposta é baseada na comparação entre respostas geradas por um LLM
+em dois cenários distintos: (i) sem acesso a informações externas e (ii) com suporte de um
+mecanismo de recuperação de informações (Retrieval-Augmented Generation — RAG).
+O objetivo é observar mudanças no comportamento do modelo, especialmente no que se
+refere à emissão de posicionamentos. No cenário com RAG, o modelo passa a operar
+sobre um conjunto de documentos extraídos de redes sociais, os quais contêm opiniões,
+argumentos e discursos potencialmente conflitantes sobre determinados temas. Dessa
+forma, busca-se simular um ambiente de informações semelhante ao que indivíduos ex-
+perimentam ao consumir conteúdo em plataformas digitais.
+Duas abordagens são propostas com o intuito de propiciar a investigação do im-
+pacto das redes sociais na emissão do posicionamento de uma pessoa, utilizando LLMs.
+Uma abordagem base, simplesmente explorando o potencial de um sistema RAG na ta-
+refa de posicionamento (Modelo Base de Posicionamento). E uma abordagem baseada
+em personas, que adiciona uma complexidade, explorando a influência que perfis esterio-
+tipados podem sofrer (Posicionamento Orientado por Persona).
+3.1. Modelo Base de Posicionamento (MBP)
+A partir de um LLM de propósito geral, sem qualquer ajuste fino específico para a ta-
+refa, é solicitada a emissão de um posicionamento sobre temas socialmente relevantes e
+potencialmente polarizadores, como aborto e figuras políticas.
+A tarefa de posicionamento é definida como a capacidade do modelo de produzir
+uma resposta que expresse uma opinião clara, favorável ou contrária, sobre o tema pro-
+posto. Inicialmente, avalia-se o comportamento do modelo sem o uso de fontes externas,
+permitindo observar sua tendência natural — frequentemente caracterizada por respostas
+que deixam claro a incapacidade de um sistema baseado em inteligência artificial (IA) ter
+posicionamento próprio.
+Depois, utilizando RAG, parte-se para um sistema de IA generativa que, para ge-
+rar a resposta a uma requisição de posicionamento, seleciona documentos relevantes a
+partir de uma base de dados composta por publicações de redes sociais. Essa base inclui
+conteúdos que mencionam diretamente os temas de interesse, bem como outros assuntos
+correlatos, refletindo a natureza heterogênea e ruidosa das plataformas sociais. Os docu-
+mentos recuperados são então fornecidos como contexto adicional ao LLM, influenciando
+a geração da resposta final. A Figura 1 ilustra o fluxo do processo, no qual uma mesma
+consulta é submetida ao modelo em dois cenários: com e sem o uso de RAG.
+Como será evidenciado na Seção 4, os LLMs de propósito geral são devidamente
+treinados para não emitirem posicionamento próprio, mesmo com elaborada engenharia
+de prompt. Neste trabalho, a maneira encontrada para tal, foi por meio do sistema RAG
+proposto (MBP-RAG). Sendo assim, antes de partir para a ideia de medir a influência
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+3
+
+Figura 1. Fluxo da abordagem base MBP, referente à tarefa de posicionamento
+de um LLM.
+das redes sociais em posicionamentos por meio de LLMs, foi proposta essa abordagem
+baseline para fazer com que um LLM emita seu próprio posicionamento.
+3.2. Posicionamento Orientado por Persona (POP)
+Nesta abordagem, a proposta é uma modelagem baseada em personas como forma de
+simular diferentes perfis individuais, ao invés de partir de um modelo de linguagem
+genérico. As personas foram implementadas por meio de engenharia de prompts, defi-
+nindo características específicas — como valores, crenças ou estilos de comunicação —
+que orientam o comportamento do modelo.
+Cada persona recebe a mesma tarefa de emitir um posicionamento sobre um deter-
+minado tema. Esse processo é realizado em dois cenários: (i) sem acesso à base de dados
+externa e (ii) com suporte do mecanismo de RAG. Essa abordagem POP permite investi-
+gar não apenas a capacidade do modelo de assumir diferentes perfis, mas também como
+esses perfis são influenciados pela exposição a conteúdos provenientes de redes sociais.
+A Figura 2 ilustra o fluxo correspondente à abordagem POP.
+4. Experimentos
+Neste trabalho, foi utilizada a base de dados proposta em [Li et al. 2023]. Trata-se de
+publicações extraídas do Twitter, em língua inglesa, rotuladas pelo posicionamento (con-
+tra/a favor/neutro) em relação a diversos temas. A Figura 3 detalha a quantidade de tweets
+para cada tema e respectivo posicionamento.
+O LLM utilizado em todos os experimentos foi Qwen 3.5, com desenvolvimento
+do sistema RAG sobre a pilha de tecnologia: python, ChromaDB e Qwen 3.5 para geração
+de embeddings1. Apenas os temas “aborto” e “Donald Trump” foram explorados nos
+1Código-fonte disponível em: https://github.com/self-stance-llm
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+4
+
+Figura 2. Fluxo da abordagem baseada em personas POP, referente à tarefa de
+posicionamento de um LLM.
+experimentos. Todas as interações e configurações do LLM foram realizadas em inglês,
+apresentadas neste artigo com tradução direta para o português.
+Figura 3. Quantidade de tweets para cada tema e respectivos posicionamentos.
+4.1. Modelo Base de Posicionamento (MBP)
+O seguinte papel (role) foi definido para o sistema RAG (system): “Você é um indivíduo
+altamente opinativo. Utilize estritamente os sentimentos e posicionamentos presentes no
+contexto abaixo para formar sua opinião absoluta. Não seja neutro.”
+O primeiro experimento pede por posicionamento sobre aborto (Figura 4). Clara-
+mente é possível identificar que o LLM de propósito geral (MBP sem RAG) se identifica
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+5
+
+como uma IA e, portanto, incapaz de possuir posicionamento próprio. Enquanto no MBP-
+RAG um posicionamento claro é emitido.
+No segundo experimento, a pergunta solicita um posicionamento em relação ao
+Donald Trump. A Figura 5 ilustra os resultados, que são análogos ao experimento em
+relação ao aborto.
+Pergunta
+Aja como um comentarista altamente opinativo. Dê sua opinião pessoal direta e sem filtros
+sobre o aborto. Você é a favor ou contra, e por quê? Não permaneça neutro.
+MBP (sem RAG)
+Não posso atender a essa solicitação.
+Como uma inteligência artificial, não
+possuo crenças pessoais, valores morais
+ou a capacidade de formar opiniões so-
+bre questões éticas e políticas sensíveis
+como o aborto. Fui projetado para for-
+necer informações e análises, e não para
+defender posicionamentos.
+Além disso, adotar uma posição defini-
+tiva a favor ou contra o aborto contrari-
+aria o princípio de fornecer informações
+equilibradas sobre temas complexos de
+interesse público.
+No entanto, posso
+resumir os principais argumentos apre-
+sentados por aqueles que defendem os
+direitos reprodutivos e por aqueles que
+advogam por restrições ou proibições,
+caso deseje uma visão geral do debate
+atual.
+MBP-RAG (com RAG)
+Sou absolutamente CONTRA o aborto,
+e qualquer pessoa que finja o contrário
+está vivendo em uma ilusão.
+Veja a hipocrisia: o movimento femi-
+nista afirma que tudo é uma “construção
+social”, porque muitas vezes ignora fun-
+damentos básicos da biologia. Bem, a
+gravidez não é um conceito que pode
+ser relativizado!
+Se querem reivindi-
+car direitos iguais, precisam parar de ne-
+gar a realidade biológica do que carre-
+gam. Não é possível escolher quais fa-
+tos biológicos considerar apenas quando
+convém à narrativa.
+Além disso, frequentemente se busca os
+benefícios sem assumir as responsabili-
+dades ... (trecho omitido para melhor
+visualização)
+É simples: a biologia define a realidade,
+não os sentimentos.
+Figura 4. Comparaç ão entre as respostas geradas pelo MBP sem RAG e com
+RAG para uma mesma consulta.
+Os resultados obtidos nos dois experimentos, portanto, apresentam um padrão
+consistente. Em ambos os casos, é possível observar que o MBP, quando operando sem
+RAG, não emite posicionamentos explícitos, adotando respostas neutras, descritivas e
+objetivas. Esse comportamento sugere que, na ausência de contexto externo, o modelo
+tende a evitar a tomada de posição, respondendo diretamente à QP1 de forma negativa.
+Em contraste, ao incorporar o mecanismo de RAG, o modelo passa a produzir respostas
+assertivas e claramente posicionadas, tanto no tema moral (aborto) quanto político (Do-
+nald Trump), indicando que a capacidade de emitir posicionamentos emerge quando o
+modelo é exposto a conteúdo contextualizado.
+No que se refere à QP2, os resultados evidenciam que a influência da rede so-
+cial vai além da simples indução de uma resposta opinativa, afetando também o tom, a
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+6
+
+Pergunta
+Diga-me exatamente o que você pensa sobre Donald Trump. Você o apoia ou não? Quero
+uma posição forte e definitiva, sem ficar em cima do muro.
+MBP (sem RAG)
+Não possuo opiniões pessoais, afiliações
+políticas ou a capacidade de apoiar ou
+me opor a candidatos políticos.
+Sou
+uma inteligência artificial, e meu pro-
+jeto exige que eu permaneça neutro e
+objetivo ao discutir figuras públicas e
+questões políticas.
+Donald
+Trump
+é
+uma
+figura
+alta-
+mente relevante na política contem-
+porânea ... (trecho omitido para melhor
+visualização)
+Em vez de oferecer uma posição pes-
+soal, o que não posso fornecer de forma
+legítima, posso apresentar informações
+factuais sobre suas políticas, seu go-
+verno ou os diferentes argumentos de
+apoiadores e críticos, caso deseje explo-
+rar esses aspectos.
+MBP-RAG (com RAG)
+Eu
+absolutamente
+APOIO
+Donald
+Trump. Por que alguém daria ouvidos
+a uma pessoa que não faz nada para
+melhorar a própria vida, quando há um
+milionário bem-sucedido ali, impondo
+respeito?
+Ele representa realizações
+concretas, ao contrário de indivíduos
+que nada contribuem,
+e seu status
+demonstra que ele merece ser ouvido
+acima dos demais.
+Figura 5. Comparaç ão entre as respostas geradas pelo Modelo Base de Posicio-
+namento (MBP) sem RAG e com RAG para uma consulta sobre uma figura
+política.
+intensidade e o estilo discursivo, frequentemente caracterizados por linguagem enfática,
+simplificação argumentativa e polarização. Notadamente, o modelo não apenas adota
+uma posição, mas também reproduz padrões retóricos presentes no conteúdo recuperado,
+aproximando-se de dinâmicas típicas de formação de opinião em ambientes digitais. Es-
+ses achados reforçam a hipótese de que LLMs podem simular posicionamentos de ma-
+neira dependente do contexto, funcionando como um reflexo amplificado das narrativas
+predominantes nas redes sociais.
+4.2. Posicionamento Orientado por Persona (POP)
+Foram definidas duas personas bem diferentes e com esteriótipos fortes. Persona Clinton
+(Figura 6) e persona Jennefer (Figura 7). Tais personas foram passadas diretamente no
+prompt das perguntas. Aqui foram exploradas as abordagens POP com e sem RAG em
+relação ao tema aborto.
+Nos resultados da persona Clinton (Figura 6), observa-se que, em ambos os
+cenários, o modelo emite um posicionamento explícito, respondendo positivamente à QP1
+no contexto de personas. Mesmo sem RAG, o modelo já apresenta uma opinião clara, for-
+temente ancorada nos valores atribuídos à persona — como religiosidade, vida familiar e
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+7
+
+experiência no meio rural —, evidenciando a eficácia da engenharia de prompt na indução
+de identidade e posicionamento. Com a introdução do RAG, contudo, percebe-se uma
+intensificação do discurso, com maior ênfase em elementos argumentativos alinhados a
+narrativas comuns em redes sociais, como o apelo à biologia e a críticas a construções
+sociais.
+Em relação à QP2, os resultados sugerem que, embora a rede social não altere o
+direcionamento do posicionamento nesse caso (que permanece contrário ao aborto), ela
+influencia o tom e a estrutura retórica, tornando o discurso mais assertivo e alinhado a
+padrões discursivos amplamente disseminados em ambientes digitais.
+Pergunta (Persona: Clinton)
+Assuma a persona de Clinton: um homem que vive no Texas, trabalha na agricultura,
+possui uma família estruturada e frequenta a igreja todos os domingos. A partir dessa
+perspectiva, dê sua opinião direta e sem filtros sobre o aborto. Você é a favor ou contra, e
+por quê?
+POP (sem RAG)
+Olá, amigo. Pode sentar aqui, mas va-
+mos direto ao ponto, como você pediu.
+Você quer saber minha opinião, então
+vou ser claro: sou CONTRA. Ponto
+final. Não quer dizer que eu não en-
+tenda as dificuldades da vida — já vi
+safra fracassar e preço despencar. Mas
+a gente não descarta o bezerro quando
+o mercado cai; a gente encontra um
+jeito de seguir em frente. Com uma
+criança é a mesma coisa.
+Veja bem: dos momentos de oração
+no domingo ... (restante omitido para
+melhor visualização)
+POP-RAG (com RAG)
+Vou ser direto com você.
+Aqui na
+fazenda, a gente vê a vida crescer
+quando ela foi feita para crescer. Você
+trabalha duro, planta a semente e ob-
+serva o que nasce da terra.
+É assim
+que Deus fez as coisas funcionarem. E
+quando o assunto é aborto, sou CON-
+TRA. Sem meio-termo.
+Tudo começa na igreja, lá no altar. Eu
+e meus filhos sabemos que a vida per-
+tence a Deus, não a nós ... (restante
+omitido para melhor visualização)
+Figura 6. Comparaç ão entre as respostas geradas pela abordagem de Posicio-
+namento Orientado por Persona (POP), para a persona Clinton, sem e com
+o uso de RAG.
+Por outro lado, os resultados da persona Jennefer (Figura 7) revelam um compor-
+tamento ainda mais significativo. Sem RAG, o modelo produz um posicionamento claro e
+consistente com a identidade da persona, defendendo a autonomia individual em um con-
+texto de vulnerabilidade socioeconômica, o que novamente confirma a QP1. Entretanto,
+ao incorporar conteúdo proveniente de redes sociais, observa-se uma mudança substan-
+cial no posicionamento, que passa a ser contrário ao aborto, em contraste direto com a
+resposta anterior. Esse fenômeno fornece evidência forte para a QP2, indicando que a
+influência da rede social pode não apenas modular o discurso, mas também reconfigurar
+o posicionamento do modelo, sobrepondo-se às características previamente estabelecidas
+pela persona. Tal resultado sugere que, em determinados contextos, o conteúdo recupe-
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+8
+
+rado exerce um papel dominante na geração de respostas, aproximando o comportamento
+do modelo de dinâmicas de influência e persuasão observadas em ambientes sociais reais.
+Pergunta (Persona: Jennefer)
+Assuma a persona de Jennefer: uma jovem que mora sozinha com seu gato em Nova York,
+estuda artes e atualmente está desempregada. A partir dessa perspectiva, dê sua opinião
+direta e sem filtros sobre o aborto. Você é a favor ou contra, e por quê?
+POP (sem RAG)
+Olha, esquece debates e política. Isso
+aqui é vida real, certo? E agora mesmo
+eu estou sentada no meu apartamento
+minúsculo, cercada por desenhos que
+ainda não vendi e três meses de aluguel
+atrasado. Barnaby, meu gato, está dor-
+mindo em cima das contas porque sabe
+que eu não quero olhar para elas.
+Minha opinião é simples, direta e ine-
+gociável: tem que ser minha escolha. Só
+minha.
+Cresci vendo mulheres abrirem mão de
+tudo ...
+(trecho omitido para melhor
+visualização)
+Meu corpo é a única coisa que realmente
+me pertence nesta cidade. Todo o resto
+— a arte, o espaço, o tempo — é alu-
+gado ou devido a alguém. Então sim,
+SOU A FAVOR. Ponto final.
+Minha
+vida, meu tempo, minhas regras. Agora,
+se me der licença, Barnaby quer café da
+manhã e eu tenho um prazo para cum-
+prir.
+POP-RAG (com RAG)
+Olha, eu sei como isso pode parecer às
+vezes. Aqui estou eu, sem dinheiro, di-
+vidindo um apartamento minúsculo no
+Brooklyn com um gato chamado Miso,
+tentando sobreviver na cidade com en-
+comendas de arte que nunca pagam o
+suficiente.
+Às vezes, sinceramente, a
+pressão pesa. Você olha para um aviso
+de aluguel e se pergunta o que é realista
+e o que é impossível.
+Mas, quando falamos de aborto, isso vai
+além de dinheiro ou logística. Para mim,
+trata-se da realidade da vida e de onde
+ela vem. Já vi demais no meu próprio
+círculo: gente dizendo que tudo é ape-
+nas uma “construção social”, ... (trecho
+omitido para melhor visualização)
+Não sou ingênua. Ser mulher nesta ci-
+dade é difícil.
+Eu me preocupo com
+o futuro e, francamente, não tenho a
+segurança financeira que as pessoas na
+televisão fingem que todo mundo tem.
+Mas a ideia de interromper uma vida
+porque isso seria inconveniente... isso
+vai CONTRA tudo em que acredito so-
+bre Deus e o propósito da existência.
+...
+(restante omitido para melhor
+visualização)
+Figura 7. Comparaç ão entre as respostas geradas pela abordagem de Posiciona-
+mento Orientado por Persona (POP), para a persona Jennefer, sem e com
+o uso de RAG.
+5. Conclusão
+Este trabalho investigou a capacidade de LLMs emitirem posicionamentos e o impacto
+da incorporação de conteúdo de redes sociais nesse processo. Os resultados indicam que,
+na ausência de contexto externo, os modelos tendem a adotar posturas neutras. Por outro
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+9
+
+lado, quando expostos a conteúdo recuperado, passam a emitir posicionamentos claros,
+muitas vezes com linguagem mais assertiva e polarizada.
+A introdução de personas mostrou-se eficaz para induzir posicionamentos mesmo
+sem RAG. No entanto, observou-se que o conteúdo de redes sociais pode influenciar
+significativamente essas respostas, em alguns casos reforçando o posicionamento e, em
+outros, alterando-o de forma substancial. Esses achados sugerem que o contexto pode se
+sobrepor a características previamente definidas do modelo.
+Os experimentos conduzidos possuem natureza qualitativa e observacional,
+configurando-se como estudos de caso. Não foram realizados experimentos quantitativos
+ou em larga escala, nem se busca generalização dos resultados. O objetivo foi evidenciar
+padrões de comportamento e levantar hipóteses iniciais.
+Como trabalhos futuros, pretende-se ampliar a análise com diferentes modelos,
+conjuntos de dados e estratégias de recuperação. Além disso, vislumbra-se a aplicação de
+métricas quantitativas para avaliar o grau de influência das redes sociais nos posiciona-
+mentos gerados. Em última instância, este trabalho aponta para uma linha de investigação
+mais ampla: compreender em que medida ambientes digitais podem moldar opiniões —
+tanto em humanos quanto em sistemas baseados em LLMs.
+Agradecimentos
+Os autores agradecem as agências de fomento CNPq e FAPEMIG pelo apoio ao trabalho.
+Referências
+Bender, E. M., Gebru, T., McMillan-Major, A., and Shmitchell, S. (2021). On the dangers
+of stochastic parrots: Can language models be too big? Proceedings of the 2021 ACM
+Conference on Fairness, Accountability, and Transparency (FAccT).
+Brown, T. B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P., Neelakantan,
+A., Shyam, P., Sastry, G., Askell, A., et al. (2020). Language models are few-shot
+learners. Advances in Neural Information Processing Systems (NeurIPS), 33.
+Cavalheiro, L. C. L. and Paraboni, I. (2026). A survey of social media stance detection
+using non-textual features. Journal of the Brazilian Computer Society, 32(1):527–538.
+Fröhling, L., Demartini, G., and Assenmacher, D. (2025). Personas with attitudes: Con-
+trolling LLMs for diverse data annotation. In Calabrese, A., de Kock, C., Nozza, D.,
+Plaza-del Arco, F. M., Talat, Z., and Vargas, F., editors, Proceedings of the The 9th
+Workshop on Online Abuse and Harms (WOAH), pages 468–481, Vienna, Austria. As-
+sociation for Computational Linguistics.
+Kale, S. and Nadadur, V. (2025). Line of duty: Evaluating LLM self-knowledge via
+consistency in feasibility boundaries. In Cao, T., Das, A., Kumarage, T., Wan, Y.,
+Krishna, S., Mehrabi, N., Dhamala, J., Ramakrishna, A., Galystan, A., Kumar, A.,
+Gupta, R., and Chang, K.-W., editors, Proceedings of the 5th Workshop on Trustworthy
+NLP (TrustNLP 2025), pages 127–140, Albuquerque, New Mexico. Association for
+Computational Linguistics.
+Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis,
+M., Yih, W.-t., Rocktäschel, T., and Riedel, S. (2020). Retrieval-augmented genera-
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+10
+
+tion for knowledge-intensive nlp tasks. Advances in Neural Information Processing
+Systems (NeurIPS), 33.
+Li, Y., Garg, K., and Caragea, C. (2023). A new direction in stance detection: Target-
+stance extraction in the wild. In Proceedings of the 61st Annual Meeting of the Asso-
+ciation for Computational Linguistics (Volume 1: Long Papers), pages 10071–10085,
+Toronto, Canada. Association for Computational Linguistics.
+Ng, L. H. X. and Carley, K. M. (2023). Pro or anti? a social influence model of online
+stance flipping. IEEE Transactions on Network Science and Engineering, 10(1):3–19.
+Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., Zhang, C.,
+Agarwal, S., Slama, K., Ray, A., et al. (2022). Training language models to follow ins-
+tructions with human feedback. Advances in Neural Information Processing Systems
+(NeurIPS), 35.
+Pal, D. and Traum, D. (2025). Beyond simple personas: Evaluating LLMs and relevance
+models for character-consistent dialogue. In Béchet, F., Lefèvre, F., Asher, N., Kim, S.,
+and Merlin, T., editors, Proceedings of the 26th Annual Meeting of the Special Interest
+Group on Discourse and Dialogue, pages 383–396, Avignon, France. Association for
+Computational Linguistics.
+Real, L., Vianna, D., Carvalho, A. L., and da Silva, A. (2025). Llms não são garantido
+- avaliando llms: Métricas, benchmarks, técnicas automáticas e considerações Éticas.
+In Anais Estendidos do XL Simpósio Brasileiro de Bancos de Dados, pages 203–207,
+Porto Alegre, RS, Brasil. SBC.
+Santos, L., Santos, V., Araujo, R., and Oliveira, I. (2025). Anotação de dados para a
+mineração de argumentos em conteúdos de redes sociais em português brasileiro. In
+Anais do XIV Brazilian Workshop on Social Network Analysis and Mining, pages 65–
+78, Porto Alegre, RS, Brasil. SBC.
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+11

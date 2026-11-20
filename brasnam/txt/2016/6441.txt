@@ -1,0 +1,690 @@
+31
+BraSNAM - 5º Brazilian Workshop on Social Network Analysis and Mining
+Análise e Ranqueamento da Rede de Advogados
+induzida por Processos Judiciais Trabalhistas
+Leonardo Filipe Rodrigues Ribeiro1, Daniel R. Figueiredo1,
+Paulo Roberto Nascimento1
+1Programa de Engenharia de Sistemas e Computação (PESC/COPPE)
+Universidade Federal do Rio de Janeiro (UFRJ) – Rio de Janeiro – RJ
+leoribeiro@cos.ufrj.br, daniel@land.ufrj.br, prmn@cos.ufrj.br
+Abstract. Who are the most important lawyers in the labor court of Rio de Ja-
+neiro state? Using data from tens of thousands of cases, we created a network of
+lawyers, directed and weighted, in order to answer that and some other questi-
+ons. An empirical evaluation indicates that the structure of the network has very
+commonly features founded in other real social networks. Metrics as closeness,
+betweenness, vertex strength and pagerank were used to perform ranking of its
+vertices and identifying the main lawyers of the network. Lastly, we found in-
+formation about how lawyers are related to each other in the different trials in
+which they worked. The main objective of this work is to understand how labor
+lawyers are connected and what their importance is in the community in which
+they work.
+Resumo. Quais são os advogados mais influentes da justiça do trabalho do es-
+tado do Rio de Janeiro? Utilizando dados de dezenas de milhares de processos,
+construímos uma rede de advogados, direcionada e com pesos, com o objetivo
+de responder a essa e algumas outras perguntas. Uma avaliação empírica in-
+dica que a estrutura da mesma apresenta características muito comumente en-
+contradas em outras redes sociais reais. As métricas closeness, betweenness,
+força do vértice e pagerank foram utilizadas para realizar o ranqueamento dos
+seus vértices e identificar os principais advogados da rede. Por fim, identifi-
+camos como os advogados estão relacionados nos diferentes processos onde
+atuaram. O principal objetivo desse trabalho é entender como os advogados
+trabalhistas estão conectados e qual sua importância na comunidade em que
+trabalham.
+1. Introdução
+A solução judicial de conflitos decorrentes das relações de trabalho, segundo a
+Constituição, é de competência da Justiça do Trabalho, a qual está estruturada em um
+Tribunal Superior do Trabalho (TST), com competência em todo o território nacional, e
+24 Tribunais Regionais do Trabalho (TRT) distribuídos pelo país. O Tribunal Regional
+do Trabalho - 1a Região (TRT1) tem competência para julgar os processos trabalhistas no
+âmbito do Estado do Rio de Janeiro.
+Os processos de natureza trabalhista são norteados pelos princípios e normas do
+Direito Processual do Trabalho. Um processo possui um autor, também chamado de
+reclamante na reclamação trabalhista, e um réu, também chamado de reclamado. Na
+
+XXXVI Congresso da Sociedade Brasileira de Computação
+32
+justiça do trabalho reclamante é aquele que aciona o judiciário, geralmente o empregado,
+ao passo que reclamado é aquele que é chamado a se defender perante o juízo, em geral é
+a empresa ou empregador.
+Atualmente, todos os novos processos iniciados no TRT1 são eletrônicos. Para
+isso, utiliza-se o Processo Judicial Eletrônico da Justiça do Trabalho (PJe-JT), que é um
+sistema desenvolvido pelo Conselho Superior da Justiça do Trabalho (CSJT) a partir de
+um branch do Processo Judicial Eletrônico (PJe), o qual é desenvolvido pelo Conselho
+Nacional de Justiça (CNJ) em parceria com tribunais e tendo a participação da Ordem dos
+Advogados do Brasil. O PJe-JT foi implantado no TRT1 em junho de 2012 e hoje já conta
+com mais de 713 mil processos na 1a instância e mais de 57 mil processos na 2a instância.
+Todos os atos e documentos de processos PJe-JT são eletronicamente cadastrados. Os
+dados são públicos, salvo aqueles em segredo de justiça, e podem ser acessados através
+do portal do tribunal.
+Este trabalho utiliza as informações dos processos judiciais trabalhistas oriundas
+da base de dados do sistema PJe-JT, em particular, informações das partes reclamante e
+reclamada. Essas partes possuem um ou mais advogados. Apesar do portal público, estas
+informações foram obtidas diretamente do banco de dados do PJe-JT e os dados foram
+anonimizados, de forma que os nomes dos advogados foram transformados em números
+aleatórios a fim de preservar a privacidade dos advogados.
+Iremos construir uma rede de advogados onde os vértices representam os advo-
+gados e uma aresta direcionada de um advogado A para um advogado B indica que A
+“perdeu” um ou mais processos para B. As arestas possuem pesos, então se o advogado
+A perdeu k processos para o advogado B, existirá uma aresta direcionada de A para B
+com peso k. A ideia é que um advogado, ao perder um processo para outro, está confe-
+rindo importância ao segundo. Logo, um advogado que possui muitas arestas de entrada
+e poucas de saída terá um maior prestígio na rede de advogados, por ter vencido muitos
+processos e perdido poucos.
+A Figura 1 mostra um pequeno pedaço da rede de advogados, mais especifica-
+mente advogados que atuaram na 2a Vara de Macaé. Os advogados 38846 e 681953
+ganharam dois e cinco processos, respectivamente, do advogado 492270. Os advogados
+111275 e 44401 perderam e ganharam entre si um processo, e o mesmo ocorreu entre os
+advogados 44401 e 492270. Repare as intensidades (pesos) das arestas, e a possibilidade
+de reciprocidade entre um par de advogados (A perde para B, e vice-versa).
+As principais contribuições deste trabalho são a construção, caracterização e
+ranqueamento de uma rede empírica de advogados a partir de processos judiciais. A
+caracterização desta rede indica que a mesma possui propriedades tipicamente encontra-
+das em redes sociais, tais como baixa densidade, distâncias curtas e distribuição de grau
+com cauda pesada. A partir da rede, realizamos um ranqueamento utilizando métricas
+distintas (pagerank e força do vértice, entre outras) com o objetivo de identificar os ad-
+vogados mais influentes. Ao final, comparamos o ranqueamento com o valor monetário
+dos processos envolvendo os respectivos advogados, que indica uma correlação com o
+ranqueamento.
+O restante desse artigo está organizado da seguinte forma: na seção 2 apresen-
+tamos os trabalhos relacionados; uma descrição dos detalhes do dataset e de como foi
+
+33
+BraSNAM - 5º Brazilian Workshop on Social Network Analysis and Mining
+Figura 1. Rede de advogados com pesos nas arestas que indicam vitórias em
+processos julgados.
+criada a rede são exibidos na seção 3; na seção 4 é apresentada a análise da rede; o ran-
+queamento dos advogados é relatado na seção 5 e as conclusões são traçadas na seção
+6.
+2. Trabalhos Relacionados
+Em [16] é feita uma análise estrutural de uma rede de tenistas criada com base nos dados
+da Associação de Tenistas Profissionais (ATP). É proposto um ranking de tenistas utili-
+zando um algoritmo análogo ao pagerank. Em [8] são produzidos ranqueamentos em
+redes sociais esportivas, levando em conta o aspecto temporal inerentemente presente nos
+esportes para realizar o cálculo dos pesos das arestas da rede, capturando a noção de que
+resultados mais antigos não são tão importantes quanto resultados mais recentes, para a
+criação de um ranqueamento atual.
+Em [6] foi criada a “Rede da Lei”, uma rede com várias citações feitas em casos,
+estatutos ou por autoridades na área da jurídica nos EUA. O objetivo é caracterizar e
+entender como o sistema legal americano tem se comportado. Essa rede possui várias
+semelhanças estruturais com a Web.
+Newman [12][13] caracteriza redes de colaborações científicas onde os vértices
+são cientistas e haverá uma aresta entre dois cientistas se eles foram co-autores em um
+ou mais artigos científicos. O estudo mostra diversas propriedades da rede criada como
+curtas distâncias entre cientistas, a presença de agrupamentos, além de diferentes padrões
+encontrados dependendo do campo de colaboração estudado.
+Em [7] é explorado como padrões presentes na rede de interações entre pessoas de
+uma organização afetarem a percepção que os empregados têm uns dos outros. Isso acon-
+tece através da influência social baseada na proximidade das pessoas e do poder exercido
+baseado na centralidade da rede. Os resultados sugerem que algumas características da
+rede explicam melhor as percepções que as pessoas têm umas das outras, do que atributos
+individuais ou posições formais na organização.
+3. Dataset e Rede
+Os dados dos processos utilizados na criação da rede de advogados trabalhistas do es-
+tado do Rio de Janeiro foram capturados do sistema PJe-JT. Selecionamos processos
+
+XXXVI Congresso da Sociedade Brasileira de Computação
+34
+eletrônicos distribuídos de junho de 2012 à outubro de 2015 e dentre estes seleciona-
+mos somente processos pertencentes às seguintes classes processuais: Ação Trabalhista
+- Rito Sumário (Alçada), Ação Trabalhista - Rito Sumaríssimo e Ação Trabalhista - Rito
+Ordinário.
+O Rito Sumário, também chamado de alçada, é regulado pela lei 5584/70, e
+abrange as causas de pequeno valor que não excedam a dois salários mínimos. Ele foi
+criado no intuito de acelerar a resolução dos processos individuais do trabalho, não per-
+mitindo recursos e limitado a três testemunhas por parte. Devido ao valor muito baixo
+dos processos que se sujeitam ao Rito Sumário, o mesmo se revelou pouco eficiente nas
+regiões sul e sudeste do Brasil, regiões em que as demandas processuais trabalhistas su-
+peram em sua esmagadora maioria o valor de dois salários mínimos [1].
+O Rito Sumaríssimo é previsto no artigo 852-A e seguintes da Consolidação das
+Leis Trabalhistas (CLT), e versa normalmente sobre matérias não complexas. Para um
+processo se enquadrar neste rito é necessário que o valor da causa não exceda a 40 salários
+mínimos. Algumas características básicas desse tipo de processo é que os pedidos devem
+ser apresentados de forma líquida, os incidentes processuais devem ser necessariamente
+resolvidos em audiência e o número de testemunhas por parte deve ser duas.
+Figura 2.
+Quantidade de processos divididos por classes processuais.
+Para
+cada classe é mostrada a quantidade de processos procedentes (verde), pro-
+cedentes em parte (verde claro), improcedentes (vermelho) ou processos com
+homologaç ão de transaç ão (azul).
+No Rito Ordinário são enquadrados os processos que não se enquadram no Rito
+Sumário ou Sumaríssimo. Ele tem como características básicas: três testemunhas por
+parte (salvo o inquérito para apuração de falta grave que exige seis testemunhas), os pedi-
+dos podem ser ilíquidos e na sentença há exigência de relatório. É utilizado normalmente
+para causas mais complexas ou contra os entes públicos.
+
+35
+BraSNAM - 5º Brazilian Workshop on Social Network Analysis and Mining
+Além das três classes processuais, iremos focar em quatro resultados que podem
+ocorrer nesses tipos de processo: procedência, procedência em parte, improcedente e
+homologação de transação. A procedência ocorre quando o juiz julga procedente o pe-
+dido, aceita o pedido do autor da ação e diz que ele tem razão, ou seja, o autor ganha
+a ação. A procedência em parte ocorre quando o juiz profere uma decisão dando ganho
+de causa parcial ao autor, ou seja, ele ganhou a ação, mas não o valor total solicitado.
+A improcedência ocorre quando o julgamento da causa é desfavorável ao autor, significa
+que o juiz deu ganho de causa para o réu e não para o autor, ou seja, o pedido do autor foi
+improcedente. Quando as duas partes entram em um acordo e o juiz homologa, estamos
+diante da homologação de transação. [11]
+Por fim, iremos considerar apenas os processos que foram transitados em julgado,
+isso significa que chegaram ao fim. A decisão do juiz ou desembargador é definitiva e
+não pode mais ser modificada, portanto não é possível apresentar mais nenhum recurso.
+A figura 2 mostra todos os 166183 processos presentes na base de dados avaliada, o
+número de processos das diferentes classes e os diferentes resultados por classe. Repare
+que a classe Rito Sumário possui uma minoria dos processos (menos de 300) em qualquer
+resultado, enquanto o Rito Ordinário possui aproximadamente 10 mil processos (ou mais)
+em três resultados.
+Os vértices da rede a ser construída a partir dos dados dos processos são advogados
+e uma aresta direcionada de um advogado A para um B indica que o advogado A perdeu
+um processo para B. Portanto precisamos definir o significado de perder ou ganhar e para
+isso utilizaremos os resultados dos processos.
+Figura 3. Distribuiç ão Complementar Cumulativa Empírica (CCDF) de advogados
+que atuaram (preto), empataram (azul), ganharam (verde) ou perderam (verme-
+lho) em k ou mais processos.
+Nos processos que foram procedentes ou procedentes em parte consideramos que
+
+XXXVI Congresso da Sociedade Brasileira de Computação
+36
+os advogados do autor (ou o advogado do autor, se existir apenas um) ganharam dos
+advogados do réu (ou do advogado do réu, se existir apenas um), dando origem a uma
+aresta direcionada de cada advogado do réu para cada advogado do autor. No caso de
+um processo improcedente consideramos o que os advogados do autor (ou o advogado do
+autor, se existir apenas um) perderam para os advogados do réu (ou do advogado do réu,
+se existir apenas um), dando origem a uma aresta direcionada do(s) advogado(s) do autor
+para o(s) advogado(s) do réu.
+Nos casos de processos em que ocorreu a homologação de transação, as partes
+do processo chegaram a um acordo. Esses processos são a maioria, conforme ilustrado
+na figura 2, e esse comportamento é esperado pois a CLT torna obrigatória a proposta de
+conciliação, assim o acordo, na Justiça do Trabalho, tem prioridade absoluta [9]. Como
+houve um acordo no processo, não existiu um ganhador, por isso não iremos considerar
+processos homologados na rede pois eles não contribuem para a importância relativa dos
+advogados.
+A figura 3 apresenta a fração de advogados da rede que atuaram em k ou mais
+processos.
+É possível perceber que a maioria dos advogados da rede participaram de
+apenas um processo na justiça trabalhista, levando em conta a amostra de dados coletados
+para nossa rede. Pouco menos de 10% dos advogados ganharam ou perderam mais de
+10 processos e este número cai para menos de 0.5% se tratando de 100 processos. Por
+outro lado, temos advogados que atuaram em mais de mil processos, indicando que a
+distribuição possui cauda pesada.
+Outro ponto mostrado na figura é a grande quantidade de homologações entre
+advogados na rede, ou seja, ocorreu um acordo entre as partes e o juiz realizou uma
+homologação de transação. A cauda da distribuição de advogados que perderam processos
+é mais pesada do que a dos que ganharam, ou seja, é mais “fácil” (comum) perder do que
+ganhar. Além disso, a cauda da distribuição de advogados que homologaram processos é
+ainda mais pesada, ou seja, é mais “fácil” homologar um processo do que perdê-lo.
+Tabela 1. Informaç ões da rede
+Vértices
+17575
+Arestas
+113990
+Diâmetro
+9
+Densidade
+3.69 × 10−4
+Grau médio (entrada + saída)
+12.97
+Distância média
+2.24
+Grau mínimo de entrada
+0
+Grau mínimo de saída
+0
+Grau máximo de entrada
+326
+Grau máximo de saída
+408
+Componentes conexas
+177
+Tamanho da maior componente
+17173(97.71%)
+Componentes fortemente conexas
+9464
+Tamanho da maior componente
+fortemente conexa
+8080(45.97%)
+Coeficiente de clusterização local
+1.31 × 10−2
+Coeficiente de clusterização global
+7.71 × 10−3
+Reciprocidade
+0.15
+4. Análise da Rede
+A tabela 1 apresenta diversas informações sobre a estrutura da rede de advogados, que
+possui 17575 vértices (advogados) e 113990 arestas direcionadas. Nota-se ainda que a
+rede possui diversas características encontradas em outras redes reais [5]:
+
+37
+BraSNAM - 5º Brazilian Workshop on Social Network Analysis and Mining
+• Distância e diâmetro baixos: A rede possui uma distância média muito pequena
+em relação a quantidade de vértices: a distância média entre 17575 vértices é de
+apenas 2.24. O diâmetro da rede também é bem pequeno em relação aos vértices:
+9, ou seja, a maior distância entre dois vértices são 9 passos.
+• Esparsa e conectada: Muitas redes reais são extremamente esparsas, exibindo
+uma densidade muito baixa (ordens de grandeza menor que 1), porém são ex-
+tremamente “conectadas”, com quase todos os vértices pertencendo à maior
+componente conexa.
+A rede de advogados possui uma densidade bem baixa
+(3.69 × 10−4) e sua maior componente conexa possui 97.71% dos vértices da rede.
+• Alto coeficiente de clusterização: Redes sociais estão cheias de triângulos, ou
+seja, se um advogado A está relacionado aos advogados B e C, é bem provável que
+os advogados B e C também estejam relacionados. O coeficiente de clusterização
+de muitas redes reais, que mede a tendência da rede a exibir triângulos, é ordens
+de magnitude maior que a densidade da rede. A rede de advogados possui o coe-
+ficiente de clusterização (7.71 × 10−3) uma ordem de grandeza maior que a den-
+sidade da rede (3.69 × 10−4). É importante notar que um único processo não gera
+nenhum triângulo na rede, pois um processo gera um grafo bipartido completo
+entre advogados das duas partes do processo.
+• Distribuição de grau com cauda pesada: Em muitas redes reais, os graus
+dos vértices são bem desiguais, vértices com graus ordens de grandeza maior
+que a média são encontrados com probabilidade não desprezível, exibindo uma
+distribuição de grau com cauda pesada. A rede de advogados possui cauda pesada
+pois, como é possível ver na figura 4a, podemos encontrar vértices com graus bem
+maiores que o grau médio da rede (12.97), com probabilidade não desprezível,
+tanto para o grau de entrada quanto para o grau de saída.
+• Distribuição da força dos vértices: A força de um vértice é dada pela soma
+dos pesos de suas arestas de entrada ou saída, respectivamente. Na figura 4b,
+que mostra a distribuição das forças dos vértices, é possível ver que menos de
+1% dos advogados trabalharam em centenas de processos. É interessante notar
+que a distribuição da força de entrada dos vértices possui a cauda menor que a
+distribuição da força de saída. Essa diferença é percebida para advogados que
+possuem mais de 100 processos, indicando ser mais fácil perder do que ganhar
+um processo.
+A rede possui uma reciprocidade relativamente alta (0.15), significando que mui-
+tas vezes (15%) os advogados, que se enfrentam, perdem um do outro mutuamente, em
+diferentes processos. Ou seja, não há uma preponderância significativa em sempre vencer
+(ou sempre perder) quando consideramos um par de advogados que se enfrentam.
+5. Ranqueamento de advogados
+A partir da estrutura da rede, queremos identificar os advogados mais influentes da justiça
+trabalhista do estado do Rio de Janeiro. Para isso utilizamos algumas métricas de centra-
+lidade para definir a importâncias relativa desses advogados.
+A forma mais simples de medir a “importância” de um vértice em uma rede é
+considerar seu grau, ou seja, a quantidade de arestas de entrada no vértice, essa métrica
+é chamada de centralidade de grau. Porém, também é importante levar em conta o peso
+das arestas que apontam para o vértice, pois o peso de uma aresta direcionada, do vértice
+
+XXXVI Congresso da Sociedade Brasileira de Computação
+38
+Figura 4. a) Distribuiç ão Complementar Cumulativa Empírica (CCDF) dos graus
+de entrada e saída da rede. b) Distribuiç ão Complementar Cumulativa Empírica
+(CCDF) das forças dos vértices (entrada e saída).
+A para o vértice B, é a quantidade de vezes que B ganhou de A e para isso utilizamos a
+força do vértice [2], que é dada por:
+Sv =
+
+u∈Γ−(v)
+wu→v
+Onde Γ−(v) são todos os vértices vizinhos de v que têm arestas apontando para v
+e wu→v é o peso da aresta direcionada de u para v.
+Na tabela 2 é possível ver os 10 vértices com maior força e seus respectivos graus,
+de entrada e saída. Repare que nem sempre o vértice com maior grau possui maior força,
+devido aos vértices que ganharam ou perderam várias vezes dos mesmos vértices, fazendo
+com que a aresta entre eles tenha um peso maior. É possível notar ainda os vértices com
+maior força de saída, ou seja, aqueles que mais perderam processos.
+O pagerank [14], algoritmo desenvolvido pelos fundadores do Google, vem
+sendo utilizado para calcular a importância em redes direcionadas, levando em conta a
+qualidade e a quantidade de arestas que apontam para os vértices. O valor de pagerank
+de um vértice é definido recursivamente através da seguinte equação:
+PR(v) = (1 −d)
+n
++ d
+
+u∈Γ−(v)
+PR(u)wu→v
+d+(u)
+Onde d é o fator de amortecimento, que foi definido como 0.85, valor tradicional
+utilizado em diversos artigos; (1−d)
+n
+é a importância mínima de um vértice na rede com n
+vértices, que pode ser interpretado como sua aptidão externa; Γ−(v) são todos os vértices
+vizinhos de v que têm arestas apontando para v; wu→v é o peso da aresta direcionada do
+vizinho u de v para v e d+(u) é igual a soma dos pesos de todas as arestas direcionadas
+que saem de u. O valor de pagerank pode ser calculado através de um algoritmo iterativo
+até a convergência dos valores.
+
+39
+BraSNAM - 5º Brazilian Workshop on Social Network Analysis and Mining
+5.1. Ranqueamento dos vértices
+A tabela 3 apresenta os 10 primeiros advogados quando utilizamos diferentes métricas
+para realizar o ranqueamento. Como é possível notar, muitos advogados aparecem nas
+primeiras colocações no ranqueamento de mais de uma métrica. O advogado 16604 fi-
+gura em primeiro na métrica de pagerank, isso mostra que ele têm grande importância
+no âmbito de processos trabalhistas.
+Ele também está em primeiro na métrica de
+betweenness, isso quer dizer que ele está no meio da rede e possui influência política.
+De fato, se trata de um advogado com mais de 20 anos de experiência que fundou seu
+escritório na década de 90. Processos vinculados a ele estão em vários tribunais do país,
+mostrando assim sua influência em nível nacional. Além do mais, recebeu em 2015 o
+título de cidadão honorário da cidade de São Paulo.
+O advogado 13444 está entre os melhores nas métricas pagerank e betweenness.
+Ele também é um advogado importante na justiça trabalhista trabalhistas. 13444 é um
+advogado de renome com 36 anos de prática jurídica trabalhista na cidade do Rio de
+Janeiro.
+Tabela 2. 10 maiores forças de advogados, tanto de entrada quanto de saída, e
+seus respectivos graus.
+Entrada
+Saída
+Advogado
+Grau do
+vértice
+Força do
+vértice
+Advogado
+Grau do
+vértice
+Força do
+vértice
+914
+105
+666
+1772
+408
+1290
+4674
+149
+555
+16604
+351
+928
+890
+61
+532
+15928
+84
+908
+17522
+117
+512
+9409
+239
+730
+14876
+143
+506
+13155
+247
+541
+800
+298
+447
+2471
+192
+529
+16496
+149
+417
+9430
+386
+525
+17508
+188
+399
+6942
+235
+508
+59
+326
+392
+6538
+234
+502
+244
+184
+386
+4048
+116
+492
+O advogado 9430 figura como o primeiro no ranqueamento de closeness e em
+sexto no ranqueamento de betweenness. Isso significa que esse advogado tende a conhe-
+cer muitos outros advogados, pois está próximo a outros advogados da rede, exercendo
+grande influência em seu círculo profissional. A revista Análise Advocacia 500 [4] traz
+os escritórios e advogados mais admirados no Brasil em cada ano. São vários critérios
+para definição dos advogados mais admirados, sendo o mais comum uma pesquisa de
+satisfação feita em grandes empresas ao redor do país. Na edição de 2014, encontramos
+o advogado 9430 entre os melhores advogados do estado do Rio de Janeiro. No entando,
+9430 figura entre os 10 nos ranqueamentos de centralidade de grau e força de saída do
+vértice, sendo um dos advogados da rede com uma grande quantidade de processos per-
+didos.
+O advogado 59 começou suas atividades em 1989 e está entre os 10 nos ran-
+queamentos de pagerank, betweenness e força do vértice. Também está em primeiro
+
+XXXVI Congresso da Sociedade Brasileira de Computação
+40
+no ranking de centralidade de grau de entrada, ou seja, é o advogado que mais ganhou
+processos de advogados diferentes. É um advogado que atua em prol dos direitos dos
+trabalhadores nas cidades do Rio de Janeiro, Niterói e Nova Iguaçu, tendo atuado em um
+grande número de processos.
+O advogado 15928, segundo no ranqueamento de pagerank, trabalha num dos
+maiores escritórios de advocacia do país. Esta empresa é reconhecida por analistas do
+mercado jurídico e por publicações realizadas na área, tendo ganhado inúmeros prêmios
+nos últimos anos, sendo um dos melhores escritórios de advocacia do Brasil em 12 áreas
+de atuação pela revista Análise Advocacia 500 2015 [4], e um dos melhores escritórios
+de advocacia do Brasil em 22 áreas de atuação pela Chambers Latin America 2016 [3].
+O advogado 9873 está presente nos ranqueamentos de pagerank, betweenness
+e closeness. Ele é co-autor de um livro na área de direito empresarial, trabalha em um
+grande escritório de advocacia do país e foi indicado um dos melhores advogados traba-
+lhistas da américa latina em 2015 e 2016 pela LACCA no guia Latin Lawyer 250 [10].
+Tabela 3. Top 10 advogados em cada métrica de centralidade.
+Pagerank
+Força do vértice
+Centralidade de grau
+Closeness
+Betweenness
+16604
+914
+59
+9430
+16604
+15928
+4674
+943
+1042
+59
+59
+890
+800
+7498
+943
+6942
+17522
+3117
+37
+6942
+13155
+14876
+17134
+4034
+9873
+943
+800
+328
+4662
+9430
+13444
+16496
+1790
+3570
+13444
+17134
+17508
+17508
+4853
+13155
+9873
+59
+11278
+4178
+8284
+9409
+244
+244
+7284
+7927
+Quase a totalidade de advogados listados entre os 10 melhores em cada métrica
+possui anos de experiência na área de direito trabalhista. Esta observação indica que a rede
+de advogados construída pode de fato ser utilizada para identificar advogados influentes
+a partir de métricas de ranqueamento de vértices bem objetivas. Outro ponto interessante
+é que a boa parte dos advogados bem ranqueados atuam para funcionários e sindicatos.
+Muitos advogados acreditam que a legislação trabalhista no Brasil, muitas vezes consi-
+derada excessiva, favorece o trabalhador. Desta forma, ao dar uma proteção excessiva ao
+trabalhador, a Justiça acaba desprestigiando o trabalho e o emprego. Eles acreditam que
+esse cuidado concedido ao empregado é resultado de sua fraqueza em relação ao empre-
+gador. Outro ponto é que os altos índices de condenação das empresas são resultado da
+dificuldade que os empregadores têm em cumprir o excesso de normas que compõem a
+legislação trabalhista. [15]
+A tabela 4 mostra a soma de todos os valores pedidos nos processos, divididos em
+homologados, procedentes e procedentes em parte e improcedentes, para cada advogado
+na métrica de força de entrada do vértice. É possível perceber que os maiores valores se
+encontram nos processos homologados. Os valores monetários possuem uma correlação
+com o ranqueamento, pois todos os 10 advogados melhores ranqueados possuem valores
+
+41
+BraSNAM - 5º Brazilian Workshop on Social Network Analysis and Mining
+muito mais altos em seus processos procedentes do que em seus processos improcedentes.
+Os valores monetários dos processos não foram utilizados em nosso trabalho porque não
+representam quanto efetivamente foi ganho ou perdido em um processo, pois são valores
+pedidos no início do processo e não o valor real definido em sentença. A base de dados
+de onde foram coletados os dados não ofereceu este valor de forma fácil.
+Tabela 4. Top 10 advogados na métrica de força de entrada do vértice e a soma
+dos valores monetários pedidos nas causas que foram homologadas, proceden-
+tes e improcedentes.
+Força de entrada
+do vértice
+Homologação
+por transação
+Procedentes e
+Proc. em parte
+Improcedentes
+1
+914
+1.929.663, 78
+5.283.287, 24
+632.000, 00
+2
+4674
+2.354.408, 22
+4.835.868, 50
+682.748, 05
+3
+890
+1.999.900, 00
+8.165.000, 00
+1.227.500, 00
+4
+17522
+8.027.831, 50
+8.381.018, 26
+2.757.052, 12
+5
+14876
+2.284.865, 14
+4.426.888, 49
+622.748, 05
+6
+800
+11.719.880, 60
+10.175.541, 85
+1.277.629, 69
+7
+16496
+5.700.311, 72
+2.101.000, 00
+724.534, 80
+8
+17508
+21.865.543, 78
+4.415.000, 00
+942.736, 91
+9
+59
+14.965.705, 43
+7.555.000, 00
+2.622.000, 00
+10
+244
+21.123.000, 00
+4.175.000, 00
+832.736, 91
+6. Conclusão
+Uma vez que muitas redes reais possam ser representadas a partir de dados coletados,
+utilizar métricas e técnicas que levem em conta a estrutura da rede para entender seu
+comportamento tem se tornado bem útil. Neste trabalho criamos uma rede de advoga-
+dos trabalhistas do estado do Rio de Janeiro a partir de dados públicos sobre processos
+judiciais. Esta rede tem como objetivo capturar a importância relativa dos advogados,
+pois uma aresta direcionada de um advogado para outro é criada se o primeiro perdeu
+em um processo para o segundo. Uma avaliação empírica indicou que esta rede possui
+muitas características presentes em outras redes reais estudadas. A semelhança estrutural
+com essas redes permitiu utilizar as métricas apresentadas, como a força do vértice e o
+pagerank, para caracterizar o relacionamento entre os advogados.
+Nossa abordagem para identificar os advogados mais influentes da rede identificou
+advogados com tradição na justiça do trabalho e com participação em muitos processos,
+inclusive com um deles sendo citado em uma revista especializada, como estando entre os
+melhores advogados do estado do Rio de Janeiro. Desta forma, ilustramos como a rede de
+advogados induzidos por processos judiciais trabalhistas pode ser utilizada para revelar
+aspectos importantes, como a importância relativa.
+Como trabalhos futuros, propõe-se utilizar na representação da rede o valor ga-
+nho ou perdido em um processo e com isso utilizar outras métricas de centralidade para
+ranquear os advogados.
+
+XXXVI Congresso da Sociedade Brasileira de Computação
+42
+Referências
+[1]
+Patrícia Ribeiro de Azevedo e Kalina Valéria Bastos Pedroza. Procedimento Su-
+maríssimo: aspectos polêmicos. Acessado em 11/03/2016. URL: http : / /
+www.webartigos.com/artigos/procedimento- sumarissimo-
+trabalhista-aspectos-polemicos/90877/.
+[2]
+A. Barrat et al. “The architecture of complex weighted networks”. Em: Proc. Natl.
+Acad. Sci. 101 (2004), pp. 3747–3752.
+[3]
+Chambers e Partners. Chambers Latin America 2016. Acessado em 18/03/2016.
+URL: http : / / www . chambersandpartners . com / guide / latin -
+america/9.
+[4]
+Análise Editora. Advocacia 500 - 2014. Acessado em 16/12/2015. URL: http:
+//www.analise.com/site/publicacoes/exibe/2/analise-
+advocacia-500.
+[5]
+Daniel Ratton Figueiredo. “Introdução a Redes Complexas”. Em: Atualizações em
+Informática 2011. Ed. por Alberto Ferreira de Souza e Wagner Meira Jr. PUC-Rio,
+2011. Cap. 7, pp. 303–358.
+[6]
+James H. Fowler et al. Network Analysis and the Law: Measuring the Legal Impor-
+tance of Precedents at the U.S. Supreme Court. 2007.
+[7]
+Steven B. Andrews Herminia Ibarra. “Power, Social Influence, and Sense Making:
+Effects of Network Centrality and Proximity on Employee Perceptions”. Em: Ad-
+ministrative Science Quarterly 38.2 (1993), pp. 277–303. ISSN: 00018392.
+[8]
+Péterson Sampaio Procópio Júnior et al. “Time-aware Ranking in Sport Social
+Networks”. Em: Journal of Information and Data Management (2012).
+[9]
+Conselho Nacional de Justiça. Resolução No 125 de 29/11/2010. Acessado em
+11/03/2016. URL: http : / / www . cnj . jus . br / busca - atos - adm ?
+documento=2579.
+[10]
+LACCA. Latin Lawyer 250. Acessado em 18/03/2016.
+URL: http : / /
+latinlawyer.com/ll250/.
+[11]
+Jocélia Lopes. Termos Judiciais. Acessado em 16/12/2015. URL: http://www.
+jocelialopesadvocacia.com.br/termos.html.
+[12]
+M. E. J. Newman. “The structure of scientific collaboration networks”. Em: Proce-
+edings of the National Academy of Sciences 98.2 (2001), pp. 404–409.
+[13]
+Mark E.J. Newman. “Complex Networks”. Em: ed. por Eli Ben-Naim, Hans Frau-
+enfelder e Zoltan Toroczkai. Berlin, Heidelberg: Springer Berlin Heidelberg, 2004.
+Cap. Who Is the Best Connected Scientist? A Study of Scientific Coauthorship
+Networks, pp. 337–370.
+[14]
+Lawrence Page et al. The PageRank Citation Ranking: Bringing Order to the Web.
+Technical Report 1999-66. Previous number = SIDL-WP-1999-0120. Stanford In-
+foLab, nov. de 1999.
+[15]
+Quem é protecionista é a legislação, não a Justiça do Trabalho, dizem advoga-
+dos. http://www.conjur.com.br/2015- set- 28/protetora-
+trabalhador-legislacao-nao-justica. Acessado em 16/12/2015.
+[16]
+Filippo Radicchi. “Who Is the Best Player Ever? A Complex Network Analysis of
+the History of Professional Tennis”. Em: PLoS ONE 6.2 (fev. de 2011), e17249.

@@ -1,0 +1,801 @@
+Visibilidade no Facebook: Modelos, Medições e Implicações
+Eduardo Hargreaves1,
+Daniel Menasché1, Giovanni Neglia2, Claudio Agosti3
+1Dept. Ciência da Computação, UFRJ, Rio de Janeiro, Brasil
+2INRIA, Sophia Antipolis, França
+3Universidade de Amsterdã, Amsterdã, Holanda
+eduardo@hargreaves.tech, sadoc@dcc.ufrj.br,giovanni.neglia@inria.fr
+claudio.agosti@logioshermes.org
+Resumo. O Facebook tem um impacto significativo na vida de milhões de
+usuários da Internet, todos os dias. Entretanto, os mecanismos usados pelo Fa-
+cebook para filtrar mensagens apresentadas aos usuários não são de domínio
+público, motivando uma engenharia reversa dos mesmos. Neste trabalho, pro-
+pomos modelos e medições para melhor entender o comportamento de timeli-
+nes. Em particular, reportamos resultados sobre medições de visibilidade de
+fontes das eleições italianas de 2018, que motivam um modelo analítico para
+caracterizar a visibilidade de posts. Dentre as implicações práticas de nossos
+estudos, indicamos seu potencial para inferir diferentes métricas de visibilidade
+a partir de medidas colhidas do sistema.
+Abstract. Facebook news feed personalization algorithm has a significant im-
+pact, on a daily basis, on the lifestyle, mood and opinion of millions of Internet
+users. Nonetheless, such algorithms lack transparency challenging researchers
+to improve their fairness and accountability. In this paper, we propose a model
+to capture the dynamics of contents over a timeline (also known as news feed).
+The input to our model is a fundamental quantity associated to timelines, which
+we show that can be easily parameterized using real world data: the arrival rate
+of posts of a given publisher followed by the user. Using real world Facebook
+traces from the latest elections in Italy, we validate the accuracy of the proposed
+model and use the model for conterfactual what-if analysis.
+1. Introdução
+O Facebook tem um impacto significativo na vida de milhões de usuários da Internet, to-
+dos os dias [Tsaparas 2017]. Entretanto, os mecanismos usados pelo Facebook para filtrar
+mensagens apresentadas aos usuários não são de domínio público, motivando pesquisas
+que envolvem desde estatísticas básicas até engenharia reversa de algoritmos. Tais estudos
+são fundamentais para garantir certo nível de transparência aos usuários do sistema.
+Compreender um sistema complexo como o Facebook não é trivial. A visibilidade
+de uma certa fonte, por exemplo, depende da taxa de publicação de postagens por parte da
+fonte e dos interesses dos usuários. No artigo publicado em [TechCruch 2016] é dito que
+o Facebook utiliza aproximadamente 100.000 variáveis para escolher a publicações exi-
+bidas na suas News Feeds. Uma abordagem para avaliar o impacto de diferentes fatores
+
+na visibilidade consiste na criação de modelos analíticos que permitam derivar métricas
+de interesse a partir de dados colhidos das redes, mas tais dados em geral não estão dis-
+poníveis de forma aberta.
+Neste trabalho, propomos medições e um modelo para melhor entender o com-
+portamento de timelines. O modelo proposto é baseado em modelos de filas e de caches,
+para os quais existem uma vasta literatura. Em particular, parametrizamos e validamos o
+modelo proposto usando dados do Facebook, indicando o poder expressivo do mesmo.
+Contribuições
+Dentre as principais contribuições deste trabalho, destacamos as seguin-
+tes.
+Medições do Facebook Usando usuários virtuais, colhemos visões distintas sobre as
+postagens no Facebook nas eleições da Itália em 2018. Tais medições motivam
+a criação de modelos para capturar a essência da dinâmica das publicações em
+timelines.
+Modelo de visibilidade Propomos
+um
+modelo
+para
+estimar
+a
+visibilidade
+das
+publicações em função das taxas de criação das fontes e do algoritmo de filtragem
+da rede social. Usando dados reais do Facebook, validamos os modelos propostos.
+Estudo contrafactual de caso Usando as medições e os modelos propostos, avaliamos
+qual teria sido a visibilidade de diferentes publicações, sob diferentes critérios de
+interesse.
+O restante deste artigo está organizado da seguinte forma. Na Seção 2 apresenta-
+mos a metodologia de medições adotada neste trabalho. Em seguida, a Seção 3 traz os
+resultados empíricos obtidos nas eleições italianas. A Seção 4 traz uma visão geral sobre
+o modelo proposto, seguida pela Seção 5 que apresenta o modelo analíticos proposto. A
+Seção 6 faz uma análise contrafactual dos dados usando o modelo proposto, seguida da
+Seção 7 que cobre trabalhos relacionados. A Seção 8 conclui.
+2. Medições
+Obtenção das métricas de interesse
+Usando a infraestrutura do Facebook Tracking
+Exposed,1 criamos seis usuários virtuais no Facebook. Todos os usuários seguem as mes-
+mas fontes. Entretanto, os usuários possuem diferentes perfis (e.g., um curte páginas
+de direita e outro de esquerda). A cada hora, colhemos as publicações apresentadas na
+timeline de cada usuários. Tais fotografias constituem nossa base de dados.
+Cabe destacar que a API do Facebook desde 2015 não oferece os dados
+acima [Facebook 2018b].
+Mesmo quando a API era aberta, o Facebook dizia que a
+informação fornecida pela API não era fidedigna [Facebook 2018a]. Utilizamos esta API
+somente para colhermos informações sobre o número de publicações por fonte.
+Métricas de interesse
+Dentre as métricas de interesse, destacamos as seguintes:
+Repercussão (probabilidade de acerto) de uma fonte é a probabilidade de um usuário
+efetivamente ler (e possivelmente clicar) em uma publicação. Nesse trabalho, não
+distinguimos entre probabilidade de acerto e probabilidade de click. A probabi-
+lidadde de acerto de uma fonte pode ser dada pela visibilidade ou pela ocupação
+das postagens desta fonte.
+1Facebook tracking exposed: https://facebook.tracking.exposed/
+
+Visibilidade é a probabilidade de existir uma publicação de uma determinada fonte na
+timeline.
+Ocupação é o número de publicações de uma determinada fonte na timeline.
+Denotamos por πij a visibilidade da fonte j na timeline do usuário i. Denotamos
+por Nij o número médio de publicações do publisher j na timeline de i. Neste trabalho,
+assumimos que a repercussão de uma fonte pode ser dada em função da visibilidade ou da
+ocupação. A repercussão igual a visibilidade condiz com usuários que eventualmente irão
+ler uma das publicações de cada uma das fontes presentes nas K primeiras posições de
+suas timelines. A repercussão igual a ocupação, por outro lado, captura o comportamento
+de usuários que irão influenciar-se mais por fontes que ocupam mais posições em suas
+timelines, ou seja, quanto mais posições ocupadas por uma fonte, maior a repercussão da
+mesma.
+3. Descobertas empíricas sobre a eleição italiana
+3.1. Coleta dos dados
+As eleições italianas foram no dia 04 de março de 2018 e o experimento ocorreu entre os
+dias 10 de janeiro de 2018 e 06 de março de 2018 de forma que procuramos analisar o
+período antecedente às eleições e os dois dias seguintes para capturarmos as reações ao
+resultado das eleições.
+Foram selecionadas 30 fontes italianas que posteriormente foram classificadas de
+acordo com uma das cinco orientações políticas: esquerda, centro-esquerda, direita, ultra-
+direita e movimento 5 estrelas. Também foram criados 6 usuários fictícios. Todos os
+usuários seguem as mesmas 30 fontes. No entanto, os usuários foram polarizados de
+forma que cada usuário curtia publicações de apenas uma orientação política. O sexto
+usuário foi caraterizado como indeciso uma vez que não curtiu publicações de numa
+página.
+As “fotografias” das timelines foram “tiradas”através de uma extensão dos nave-
+gadores Chrome e Firefox chamada facebook.tracking.exposed. Essa extensão coleta os
+dados públicos, e retorna a data de criação da publicação, o momento da visualização, o
+usuário que visualizou, a fonte, o conteúdo, a quantidade de reações, o número de com-
+partilhamentos, e a ordem de aparição da publicação. Em paralelo, a API do Facebook
+foi utilizada para a obtenção de todas as publicações das fontes selecionadas. Chamamos
+de Si o número de fotografias tiradas no i-ésimo usuário. Nos nossos experimentos, os
+usuários foram indexados de 1 a 6, denotando as orientações de centro-esquerda, ultra-
+direita, esquerda, M5S, direita e a indecisa. Os valores de Si obtidos foram: 577, 504,
+623, 674, 655, 576, com i = 1, . . . , 6. A diferença entre o número de fotografias advém
+de falhas de medição, e.g., máquinas travarem, falta de luz e queda de conexão. Embora
+existam tais falhas, acreditamos que estatisticamente elas não afetam os resultados, tendo
+em vista o grande volume de fotografias colhidas.
+3.2. Achados empíricos
+A seguir, apresentamos uma visão geral dos dados colhidos. A Figura 1 (a) ilustra o
+número de publicações por fonte. Esta informação foi colhida diretamente da API do
+Facebook. Algumas poucas fontes geraram milhares de publicações durante o período
+considerado, enquanto que a maioria gerou dezenas de publicações.
+
+0
+2500
+5000
+7500
+Il Giornale
+Il Fatto Quoti
+Lega Salvini
+Noi con Salvini
+La Repubblica
+M5S news
+Il Populista
+W IL M5S
+M5S
+Democratica
+Luigi Di Maio
+Il manifesto
+M. RenziNs
+Il Primato...
+L.Borgonzoni
+Giorgia Meloni
+P. Democratico
+Adesso ti inf
+CasaPound
+Forza Nuova
+Beppe Grillo
+Ordine Futuro
+Sinistra Italiana
+Roberto Fiore
+Matteo Renzi
+Giuseppe Civati
+Articolo UNO
+Possibile
+Laura Boldrini
+Fascisti uniti
+Lotta Studt
+Fontes
+Publicações
+Orientação da fonte
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+Figura 1. Total de publicaç ões por fonte
+Chamamos cada publicação visualizada de impressão, e chamamos de Iij o
+número total de impressões da fonte j no usuário i. Se uma publicação é visualizada
+duas vezes, ela conta com duas impressões. Esta informação foi colhida a partir de nosso
+aplicativo (Facebook Tracking Exposed). A Figura 2 mostra o total de impressões Iij
+por usuário. Em nenhum usuário a distribuição das publicações vistas foi semelhante a
+distribuição das publicações criadas. Em todos os usuários, as fontes mais vistas refle-
+tiram a polarização dos mesmos. Por exemplo, o usuário que curtiu fontes de esquerda
+(no topo a direita da Figura 2) visualizou mais postagens de fontes de esquerda do que
+os demais. Cabe relembrar que todos os usuários seguiram todas as fontes (e apenas
+distinguiram-se pelas curtidas) e que o viés fica claro independente da taxa com quem as
+fontes geraram conteúdos (ilustrada na Figura 1).
+A Figura 3 (a) mostra o número de impressões em cada um dos seis usuários,
+agrupadas por orientação política, e a Figura 3 (b) mostra o número total de publicações
+por orientação política. Essa Figura corrobora as observações anteriores: o viés das
+publicações reflete o viés dos usuários.
+Cabe destacar que a grande diferença entre a ordem de aparição das fontes nas
+Figuras 1 e 1 é fruto da filtragem realizada pelo Facebook. Um dos objetivos do presente
+trabalho é propor um modelo analítico que nos permita compreender os efeitos de tal
+filtragem nas métricas de visibilidade e ocupação das fontes nas timelines.
+Embora as observações apresentadas acima em parte sejam esperadas, cabe des-
+tacar que analisamos também usuários neutros. Para usuários neutros, que não curtem
+nenhuma fonte, seria de esperar que a presença de publicações fosse semelhante a Fi-
+gura 1, ou então que existisse uma uniformidade entre as fontes. A Figura 2 mostra que
+esse não é o caso. Podemos constatar o alto número de impressões da fonte M5S no elei-
+tor indeciso. É importante observar que o partido M5S foi o partido que recebeu mais
+votos nas eleições italianas. O modelo analítico apresentado a seguir nos permite realizar
+
+M5S
+direita
+indeciso
+centro−esquerda
+ultra−direita
+esquerda
+Il Giornale
+Il Fatto Quoti
+Lega Salvini
+Noi con Salvini
+La Repubblica
+M5S news
+Il Populista
+W IL M5S
+M5S
+Democratica
+Luigi Di Maio
+Il manifesto
+M. RenziNs
+Il Primato...
+L.Borgonzoni
+Giorgia Meloni
+P. Democratico
+CasaPound
+Forza Nuova
+Sinistra Italiana
+Roberto Fiore
+Giuseppe Civati
+Articolo UNO
+Laura Boldrini
+Il Giornale
+Il Fatto Quoti
+Lega Salvini
+Noi con Salvini
+La Repubblica
+M5S news
+Il Populista
+W IL M5S
+M5S
+Democratica
+Luigi Di Maio
+Il manifesto
+M. RenziNs
+Il Primato...
+L.Borgonzoni
+Giorgia Meloni
+P. Democratico
+CasaPound
+Forza Nuova
+Sinistra Italiana
+Roberto Fiore
+Giuseppe Civati
+Articolo UNO
+Laura Boldrini
+Il Giornale
+Il Fatto Quoti
+Lega Salvini
+Noi con Salvini
+La Repubblica
+M5S news
+Il Populista
+W IL M5S
+M5S
+Democratica
+Luigi Di Maio
+Il manifesto
+M. RenziNs
+Il Primato...
+L.Borgonzoni
+Giorgia Meloni
+P. Democratico
+CasaPound
+Forza Nuova
+Sinistra Italiana
+Roberto Fiore
+Giuseppe Civati
+Articolo UNO
+Laura Boldrini
+0
+500
+1000
+1500
+0
+500
+1000
+1500
+Fonte
+Impressões
+Orientação da Fonte
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+Figura 2. Total de impressões no topo da timeline por fonte em cada usuário
+(Apenas ocupaç ões superiores a 0.2 estão representadas)
+estudos contrafactuais, para averiguar o que ocorre com a visibilidade das fontes caso
+diferentes filtros sejam adotados.
+4. Uma visão geral sobre a modelagem de timelines
+A seguir, apresentamos intuitivamente as ideias que suportam o modelo analítico introdu-
+zido na seção seguinte.
+4.1. Analogias entre filas, caches e timelines
+Em redes sociais virtuais, as publicações criadas pelas fontes fluem através das conexões
+entre os seus respectivos membros e alcançam as timelines dos usuários interessados.
+Desta forma, timelines são um canal de comunicação entre fontes e usuários.
+Na sua forma mais simples, as publicações são organizadas por ordem de chegada,
+de forma que estas entram e saem das timelines de acordo com uma ordem cronológica.
+Os algoritmos de personalização somente filtram as publicações da fonte j na timeline do
+usuário i, transformando uma taxa de criação de conteúdo Λj em uma taxa de exibição de
+mensagens λij.
+O comportamento recém descrito, é o comportamento de uma fila do tipo pri-
+meiro a entrar, primeiro a sair, ou, como é mais conhecida, como uma fila FIFO (first-in,
+first-out). Desta forma, acreditamos ser natural utilizar a teoria de filas para modelar as
+métricas de interesses das timelines.
+Também argumentamos que existem inúmeras similaridades entre timelines e
+caches de conteúdos.
+Tanto timelines quanto caches são utilizadas para armazenar
+conteúdos de interesse a usuários. Ambas podem ser encaradas como filtros, tendo em
+
+M5S
+direita
+indeciso
+centro−esquerda
+ultra−direita
+esquerda
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+0
+1000
+2000
+3000
+0
+1000
+2000
+3000
+Orientação da fonte
+Impressões
+Orientação do fonte
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+0
+5000
+10000
+15000
+20000
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+Orientação da fonte
+Publicações
+Orientação do fonte
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+(a)
+(b)
+Figura 3. (a) Total de impressões no topo da timeline (por orientaç ão política),
+(b) Total de publicaç ões por orientaç ão política
+vista que tem tamanho limitado. Além disso, ambas em geral armazenam conteúdos mais
+recentes, e removem conteúdos que não são mais de interesse dos usuários. E, principal-
+mente, ambas aumentam a eficiência da obtenção de informação do que está guardado
+nelas.
+Existe uma ampla literatura sobre caches e teoria de filas. Estabelecendo a relação
+entre filas, caches e timelines, podemos nos aproveitar desta literatura para estudar timeli-
+nes que, por serem mais recentes, receberam menos atenção da comunidade científica em
+comparação com caches e filas, que são melhor entendidas. No caminho oposto, acredita-
+mos que resultados obtidos através dos estudos de timelines podem ser resultar em novas
+políticas de caching ou em novas formas de distribuição de conteúdo.
+4.2. Timelines são caches?
+Neste trabalho, um de nossos objetivos é compreender como projetar timelines (tendo
+em vista suas similaridades com caches) para melhor prover conteúdo de interesse dos
+usuários. Cabe destacar, entretanto, que existem importantes diferenças entre timelines e
+caches. Usuários de timelines estão tipicamente interessados numa classe de itens relaci-
+onados a uma certa categoria ou usuários. Esta é a principal diferença entre os dois. Por
+exemplo, um usuário deseja seguir as últimas notícias de seu jornal favorito. Esta trata-se
+de uma consulta flexível, em comparação com uma busca mais específica, por exemplo, a
+busca por um determinado episódio de uma série de televisão. A Tabela 1 ilustra algumas
+das diferenças entre caches e timelines.
+Pelas razões acima, embora timelines e caches tenham muitas similaridades, elas
+necessitam de políticas de inserção e remoção de conteúdos distintas. Algoritmos de
+caching clássicos prestam-se a servir requisições por itens específicos. Algoritmos para
+timelines, em contrapartida, precisam lidar com a distribuição de conteúdo baseada em
+classes, como por exemplo, um tópico especifico ou uma fonte preferida. Por estes mo-
+tivos, consideramos que timelines são caches orientados a fontes ou classes e divergindo
+dos caches tradicionais que são orientados à requisição.
+5. Um modelo analítico para timelines
+A seguir, apresentamos o modelo analítico proposto, seguido por sua validação usando
+dados das eleições italianas de 2018.
+
+Tabela 1. Comparaç ão entre timelines e caches
+Timelines
+Caches
+Evento de interesse
+publicação de conteúdo
+chegada de requisições
+Decisões de
+tomadas após
+tomadas depois
+inserção e remoção
+a publicação
+de um miss
+Requisições
+para classe de conteúdos
+para conteúdos específicos
+Controle
+de itens por
+de itens
+de ocupação
+classe
+específicos
+5.1. Descrição do modelo
+Nesta seção, descrevemos um modelo analítico para capturar a dinâmica das publicações
+em uma timeline.
+Tabela 2. Tabela de notaç ão
+Variável
+descrição
+K
+número de posições de interesse no topo da timeline (top K)
+j
+j-ésima fonte
+i
+i-ésimo cliente (usuário)
+Si
+número de fotografias tiradas no usuário i
+Iij
+número de impressões da fonte j no usuário i
+Dij
+número de publicações distintas da fonte j visualizadas pelo usuário i
+Λj
+taxa de criação de publicações da fonte j
+λij
+taxa efetiva de chegada de publicações de j na timeline de i
+λi,−j
+taxa efetiva de chegada de publicações de outras fontes (que não j) na timeline de i
+λi
+taxa total de chegada na timeline de i
+Tij
+valor esperado para tempo de permanência das publicações da fonte j na timeline de i
+ˆπij
+visibilidade de j medida na timeline de i
+πij
+visibilidade segundo modelo
+N̂ij
+ocupação média das publicações da fonte j medida na timeline de i
+Nij
+ocupação média das publicações de j medida na timeline de i segundo modelo proposto
+Dividimos os membros das redes sociais virtuais entre fontes e usuários. Mem-
+bros que geram conteúdos são fontes, e membros que consomem tais conteúdos são os
+usuários. Ao administrar sua timeline, um usuário ou grupo de usuários pode subscrever
+a fontes, e um subconjunto das publicações destas fontes será exibida na timeline. Note
+que numa rede em que a maior parte dos conteúdos é gerada pelos próprios usuários (ex.,
+Facebook), o papel de cada usuário dinamicamente muda entre fonte e usuário.
+Seja I := {1, . . . , i, . . . I} o conjunto de usuários em estudo, cada usuário associ-
+ado a uma timeline, e seja J := {1, . . . , j, . . . J} o conjunto de fontes. Seja i o usuário
+de interesse, cuja timeline desejamos modelar (a notação é sumarizada na Tabela 2).
+A fonte j cria publicações segundo um processo Poisson com taxa Λj. Seja λij ≤
+Λj a taxa efetiva com que a fonte j alimenta a timeline i. A taxa agregada de publicações
+chegando na timeline do usuário i é dada por
+λi =
+J
+X
+j=1
+λij
+(1)
+
+2
+1
+K
+K+1
+λij
+λij
+λij
+λij
+λi,−j
+λi,−j
+λi,−j
+λi,−j
+Figura 4. CTMC caracterizando a publicaç ão da fonte j na posiç ão mais no topo
+na timeline do usuário i.
+A taxa com que publicações de fontes, diferentes de j, chegam ao usuário i é
+λi,−j = λi −λij
+(2)
+Dinâmica FIFO
+Assumimos que cada publicação entra no topo da timeline, na posição
+1. Com taxa λi, as publicações tem sua posição incrementada em uma unidade. Estamos
+interessados nas primeiras K posições (slots) da timeline. De forma equivalente, assumi-
+mos que a timeline tem tamanho K. Uma publicação é removida da timeline quando ela
+passa da posição K para a posição fictícia K + 1.
+Cadeia de Markov
+A seguir, consideramos uma cadeia de Markov para capturar a
+evolução das publicações da fonte j, na timeline do usuário i. O objetivo é calcular a
+visibilidade e a ocupação de j na timeline do usuário i. Por isso, não levamos em conta
+a posição de cada publicação de j na timeline de i, mas apenas a posição da publicação
+mais no topo. Enquanto houver um post de j na timeline de i, a fonte j estará visível.
+A Figura 4 mostra uma cadeia de Markov tempo contínuo (CMTC) cuja variável
+de estado X representa a posição mais no topo ocupada por uma publicação da fonte j.
+Seja ˜πij(x) = P(X = x). Com taxa λij, uma publicação de j chega no topo timeline.
+Com taxa λi,−j, uma publicação de outra fonte faz com que as publicações de j sejam
+movidas para a posição k+1. A fonte j estará fora da timeline se a sua publicação mais no
+topo encontrar-se na posição fictícia K + 1. Logo, a visibilidade πij é dada por
+πij = 1 −˜πij(K + 1)
+(3)
+Proposição 1. Em uma FIFO timeline, a visibilidade da fonte j na timeline do usuário i
+é
+πij = 1 −
+λi,−j
+λi
+K
+Demonstração. O resultado segue imediatamente a partir das equações de balanço do
+sistema, que podem ser derivadas diretamente a partir da Figura 4.
+Proposição 2. Em uma FIFO timeline, a ocupação média da fonte j na timeline do
+usuário i é
+Nij = λijK
+λi
+(4)
+
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+Modelo (Ocupação)
+Medições (Ocupação)
+0.00
+0.25
+0.50
+0.75
+1.00
+0.00
+0.25
+0.50
+0.75
+1.00
+Modelo (Visibilidade)
+Medições (Visibilidade)
+(a)
+(b)
+Figura 5. Validaç ão do modelo: (a) Ocupaç ão, (b) Visibilidade
+Demonstração. Quando a m-ésima publicação entra na timeline ela fica visível até a che-
+gada do (m + K + 1)-ésima publicação. Já que o tempo médio entre chegadas é 1/λi, o
+tempo de residência da m-ésima publicação é K/λi. Em estado estacionário, seja Tij o
+tempo médio que publicações de j ficam na timeline de i, Tij = K/λi. Pela lei de Little,
+Nij = λijTij = λijK
+λi .
+Resumo modelo FIFO
+O modelo FIFO é um dos modelos analiticamente tratáveis mais
+simples que se possa conceber para uma timeline. Nesta seção, apresentamos o modelo
+FIFO e indicamos como ele pode ser usado para derivar a visibilidade e ocupação média
+de cada fonte em uma timeline. Em trabalhos futuros, pretendemos considerar modelos
+alternativos, mais flexíveis, como aqueles baseados em caches do tipo TTL.
+5.2. Validação
+A seguir, apresentamos a validação do modelo proposto. Nosso objetivo é indicar que
+o modelo tem capacidade expressiva para capturar os dados colhidos em ambiente real
+(eleições da Itália), e que ele é de fácil parametrização (requerendo apenas a taxa efetiva
+de publicações por fonte por usuário).
+Chamamos de Dij o número de publicações distantas da fonte j vistas pelo usuário
+i. Cabe ressaltar que esse número é menor ou igual a Iij. A taxa λij é dada pela razão
+Dij/Sj. Cada taxa obtida λij é substituída em (1) e em (2) para a obtenção da visibilidade,
+através da Proposição (1), e da ocupação, através da Proposição (4).
+Cada ponto nas Figura 5 corresponde a um usuário e uma fonte. Um ponto (x, y)
+indica que, para o usuário e a fonte em questão, o modelo prediz uma ocupação x (res-
+pectivamente, visibilidade), e empiricamente observamos ocupação y (resp., visibilidade).
+Os erros advém do fato, por exemplo, de nosso modelo assumir que as publicações nunca
+são reordenadas. Ainda assim, o fato de a maioria dos pontos estar próxima à reta x = y
+ilustra o poder preditivo do modelo. O erro médio quadrático da ocupação foi igual a
+0.0971 e o da visibilidade foi igual a 0.0527.
+6. Análise contrafactual (what-if analysis)
+A seguir, combinamos o modelo proposto com os dados colhidos para realizar análise
+contrafactual de ocupações. Para tal, calculamos o viés entre as ocupações medidas em-
+
+piricamente e as ocupações preditas pelo modelo, usando a quantidade de publicações
+criadas por cada fonte (API do Facebook). O objetivo é comparar a ocupação após a
+filtragem do Facebook (ocupação medida empiricamente) com aquela que nosso modelo
+prediz como sendo a ocupação condizente com um sistema sem filtros (ocupação analítica
+obtida com o modelo proposto).
+O viés é definido como a diferença N̂ij −Nj, onde N̂ij é a ocupação média
+empírica da fonte j na timeline i, e Nj é dado por (4) e N̂ij é dado por Iij/Si. Ob-
+serve que o índice i referente aos usuários é suprimido na expressão de Nj pois na análise
+de ocupação ignorando filtros assumimos que a ocupação é igual para todos os usuários.
+As Figuras 6 e 7 mostram que, de um modo geral, o viés positivo reflete a
+orientação dos usuários. No entanto, a fonte que mais produziu publicações, Il Gior-
+nale, foi penalizada em todos os usuários, e a segunda fonte que mais produziu, o Il Fatto
+Quotidiano só não foi penalizado no usuário que curtiu a sua página. O usuário neutro
+sofreu viés tanto positivo quanto negativo. A fonte M5S teve um forte viés positivo no
+usuário neutro. No entanto, o forte viés negativo do Il Fatto Quotidiano anulou esse efeito
+de forma que o viés total do M5S no usuário neutro foi negativo.
+M5S
+direita
+indeciso
+centro−esquerda
+ultra−direita
+esquerda
+−0.2
+−0.1
+0.0
+0.1
+−0.2
+−0.1
+0.0
+0.1
+−0.2
+−0.1
+0.0
+0.1
+Sinistra Italiana
+Forza Nuova
+CasaPound
+P. Democratico
+Il manifesto
+Democratica
+M5S
+M5S news
+La Repubblica
+Noi con Salvini
+Lega Salvini
+Il Fatto Quoti
+Il Giornale
+Sinistra Italiana
+Forza Nuova
+CasaPound
+P. Democratico
+Il manifesto
+Democratica
+M5S
+M5S news
+La Repubblica
+Noi con Salvini
+Lega Salvini
+Il Fatto Quoti
+Il Giornale
+Viés
+Fonte
+Orientação do fonte
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+Figura 6. Viés por usuário e por fonte (estão representados apenas os casos em
+que o valor absoluto do viés foi maior do que 0.4)
+7. Trabalhos relacionados
+O livro de [O’Neil 2016] mostrou diversas situações nas quais algoritmos podem reforçar
+preconceitos e tomar decisões que podem influenciar a sociedade como um todo. No
+contexto de mídias sociais e política, em [Epstein and Robertson 2015] foi demons-
+trado que manipulações em mecanismos de buscas são capazes de influenciar eleito-
+res indecisos. Robôs fazendo propaganda política tentando influenciar eleições foram
+estudados no mundo todo em [Woolley and Howard 2017] e particularmente no Brasil
+em [Arnaudo 2017] . Um estudo realizado por [Eslami et al. 2015] mostrou que mais de
+
+M5S
+direita
+indeciso
+centro−esquerda
+ultra−direita
+esquerda
+−2
+0
+2
+−2
+0
+2
+−2
+0
+2
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+centro−esquerda
+ultra−direita
+esquerda
+M5S
+direita
+Publicações
+Orientação
+Viés
+−3
+−2
+−1
+0
+1
+2
+3
+Figura 7. Viés por usuário e por orientaç ão política
+60% das pessoas não tinham conhecimento da existência dos filtros de personalização
+do Facebook. Em [Bakshy et al. 2015] foi identificado que as escolhas individuais são
+o maior fator de influência sobre o nível de exposições a posições políticas opostas no
+Facebook. O nosso trabalho, por outro lado, mostrou que o algoritmo reforça as pre-
+ferências dos usuários. Esse reforço de preferências pode ajudar a criar as filter bubbles
+identificadas em [Pariser 2011].
+Neste trabalho, mostramos como modelos de caches e filas podem ser usados
+no estudo de timelines. Existe uma vasta literatura sobre ambos [Martina et al. 2014,
+Dehghan et al. 2016, Harchol-Balter 2013]. Acreditamos que esta conexão aqui estabele-
+cida permita estender-se resultados destes domínios para as timelines.
+Existe uma vasta literatura focada em fazer engenharia reversa dos algoritmos
+por trás de timelines [Andreou et al. 2018]. Entretanto, a literatura de modelos analíticos
+nessa área é bem mais escassa. O trabalho de [Altman et al. 2013] foi o primeiro a mode-
+lar uma timeline com um fila Fifo. O nosso trabalho propôs uma solução do sistema capaz
+de obter além da visibilidade, a ocupação das fontes. Em particular, não é de nosso co-
+nhecimento nenhum trabalho anterior que tenha feito uso de medições reais de timelines,
+conectando tais medições com modelos analíticos.
+8. Conclusões
+O Facebook afeta milhões de usuários da Internet todos os dias, e qualquer decisão al-
+gorítmica sobre as timelines pode ter importantes impactos sociais e políticos. Neste
+trabalho, propusemos uma metodologia envolvendo medições e um modelo analítico para
+quantificar métricas de ocupação, visibilidade e viés em timelines. Indicamos que o mo-
+delo proposto tem poder preditivo, e que permite fazer análise contrafactual de dados.
+Acreditamos que este seja um importante passo no sentido de garantir maior transparência
+para os usuários ao torná-los mais informados sobre os processos de filtragem aos quais
+as publicações por eles visualizadas estão submetidas.
+
+Agradecimentos
+Este projeto foi em parte conduzido pelo time associado do projeto
+THANES, com recursos do INRIA (França) e da FAPERJ (UFRJ/Brasil), tendo sido par-
+cialmente financiado também pelo CNPq, CAPES e FAPESP.
+Referências
+Altman, E., Kumar, P., Venkatramanan, S., and Kumar, A. (2013). Competition over
+timeline in social networks. ASONAM, pages 1352–1357.
+Andreou, A., Venkatadri, G., Goga, O., Gummadi, K. P., Loiseau, P., and Mislove, A.
+(2018). Investigating ad transparency mechanisms in social media. NDSS.
+Arnaudo, D. (2017). Computational Propaganda in Brazil : Social Bots during Elections.
+Bakshy, E., Messing, S., and Adamic, L. A. (2015). Exposure to ideologically diverse
+news and opinion on Facebook. Science, 348(6239):1130–1132.
+Dehghan, M., Massoulie, L., Towsley, D., Menasché, D., and Tay, Y. C. (2016). A utility
+optimization approach to network cache design. In Proceedings - IEEE INFOCOM,
+volume 2016-July, pages 1–10.
+Epstein, R. and Robertson, R. E. (2015). The search engine manipulation effect and its
+possible impact on the outcomes of elections. Nat. Academy of Sciences of the United
+States of America, 112(33):E4512–21.
+Eslami, M., Rickman, A., Vaccaro, K., Aleyasen, A., Vuong, A., Karahalios, K., Hamil-
+ton, K., and Sandvig, C. (2015). I always assumed that I wasn’t really that close to
+[her]. Human Factors in Computing (HCI), pages 153–162.
+Facebook (2018a). Graph api reference /user-id/home.
+Facebook (2018b).
+Log de alterações da graph api.
+Retrieved April 6, 2018 from:
+https://developers.facebook.com/docs/graph-api/changelog.
+Harchol-Balter, M. (2013). Performance Modeling and Design of Computer Systems.
+Cambridge University Press, Cambridge.
+Martina, V., Garetto, M., and Leonardi, E. (2014). A unified approach to the performance
+analysis of caching systems. IEEE INFOCOM, pages 2040–2048.
+O’Neil, C. (2016). Weapons of Math Destruction: How Big Data Increases Inequality
+and Threatens Democracy. Crown Publishing Group, New York, NY, USA.
+Pariser, E. (2011). The Filter Bubble: How the New Personalized Web Is Changing What
+We Read and How We Think. Penguin Publishing Group.
+TechCruch
+(2016).
+How
+facebook
+news
+feed
+works.
+Retrieved
+Decem-
+ber
+31,
+2017
+from:
+https://techcrunch.com/2016/09/06/
+ultimate-guide-to-the-news-feed/.
+Tsaparas, P. (2017). Online social networks and media. http://www.cs.uoi.gr/
+t̃sap/teaching/cs-l14/references.html.
+Woolley, S. C. and Howard, P. N. (2017). Computational propaganda worldwide: execu-
+tive summary.

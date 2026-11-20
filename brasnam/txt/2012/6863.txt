@@ -1,0 +1,505 @@
+Caracterização de Padrões Estruturais de Redes Polarizadas
+Pedro H. Calais Guerra, Wagner Meira Jr.
+1Departamento de Ciência da Computação - Universidade Federal de Minas Gerais (UFMG)
+Belo Horizonte, MG, Brazil
+{pcalais,meira}@dcc.ufmg.br
+Abstract. Polarized networks are social networks that are increasingly gai-
+ning attention from researchers, social scientists and marketing agents. Such
+networks are found in many contexts in which individuals organize themsel-
+ves into opposing groups, since they have ideas, goals and viewpoints which
+are confliting. Such networks are found in relevant contexts such as Politics,
+Sports and many polemic topics debated on our society. However, in the lite-
+rature we do not find an accurate and coherent definition of what a polarized
+network is. In this work, we show that the currently accepted conceptualization
+of a polarized network – networks which exhibit communities with high degree
+of cohesion – is not enough to classify a network as a polarized network, since
+that non-polarized networks (such as friendship networks) also exhibit such pro-
+perty. Our major contribution is to demonstrate that polarized networks exhibit
+an additional structural characteristic – low density on the overlap of polarized
+communities.
+Resumo. Redes polarizadas constituem um tipo de rede social que vem ga-
+nhando uma crescente atenção de pesquisadores, cientistas sociais e agentes de
+marketing. Tais redes se manifestam em diversos contextos em que indivíduos se
+organizam em grupos que se opõem uns aos outros, por terem objetivos, ideias
+e visões que conflitam entre si, e podem ser observadas em contextos relevantes
+como Política, Esportes e temas polêmicos que estimulam o debate da socie-
+dade. No entanto, não há, na literatura, uma análise precisa e coerente das
+características estruturais de uma rede polarizada. Neste trabalho mostramos
+que o conceito vigente de rede polarizada – redes que contam com grupos de
+usuários com alta coesão interna – não é suficiente para que classifiquemos
+uma rede como polarizada, uma vez que redes não-polarizadas (como redes de
+amigos) também apresentam essa propriedade. Nossa principal contribuição é
+demonstrar que redes polarizadas exibem uma característica estrutural adicio-
+nal – baixa densidade de arestas na fronteira das comunidades.
+1. Introdução
+Em diversos contextos, grupos de indivíduos se dividem em segmentos que se opõem um
+ao outro, por terem objetivos, ideias e visões que conflitam entre si. Este fenômeno -
+conhecido como polarização, é bastante estudado por cientistas das áreas de Sociologia
+e Psicologia como o processo que leva grupos sociais a se dividirem em dois sub-grupos
+que fazem oposição entre si, e em que poucos membros se mantém neutros ou em uma
+posição intermediária em relação a esses grupos [Yardi and Body 2010, Sunstein 2002].
+
+Polarização entre indivíduos e suas opiniões se manifestam em diversos contextos relevan-
+tes, como Política e Esportes [Guerra et al. 2011] e ao redor de diversos temas polêmicos
+que estimulam o debate na sociedade, como aborto e cotas raciais [Yardi and Body 2010].
+Uma das razões para as quais compreender e medir a polarização em um determinado
+contexto de discussão é fundamental é o fato de que, em um debate conhecidamente
+polarizado, espera-se um alto grau de viés nas opiniões emitidas pelos indivíduos en-
+volvidos [Guerra et al. 2011, Plous 1993], o que sinaliza que as opiniões não devem ser
+consideradas sem uma consideração de quem as emite.
+Dada a relevância dos contextos em que polarização se manifesta, diversos traba-
+lhos da área de Ciência da Computação e Análise de Redes Sociais investigam redes soci-
+ais online consideradas polarizadas, sobretudo no contexto político [Conover et al. 2011,
+Adamic and Glance 2005, Livne et al. 2011, Guerra et al. 2011]. Em geral, a literatura
+de Ciência da Computação considera uma rede social como polarizada quando os nós
+de um grafo social podem ser particionados em grupos que apresentem alta coesão, de
+acordo com algum critério que estabeleça que o grau de conectividade dentro do grupo
+é alto e o grau de conectividade do grupo com membros externos é baixo (a partir de
+métricas como condutância [Kannan et al. 2004] e modularidade [Newman 2006]). De
+fato, uma rede polarizada, como a rede de retweets sobre Política obtida a partir do Twit-
+ter por [Conover et al. 2011] e exibida na Figura 1, usualmente exibe uma alta coesão em
+seus grupos: devido ao princípio da homofilia, pessoas com gostos, aptidões, desejos e
+posições similares tendem a formar laços sociais entre si com probabilidade maior do que
+com pessoas de características distintas [McPherson et al. 2001].
+Figura 1. Rede polarizada extraída de [Conover et al. 2011] a partir de dados do
+Twitter, mostrando dois grupos com alta coesão (Republicanos e Democratas).
+Arestas representam retweets.
+Neste trabalho, argumentamos que o critério de polarização que é correntemente
+considerado como condição que identifica uma rede polarizada – alta densidade dentro
+de grupos e baixa conectividade entre os grupos – não é suficiente para que uma rede
+seja classificada como polarizada, uma uma vez que redes sociais não-polarizadas (como
+redes de amigos) também apresentam essa propriedade, mesmo que em intensidade um
+pouco inferior. Isto posto, buscamos responder à seguinte pergunta fundamental: redes
+polarizadas, isto é, em que há oposição entre os membros dos diversos grupos, diferem
+de redes não-polarizadas apenas pela intensidade com que os grupos são coesos, ou existe
+algum padrão estrutural mais forte, que indique de forma mais pragmática e definitiva que
+
+há polarização (isto é, oposição entre grupos) em uma rede social?
+Nossos resultados mostram que há, de fato, uma diferença estrutural marcante en-
+tre redes polarizadas e não-polarizadas, ainda não explorada em modelos de análises de
+redes sociais: a a densidade de arestas na sobreposição entre as comunidades/grupos.
+A maior parte dos trabalhos que propõem algoritmos para detectar comunidades em
+grafos consideram que não há sobreposição entre os grupos, ou seja, que cada nó per-
+tence exclusivamente a uma comunidade, como no exemplo da Figura 1. No entanto,
+como demonstrado em trabalhos mais recentes, comunidades reais, encontradas em gran-
+des grafos, tendem a apresentar comunidades com sobreposição (overlapping communi-
+ties) [Palla et al. 2005, Leskovec 2011]. Isso significa que os nós podem participar de
+mais de uma comunidade, simultaneamente. Essa característica é bastante esperada, já
+que, no mundo real, as entidades usualmente são multi-comunidades: um indivíduo par-
+ticipa da comunidade da sua família, dos amigos da escola e da empresa; um pesquisador
+pode estar simultaneamente conectado à comunidade de Mineração de Dados, Aprendi-
+zado de Máquina e Bancos de Dados. Nesse sentido, a Figura 1 é simplista no sentido
+de considerar que todos os usuários que retuitaram mensagens durante a disputa eleitoral
+no Congresso Norte-Americano em 2010 eram exclusivamente democratas ou republica-
+nos, quando sabe-se que há usuários independentes, sem opinião formada ou, ainda, que
+propagam informação e são propagados por ambos os pólos de discussão, como (alguns)
+órgãos de imprensa.
+Nossa abordagem para caracterizar diferenças estruturais entre redes polarizadas e
+não-polarizadas investiga as características da rede na fração sobreposta das comunidades;
+como demonstraremos, ao contrário de redes não-polarizadas, nas redes polarizadas a
+densidade de arestas é menor na parte sobreposta das comunidades. Acreditamos que
+o trabalho dá um passo importante no sentido de diferenciar padrões estruturais entre
+tipos de redes, a partir da análise da estrutura de redes de blogs, Twitter e a partir da
+comparação com resultados de trabalhos recentes de outros pesquisadores. O trabalho
+está organizado da seguinte forma: a Seção 2 discute trabalhos relacionados. Na Seção 3,
+discutimos a conceituação de rede polarizada e propomos métricas de redes sociais para
+determinar o grau de polarização de uma rede social. Na Seção 4, discutimos aplicações
+e tarefas relevantes que se manifestam em redes polarizadas. Finalmente, as conclusões
+são apresentadas na Seção 5.
+2. Trabalhos Relacionados
+A Análise de Redes Sociais é um conjunto de modelos, algoritmos e métricas desen-
+volvido para sumarizar, interpretar e atuar sobre redes sociais – o grafo de relações e
+interações entre pessoas, entidades e objetos. Diversas propriedades estruturais de re-
+des sociais (tanto online quanto offline) foram mapeadas nas últimas décadas e geraram
+modelos que descrevem as redes de acordo com sua estrutura (ou seja, como os nós e
+arestas se interconectam), como small-world [Watts 1999] e scale-free [Barabasi 2003],
+bem como a forma como essa estrutura evolui ao longo do tempo [Leskovec et al. 2005].
+Esses modelos têm diversas aplicabilidades, por serem materializações de teorias so-
+ciológicas em grande escala e por permitir que a comunicação em rede seja otimizada
+de modo a favorecer a difusão de conhecimento em rede e a construção de serviços e
+aplicações que melhor aproveitem a estrutura conectada das redes sociais de grande es-
+cala [Easley and Kleinberg 2010].
+
+No entanto, ainda são incipientes modelos que consigam atuar, prever explo-
+rar a estrutura de redes sociais criadas a partir de cenários em que há um debate alta-
+mente polarizado, como Política, Esportes e temas polêmicos em geral. Na realidade,
+diversos trabalhos caracterizaram redes online polarizadas, principalmente no contexto
+político. Porém, nesses trabalhos a rede é considerada “polarizada” mais devido a obvi-
+edade do domínio do que pela existência de um conjunto de critérios que definam o que
+é uma rede polarizada. Em particular, são consideradas medidas de coesão de comunida-
+des, como modularidade e condutância, para, empiricamente, comprovar a polarização
+da rede [Waugh et al. 2009, Conover et al. 2011, Guerra et al. 2011, Livne et al. 2011,
+Adamic and Glance 2005].
+Este trabalho busca determinar características fundamentais da estrutura de grafos
+polarizados, a fim de se subsidiar e gerar modelos específicos para esse tipo de rede.
+Assim como a elaboração de modelos de geração de grafos sociais como small-world
+permitiram à área de redes sociais compreender a estrutura de uma vasta gama de redes
+sociais, aprofundar o entendimento do que caracteriza uma rede polarizada permitirá a
+geração de modelos mais realistas e úteis.
+3. Características Estruturais de Redes Polarizadas
+Na Figura 2, exibimos dois grafos sociais de naturezas distintas. No grafo da Figura 2(a),
+extraído de [Adamic and Glance 2005], os nós representam blogs sobre temas políticos
+durante as Eleições Presidenciais nos Estados Unidos, em 2004. A Figura 2(b) mostra as
+relações de uma rede social de amigos extraída do Facebook1. Desconsiderando a estru-
+tura do grafo, esperamos que a primeira rede seja polarizada: o debate político é um dos
+contextos onde oposição entre grupos mais claramente se manifesta [Guerra et al. 2011].
+Na segunda rede, não esperamos que haja polarização.
+No entanto, note que, ao menos visualmente, as duas redes apresentam uma ca-
+racterística estrutural bastante semelhante: ambas são constituídas de dois grupos (comu-
+nidades) coesas, com alta conectividade interna e com poucas arestas conectando uma
+comunidade à outra. Na primeira rede, as comunidades são os partidos norte-americanos
+(Republicanos e Democratas); na segunda rede, os grupos são comunidades profissio-
+nal (laranja, em cima) e da universidade (verde, embaixo). A comparação entre esses
+dois grafos nos leva a observação de que a alta coesão dos grupos é uma condição ne-
+cessária, mas não suficiente para que uma rede seja polarizada. Essa observação parte
+do fato de que redes sociais “gerais”2 também apresentam alta coesão de comunidades.
+Ainda que a densidade interna das arestas seja maior no Grafo da Figura 2(a), isso torna
+a diferenciação entre redes polarizadas e não-polarizadas dependente de um limiar de
+coesão que não pode ser facilmente determinado. O quanto é “alta coesão” para que uma
+rede seja decretada como polarizada? Este limiar depende do tipo de mídia social? Além
+disso, métricas clássicas de coesão de comunidades como condutância e modularidade
+combinam na mesma equação a coesão interna dos grupos com a conectividade do grupo
+com nós externos [Kannan et al. 2004], o que faz com o que o resultado da medição de
+coesão misture a intensidade da força das ligações internas do grupo com a oposição aos
+1grafo extraído a partir do perfil do autor deste artigo, utilizando a ferramenta Challenger Network
+Graph. Os nós são amigos do autor, e as arestas representam amizades entre esses amigos.
+2redes que não são sobre tópicos específicos, como Política. Exemplo: Facebook, Orkut, Google+.
+
+membros do outro grupo. Por exemplo, a condutância computa a razão entre a soma dos
+graus dos nós do grupo e o número de arestas que ligam membros do grupo com outros
+grupos; quanto menor a condutância, maior a coesão da rede. Essa combinação de fato-
+res na métrica dificulta a identificação do indicativo mais significativo de polarização – a
+oposição entre os grupos.
+Neste trabalho, buscamos uma característica estrutural que evidencie e diferen-
+cie de forma mais significativa e definitiva redes polarizadas de redes não-polarizadas. Na
+subseção seguinte, identificaremos um padrão estrutural que é capaz de identificar se há
+polarização em uma rede social.
+3.1. Densidade na Fronteira entre Comunidades
+A característica estrutural que propomos como evidência de polarização/não-polarização
+em uma rede social é a densidade de arestas na fração sobreposta das comunida-
+des. Como discutido na Seção 1, em redes sociais de grande escala as comunidades
+são sobrepostas, isto é, um nó pode participar simultaneamente de mais de uma comu-
+nidade [Leskovec 2011, Palla et al. 2005]. A hipótese que investigamos neste trabalho é
+que a parte sobreposta das comunidades esconde importantes padrões de interação entre
+os grupos. A densidade interna de arestas de uma comunidade, por outro lado, revela
+informações sobre o quanto o grupo é “coeso” e os laços sociais são intensos dentro do
+grupo, mas uma alta densidade interna não traz informações sobre como um grupo in-
+terage com o outro. A definição sociológica de polarização afirma claramente que há
+polarização quando os grupos se opõem [Sunstein 2002].
+Dessa forma, elaboramos a hipótese de que a “fronteira” sobreposta entre as co-
+munidades, por se tratar de uma porção do grafo social em que as comunidades interagem,
+pode esconder uma informação valiosa que forneça insights mais claros sobre a presença
+de polarização na rede. Em particular, avaliamos a densidade de arestas na porção sobre-
+posta das redes. A Tabela 1 exibe, para os Grafos da Figura 2, uma medida de coesão
+interna (densidade de arestas dentro do grupo) e da densidade de arestas na fronteira entre
+as comunidades, isto é, entre os nós que participam de mais de uma comunidade. Para
+determinar a(s) comunidade(s) em que cada nó participa, utilizamos a classificação ma-
+nual já realizada por [Adamic and Glance 2005] para o Grafo da Figura 2(a) e, para o
+Grafo da Figura 2(b), utilizamos também uma classificação manual, dado o número rela-
+tivamente baixo de nós. A densidade de arestas para um conjunto de nós foi computada
+como a razão entre o número de arestas existentes conectando nós do grupo e o número
+de arestas possíveis considerando o número de nós de cada grupo/fronteira. Por exem-
+plo, se há 5 nós na fronteira entre duas comunidades, o número de arestas possíveis é
+C(5, 2) = 5 ∗(5 −1)/2 = 10. Caso esta fronteira tenha 4 arestas internconectando seus
+nós, a densidade será 4/10 = 0, 4.
+A Tabela 1 mostra que, embora as comunidades em cada grafo sejam densas (den-
+sidade 0.41 e 0.33, para os grafos da Blogosfera Política e Amigos do Facebook, res-
+pectivamente), há uma diferença marcante entre os dois grafos: a densidade no grafo
+da Blogosfera Política é menor na fronteira entre as comunidades, e maior no grafo
+do Facebook. Isso significa que, na blogosfera política, os usuários neutros têm menos
+incentivo para formar relações (densidade diminuiu de 0,41 para 0,11); no grafo de ami-
+zade/Facebook, os usuários que pertencem a mais de uma comunidade (trabalho/estudo)
+
+Tabela 1. Comparaç ão de Características Estruturais dos Grafos da Figura 2.
+densidade interna média dos grupos
+densidade na fronteira
+grafo blogosfera política
+0,41
+0,11
+grafo Facebook – amigos
+0,33
+0,42
+têm mais arestas entre si em relação aos indivíduos que participam exclusivamente de
+um grupo (densidade aumentou de 0,33 para 0,42). A fim de avaliar para mais redes
+se este padrão estrutural se sustenta, avaliaremos, na próxima subseção, algumas redes
+sociais obtidas a partir do Twitter e mediremos a intensidade das relações na fronteira en-
+tre as comunidades, bem como ofereceremos possíveis explicações que justifiquem esta
+diferença.
+3.2. Redes Polarizadas – Twitter
+Nesta subseção, analisamos 3 redes potencialmente polarizadas – geradas a partir de de-
+bates de tópicos polêmicos no Twitter – e avaliamos o padrão estrutural da fronteira das
+comunidades obtidas, com o objetivo de verificar se o padrão observado na Seção 3.1 é
+consistente em outras mídias sociais e contextos. A seguir, descreveremos como os dados
+foram coletados e, em seguida, os resultados de nossas medições.
+O Twitter é a mais popular plataforma de microblogging, permitindo a qual-
+quer usuário enviar mensagens curtas que instantaneamente são tornadas disponíveis aos
+usuários que “seguem” o autor da mensagem [Kwak et al. 2010]. Desde que o serviço
+foi lançado, em 2006, milhões de usuários escreveram mais de 10 bilhões de “tweets”
+(como as mensagens são conhecidas no Twitter). Essas mensagens incluem comentários
+sobre a vida pessoal, e também opiniões sobre temas polêmicos [Kwak et al. 2010,
+Guerra et al. 2011].
+Neste trabalho, consideramos dois tópicos populares que geram bastante discussão
+no Twitter e nas mídias sociais em geral: política e esportes. Em relação ao contexto
+político, consideramos usuários que postaram mensagens sobre as Eleições Presidenciais
+Brasileiras de 2010. No contexto esportivo, coletamos tweets sobre dois campeonatos
+esportivos: o Campeonato Brasileiro de 2010 e 2011 e o Campeonato de Futebol Ame-
+ricano 2010-11 e 2011-12 (NFL). A Tabela 2 fornece informações gerais sobre os três
+conjuntos de dados. Em todos os casos, as mensagens foram coletadas por meio da API
+do Twitter3. No contexto político brasileiro, utilizamos os nomes dos três principais can-
+didatos (Dilma Rousseff, José Serra e Marina Silva) como palavras-chave de coleta. Nos
+contextos esportivos, utilizamos como palavras-chave o nome das equipes mais populares
+(12 do futebol brasileiro e 22 da NFL).
+Para cada um dos 3 cenários, montamos um grafo social em que as arestas deno-
+tam retweets entre usuários, e comunidades foram obtidas a partir do método proposto
+em [Guerra et al. 2011]4 . A Figura 3 exibe a variação na densidade de arestas de acordo
+com o número K de grupos os quais os membros da rede participam. Por exemplo,
+3disponível em http://apiwiki.twitter.com/.
+4O método escolhe a priori a comunidade de usuários-chave (como o perfil oficial de candidatos a
+eleição e perfis oficiais de futebol) e computa a distância dos nós a esses usuários-chave. Usuários neutros
+são próximos a mais de um usuário-chave simultaneamente.
+
+Tabela 2. Descriç ão Geral dos Datasets considerados (Twitter).
+Futebol Brasileiro
+NFL
+Eleições Brasileiras – 2010
+período
+05/2010 a 12/2010
+01/2010 a 02/2011
+01/2010 a 12/2010
+tópico
+esporte
+esporte
+política
+# de entidades-chave (polos)
+12
+22
+3
+# de tweets
+35.834.453
+23.094.280
+10.173.381
+# usuários no grafo
+348.752
+171.121
+18.744
+P(Aresta|K = 2) computa a probabilidade de haver uma aresta entre usuários que par-
+ticipam da comunidade de apoiadores da candidata Dilma Rousseff (em 2010) e também
+da comunidade do candidato José Serra (ou seja, usuários neutros). Nos contextos espor-
+tivos, K pode ser maior que 2, já que usuários podem participar da comunidade de várias
+equipes simultaneamente.
+Para fins de comparação, apresentamos também as medições de P(Aresta|K)
+obtidas no trabalho recente de Jure Leskovec [Leskovec 2011]. Este trabalho examinou a
+densidade na fronteira de comunidades de mais de 200 redes sociais “gerais”, obtidas a
+partir de sistemas como Facebook, Orkut e redes de citações de publicações.
+Note que P(Aresta|K), isto é, a probabilidade que haja uma aresta entre dois
+nós compartilhando K grupos, exibe uma padrão fundamentalmente diferente conforme
+K aumenta, nos dois tipos de rede analisados: para as redes sociais gerais, analisadas
+em [Leskovec 2011], note que a probabilidade de haver uma aresta entre dois nós au-
+menta conforme a sobreposição no número de grupos comuns aos pares de nós aumenta.
+Por outro lado, nas redes onde potencialmente há polarização/embate de ideias, a polari-
+dade diminui conforme a sobreposição de grupos cresce. Este resultado é coerente com a
+medição inicial feita para os grafos da Figura 2. Acreditamos que três razões expliquem
+tal diferença na estrutura de redes polarizadas e não-polarizadas:
+1. Em uma rede não-polarizada, os nós da fronteira entre comunidades, ou seja,
+que fazem parte de mais de um grupo, tem motivos adicionais para estabelecer
+uma interação ou laço social. Por exemplo, na rede de amigos do Facebook da
+Figura 2(b), os indivíduos da fronteira se conhecem do ambiente profissional e
+também do ambiente universitário. Por isso, a probabilidade de haver uma aresta
+na interseção entre os grupos é maior.
+2. Por outro lado, na rede polarizada, tal “incentivo extra” para interação ou estabe-
+lecimento de uma relação, na fronteira, não existe: o fato de um usuário de mídia
+social participar de vários partidos, ou comentar sobre vários clubes, não aumenta
+a similaridade desse usuário com outros que também fazem o mesmo.
+3. No contexto polarizado, usuários neutros tendem a ser mais comedidos em revelar
+suas opiniões e estabelecer relações que evidenciem suas opiniões. Com isso, a
+densidade na fronteira polarizada é menor do que na fronteira não-polarizada.
+4. Redes Sociais Polarizadas: Aplicações e Oportunidades
+Neste artigo, exploramos um tipo de rede social – redes polarizadas – que tem carac-
+terísticas bem particulares em relação a redes sociais “gerais”. Nesta seção, além de des-
+crevermos essas propriedades, discutimos o potencial de desenvolvimento de algoritmos
+e modelos específicos para esse tipo de rede e suas características:
+
+• atributo-chave dos nós da rede: em redes polarizadas, pode-se computar para
+cada membro da rede um atributo que desempenha uma função essencial na
+dinâmica de relações da rede: o viés (ou, em outras palavras, o pólo) ao qual o
+usuário pertence. Por exemplo, no contexto esportivo, saber que o usuário é torce-
+dor de uma determinada equipe é uma informação que impacta diretamente tarefas
+como recomendação de conteúdo, bem com a difusão de conteúdo: este usuário
+dificilmente propagará informações que vão contra o seu viés.
+• comunidades fechadas: em uma rede social geral, um usuário participa e inte-
+rage com vários grupos, que em geral reproduzem os diversos ambientes em que
+o usuário participa na vida real, tal como o ambiente familiar, profissional, de
+lazer etc. Nesse cenário, o fato do usuário participar de uma comunidade não res-
+tringe sua participação em outro grupo (a menos pela restrição de que o usuário
+possui uma quantidade de tempo limitada para manter relações). Ou seja, o fato
+do usuário interagir e fazer parte de uma comunidade de membros da empresa
+em que trabalha não delimita ou incentiva de maneira significativa sua interação
+com outras comunidades. Em uma rede polarizada, por outro lado, se um usuário
+é um participante ativo de uma comunidade que suporte uma entidade, é pouco
+provável que ele atue da mesma forma em outra(s) comunidade(s). Além disso,
+em uma rede polarizada o usuário distribui a sua atuação por todas as comunida-
+des de forma que ele atuar/apoiar mais uma comunidade significa necessariamente
+opor-se mais a outra comunidade, o que significa que ele necessariamente deve ser
+polarizado a um dos lados ou neutro em relação a ambos.
+• influência
+com
+custo-benefício
+variável:
+Um
+problema
+relevante
+em
+análise de redes sociais consiste em difundir ideias, inovações e conhe-
+cimento de forma a maximizar o número de indíviduos atingidos por tal
+ação [Kempe et al. 2003], o que é de interesse, por exemplo, por agentes de mar-
+keting viral [Richardson and Domingos 2002, Domingos and Richardson 2001].
+Uma das formas de difundir ideias por uma rede social é se valer de usuários
+influentes: um usuário influente é capaz de induzir comportamentos e ações em
+outros indivíduos. Encontrar um conjunto de K usuários influentes que maximi-
+zem a difusão de um comportamento ou ação por uma rede social é um problema
+conhecido como maximização de influência em redes sociais [Chen et al. 2009].
+Em uma rede social geral, considera-se que o benefício de influenciar um nó,
+ou seja, convencer um usuário a desempenhar uma determinada atividade (como
+consumir um produto) é o mesmo para todos os nós. Em redes polarizadas, no
+entanto, o problema de influenciar nós a adotar um certo comportamento – ou al-
+terar seu comportamento corrente – apresenta uma característica bastante peculiar:
+cada nó tem uma resistência diferente a ser influenciado. Por exemplo, usuários
+que possuem uma forte posição contrária a um determinado partido político difi-
+cilmente serão convencidos a alterar sua posição; por outro lado, usuários neutros,
+sem posição definida, são aqueles que podem ser influenciados mais facilmente.
+• migração entre pólos/dinâmica da rede: redes sociais de amizades, citações
+e interações de diversos tipos já foram investigadas segundo o seu padrão
+dinâmico; por exemplo, é sabido que o aumento da densidade do grafo e a
+diminuição do diâmetro da rede são padrões dinâmicos recorrentes em gra-
+fos [Leskovec et al. 2005].
+Redes polarizadas sugerem novas dimensões de
+análise da dinâmica temporal, a saber, como os usuários migram de um polo
+
+a outro, como usuários neutros contribuem para a conectividade e difusão de
+informação pela rede, e como eventos externos (por exemplo, um debate político
+na televisão) afetam o tamanho e estrutura topológica das comunidades.
+5. Conclusões
+Neste artigo, mostramos que duas características estruturais são encontradas em redes
+socias polarizadas: a alta coesão/densidade dentro de cada grupo, e a baixa densidade
+de arestas na porção neutra rede, isto é, no segmento da rede em que nós participam
+de mais de um grupo. Este resultado demostra um padrão diferente do encontrado em
+redes sociais não-polarizadas [Leskovec 2011] e complementa a convenção aceita até o
+momento pela literatura de redes sociais – de que uma alta coesão nos grupos seja uma
+característica suficiente para determinar uma rede polarizada [Yardi and Body 2010].
+Como continuidade natural do trabalho, pretendemos aumentar em diversidade
+e quantidade o número de redes investigadas de acordo com a dupla de características
+(coesão dos grupos/densidade da fronteira dos grupos). Acreditamos que este trabalho
+inicial, ao permitir uma classificação mais contundente de polarização/não-polarização
+de redes sociais, permite, por exemplo, a agentes de marketing responder a perguntas
+como “há polarização no contexto de discussão X, como o de debates sobre um certo
+tipo de produto?”. Além disso, o trabalho abre oportunidades para que pesquisadores de
+redes sociais desenvolvam modelos e algoritmos específicos para redes polarizadas, que
+teriam grande aplicabilidade em “eventos polarizados” como os que ocorrerão durante o
+ano de 2012, como as Eleições Presidenciais nos Estados Unidos, as Eleições Municipais
+no Brasil e as Olimpíadas de Londres.
+6. Agradecimentos
+O presente trabalho foi realizado com o apoio do UOL (www.uol.com.br) , através do
+Programa UOL Bolsa Pesquisa, Processo Número 20120130151500, e também do CNPq,
+CAPES, FAPEMIG e FINEP.
+Referências
+Adamic, L. A. and Glance, N. (2005). The political blogosphere and the 2004 u.s. elec-
+tion: divided they blog. In Proceedings of the 3rd international workshop on Link
+discovery, LinkKDD ’05, pages 36–43, New York, NY, USA. ACM.
+Barabasi, A.-L. (2003). Linked: How Everything Is Connected to Everything Else and
+What It Means for Business, Science, and Everyday Life. Plume Books.
+Chen, W., Wang, Y., and Yang, S. (2009). Efficient influence maximization in social
+networks. In Proceedings of the 15th ACM SIGKDD international conference on Kno-
+wledge discovery and data mining, KDD ’09, New York, NY, USA. ACM.
+Conover, M., Ratkiewicz, J., Francisco, M., Gonçalves, B., Flammini, A., and Menczer,
+F. (2011). Political polarization on twitter. In Proc. 5th International AAAI Conference
+on Weblogs and Social Media (ICWSM).
+Domingos, P. and Richardson, M. (2001). Mining the network value of customers. In
+Proceedings of the seventh ACM SIGKDD international conference on Knowledge dis-
+covery and data mining, KDD ’01, pages 57–66, New York, NY, USA. ACM.
+
+Easley, D. and Kleinberg, J. (2010). Networks, Crowds, and Markets: Reasoning About
+a Highly Connected World. Cambridge University Press.
+Guerra, P. H. C., Veloso, A., Meira, Jr, W., and Almeida, V. (2011). From bias to opinion:
+A transfer-learning approach to real-time sentiment analysis. In Proc. of the 17th ACM
+SIGKDD Conference on Knowledge Discovery and Data Mining, San Diego, CA.
+Kannan, R., Vempala, S., and Vetta, A. (2004). On clusterings: Good, bad and spectral.
+J. ACM, 51(3):497–515.
+Kempe, D., Kleinberg, J., and Tardos, E. (2003). Maximizing the spread of influence
+through a social network. In Proc. of the 9th ACM SIGKDD international conference
+on Knowledge discovery and data mining, KDD ’03, New York, NY, USA. ACM.
+Kwak, H., Lee, C., Park, H., and Moon, S. (2010). What is twitter, a social network or
+a news media?
+In WWW ’10: Proceedings of the 19th international conference on
+World wide web, pages 591–600, New York, NY, USA. ACM.
+Leskovec, J. (2011).
+Networks, communities and the ground-truth.
+http://
+videolectures.net/solomon_leskovec_networks/.
+Leskovec, J., Kleinberg, J., and Faloutsos, C. (2005). Graphs over time: densification
+laws, shrinking diameters and possible explanations. In Proceedings of the eleventh
+ACM SIGKDD international conference on Knowledge discovery in data mining, KDD
+’05, pages 177–187, New York, NY, USA. ACM.
+Livne, A., Simmons, M. P., Adar, E., and Adamic, L. A. (2011). The party is over here:
+Structure and content in the 2010 election. In ICWSM.
+McPherson, M., Smith-Lovin, L., and Cook, J. M. (2001). Birds of a feather: Homophily
+in social networks. Annual Review of Sociology, 27(1):415–444.
+Newman, M. E. J. (2006). Modularity and community structure in networks. Proceedings
+of the National Academy of Sciences, 103(23):8577–8582.
+Palla, G., Derényi, I., Farkas, I., and Vicsek, T. (2005). Uncovering the overlapping com-
+munity structure of complex networks in nature and society. Nature, 435(7043):814–
+818.
+Plous, S. (1993). The psychology of judgment and decision making. McGraw-Hill, New
+York.
+Richardson, M. and Domingos, P. (2002). Mining knowledge-sharing sites for viral mar-
+keting. In Proceedings of the eighth ACM SIGKDD international conference on Kno-
+wledge discovery and data mining, KDD ’02, New York, NY, USA. ACM.
+Sunstein, C. R. (2002). The Law of Group Polarization. Journal of Political Philosophy,
+10(2):175–195.
+Watts, D. J. (1999). Networks, dynamics, and the small world phenomenon. American
+Journal of Sociology, 105(2):493–527.
+Waugh, A. S., Pei, L., Fowler, J. H., Mucha, P. J., and Porter, M. A. (2009).
+Party
+Polarization in Congress: A Social Networks Approach.
+Yardi, S. and Body, D. (2010). Dynamic debates: An analysis of group polarization over
+time on twitter. Bulletin of Science, Technology and Society, 5(30).
+
+(a) Rede social de blogs sobre política - Eleições Presidenciais Norte-Americanas em 2004
+[Adamic and Glance 2005]
+(b) Rede Social de Amigos do Facebook
+Figura 2. Dois grafos sociais que apresentam comunidades com alta coesão. Na
+Figura 2(a), os nós representam blogs sobre temas políticos durante as Eleiç ões
+Presidenciais nos Estados Unidos, em 2004. A Figura 2(b) mostra relaç ão de
+uma rede social de amigos extraída do Facebook. Do ponto de vista sociológico,
+na primeira rede o contexto é polarizado; na segunda, não há polarizaç ão, pois
+trate-se de amizades formadas por motivos diversos e sem oposiç ão a um tema
+específico.
+
+0
+ 0.1
+ 0.2
+ 0.3
+ 0.4
+ 0.5
+ 0.6
+ 0.7
+ 0.8
+ 0.9
+ 1
+ 0
+ 2
+ 4
+ 6
+ 8
+ 10
+ 12
+P(aresta|K)
+K (numero de grupos compartilhados)
+200+ Redes Sociais Gerais
+Futebol Brasileiro - Twitter
+Eleicoes-BR - Twitter
+NFL - Twitter
+Figura 3. Variaç ão da probabilidade de haver uma aresta entre dois nós que par-
+ticipem de K grupos, para grafos sociais gerais e grafos (potencialmente) pola-
+rizados. Para os grafos gerais, as sobreposiç ões entre grupos são mais densas
+que a densidade interna do grupo; a densidade na sobreposiç ão entre grupos
+potencialmente polarizados é menor que a densidade dos grupos individuais.

@@ -1,0 +1,596 @@
+Disconnecting for the good: A network-oriented model for
+social contagion of opinions and social network interventions
+to increase adherence to social distancing
+Eric Araújo1, Mariza Ferro2, Gabrieli Silva2
+1Departamento de Ciência da Computação (DCC/UFLA)
+Caixa Postal 3037, 37200-900, Lavras - MG
+2Laboratório Nacional de Computação Científica (LNCC)
+Av. Getulio Vargas, 333 - Quitandinha, Petrópolis - RJ, 25651-076
+eric@ufla.br, mariza@lncc.br, gabrieli@lncc.br
+Abstract. The pandemic of the new COVID-19 has raised many questions to a
+very connected society as to how to best respond to such a challenge at this cur-
+rent time. The best response so far is to call people for following the instructions
+from the World Health Organisation (WHO) as a way of reducing the spread of
+the virus and thus relieving the health system, striving to avoid a collapse. This
+work studies the spread of positive opinion on adhering to social distancing ba-
+sed on network topology and metrics using a network-oriented model for social
+contagion. It is shown that interventions based on social network measurements
+can be used to boost the spread of positive opinion about adhering to these me-
+asures. It is also shown that our model accounts for the relevance the health
+authorities have on encouraging people to partake in social distancing volunta-
+rily.
+Resumo. A recente pandemia do COVID-19 gerou questionamentos sobre como
+melhor responder à este desafio em uma sociedade conectada. A melhor res-
+posta até o momento é convocar as pessoas para seguirem as recomendações
+da Organização Mundial de Saúde (OMS) de modo a reduzir o espalhamento
+do vírus e evitar um colapso do sistema de saúde. Este trabalho estuda o espa-
+lhamento de opiniões favoráveis à adesão ao distanciamento social baseado em
+métricas e topologias de redes usando um modelo baseado em redes de contágio
+social. É mostrado que intervenções baseadas em métricas de redes sociais po-
+dem ser usadas para aumentar o espalhamento de opiniões positivas sobre a
+adesão a essas medidas. Também é mostrado que o modelo considera a re-
+levância que os orgãos de saúde possuem ao convencer a população de que o
+distanciamento social voluntário é importante.
+1. Introduction
+The World Health Organisation (WHO) declared COVID-19 a pandemic on March 11
+2020 with over 100,000 cases of infected people by the coronavirus illness in over 100
+countries. After this announcement, the whole world has been making efforts in order
+to contain the spread of the virus, or at least to flatten the curve of infected people as it
+would cause a collapse in the health systems, due to a lack of Intensive Care Units (ICUs)
+
+and ventilators for all of those who would develop severe and critical symptoms of the
+disease and as a consequence cause a larger number of deaths.
+Many strategies have been discussed so far about what would be the best strategy
+to give time for hospitals and health centres to prepare for the worse case during the pan-
+demic. Due to the lack of a vaccine, the instructions focus on increasing hygiene habits,
+as washing your hands more often with soap, the use of masks to cover mouth and nose in
+public spaces, staying home if possible, isolating people from the risk groups, restricting
+the gathering of people on the streets, concerts and big events, and encouraging people
+to adhere to social distancing. Some regions had also to adopt a hard lockdown, where
+people are obliged to stay home for a period, after losing control over the number of in-
+fected people. For example, the Italian region of the Lombardy region suffered thousands
+of deaths within weeks due to the lack of medical resources and prevention measures by
+the mayor of the city. In some countries, like Brazil, there is still a big concern with the
+outcomes of the pandemic in the economic spectrum. Other countries, like the United
+States, that were resistant to the idea of a hard lockdown now are also suffering with the
+increased number of patients in their hospitals.
+To encourage people to stay home, artists and authorities have been broadcas-
+ting advertisements to make people aware of the importance of each individual action
+towards promoting social distancing and other cares needed to avoid the infection by
+the COVID-19. This effort is not equal in all countries, and even though encouraged
+by the WHO, still not taken seriously by all authorities. In these countries, the biggest
+motivation for the population to stay home or keep the social distancing comes from so-
+cial media, TV channels and social spread of information. Besides the important task
+of motivating people to stay home, there is a battle to reduce the spread of the virus.
+Many models [Walker et al. 2020, Dandekar and Barbastathis 2020] have been develo-
+ped in the past months in order to predict the numbers of people who are going to be
+infected. Other models try to predict when the peak of the infections are going to hap-
+pen [Li et al. 2020, Zhou et al. 2020].
+In this work, we look at the problem from a network perspective. The model pro-
+posed accounts for the motivation of people to adhere to social distancing based on ho-
+mophily and social contagion. The Center for Disease Control and Prevention (CDC) defi-
+nes social distancing (also called physical distancing) as “keeping space between yourself
+and other people outside of your home”. This measure has proven to be one of the most
+effective ways of reducing chances of infection so far [Koo et al. 2020]. The aim of this
+work is to investigate how different configurations of people’s networks could lead to dif-
+ferent scenarios of social distancing adherence. Mainly, we look to answer the following
+questions:
+1. Does the network topology affects the adherence to voluntarily social distancing
+in a pandemic scenario like COVID-19?
+2. Are interventions based on social network traits efficient to increase the adherence
+to social distancing?
+This work is organised as follow: Section 2 presents the related works. The metho-
+dology used to create the model and run the simulations is explained in Section 3. The
+results obtained are presented in Section 4 and discussed in Section 5. This latter section
+also presents the potential improvements in the model and other future works.
+
+2. Related Works
+The coronavirus pandemic has called societies around the world for social distancing in
+order to avoid spreading the virus to other people, including closest family and friends.
+This is an altruistic and difficult decision that requires a firm decision to adhere or not
+to the preventive measures such as social distancing. [Webster et al. 2020] conducted a
+rapid review to list factors associated to quarantine during infectious diseases outbreaks.
+The researches have shown that adherence decisions are dependent on a few factors as
+(1) the knowledge people have about the disease and quarantine procedure, (2) social
+norms, (3) perceived benefits of quarantine and perceived risk of the disease, (4) practical
+issues such as running out of supplies or financial consequences of being out of work.
+[Webster et al. 2020] emphasises the importance of public health officials on providing
+on time, clear rationale for quarantine, as well as guaranteeing that supplies of food,
+medication and other essentials are provided. [Braunack-Mayer et al. 2013] evaluated
+the commitment of the Australian schools after the public health officials closed them as
+a strategy to mitigate the spread of the H1N1 virus in 2009. [Braunack-Mayer et al. 2013]
+conclude that the trust in public officials, government and the school as institution was the
+reason for the effective response to the strategy.
+[Saunders-Hastings et al. 2017] proposed a mathematical model to predict the
+number of infected people, peak hospital care capacity, peak ICU capacity, deaths and
+the economic burden for future outbreaks of influenza in Ottawa, Canada. Authors used
+a social contact network structure for the transmission of the virus as three independent
+transmission-time/location steps throughout the day: household, school/work and com-
+munity. In this scenario the vaccines and other treatments are considered for the agents in
+the model. [Chhatwal and He 2015] presented an Agent-Based Model (ABM) to evaluate
+the cost effectiveness of screening a percentage of the population during the epidemic of
+an infectious disease. They have shown the total cost of the health maintenance of advan-
+ced stages, treatment costs and screening costs in relation to the reduction of deaths and
+new infections due to screening.
+[Centola 2018] presented a very good methodology for understanding how beha-
+viour spreads in complex networks. His study is a very important foundation of what
+this work is going to evaluate, that is, what is the importance of network structure, ho-
+mophily and social ties on the spread of COVID-19 and to the self-isolation adherence.
+[Araújo 2018] developed a model for the spread of healthy behaviour and social contagion
+considering people’s traits and their ego networks to predict future states for their physi-
+cal activity levels. [van Woudenberg et al. 2019] proposed a study to understand different
+strategies of interventions in order to increase the physical activity level of a group of
+children and teenagers at Dutch schools based on their networks. The model proposed in
+this research is network-oriented and time-dependent as the agents states affect the state
+of others over time [Treur 2020].
+Recent modelling researches on COVID-19 are focused mainly on the epidemi-
+ological models, like SEIR (Susceptible, Exposed, Infectious, Recovered) in order to
+describe the epidemic and assess the impact of social isolation policies [Lin et al. 2020,
+Fang et al. 2020, Kucharski et al. 2020]. Some of them propose an agent-based model
+to simulate isolation interventions and understand the impact to reduce the spread of
+COVID-19. The work of [Klôh et al. 2020] uses an ABM combined with the SEIR model
+
+to simulate interventions and understand the impact to reduce the spread of COVID-19
+considering the socioeconomic conditions of Brazil. The simulations have heterogeneous
+populations, numbers of Intensive Care Units and study different scenarios to show how
+the interventions can influence the spread of the virus.
+[Wolfram 2020] proposed an ABM of COVID-19 that models the variability of
+interaction rates between agents and the structure of the in-person contact network. The
+author point out as findings that the structure of the contact network matters in the velocity
+of the spread and that reducing interaction between communities flattens the curve and
+reduces the average total infection rate. This work is similar to ours only in the sense of
+consider a social network to model the spread of COVID-19.
+This is an initial effort to model the spread of COVID-19 and the adherence to
+social distancing as a health policy to avoid the spread of the virus. As far as our litera-
+ture review could go this is the first work that tries to understand how social distancing
+adherence spreads using a network-oriented model approach in the context of a pandemic
+like COVID-19.
+3. Model and Simulations
+According to [Sokolowski and Banks 2011],
+“Simulation is a good way to understand social processes because it can
+be used to predict the features of an environment, such as the changing
+demographics of a region over the course of time; or forecast changes
+such as business trends”.
+In this work we are interested on social processes of adherence to a new behaviour as a
+result of the COVID-19 pandemic in a network where the nodes are the people and the
+edges are the relationships.
+The model presented in this work considers the following dynamics of social re-
+lations and the pandemic of the COVID-19:
+1. People are more willing to partake in social distancing if their closer friends and
+family are following the guidelines;
+2. People are more easily convinced that they should adhere the social distancing
+when they know someone who got the virus and developed severe or critical symp-
+toms;
+3. Relationships are built based on homophily, that is, people with closer characte-
+ristics tend to have stronger bounds;
+4. Governments interventions in favour or against preventing the spread of the virus
+affect the whole population and, in that case, a risk mechanism is achieved in
+each agent considering relaxing the measures and the potential drawbacks of their
+decision.
+3.1. Social network structures and homophily
+The study of social networks encompasses the representation of social phenomena in
+social science contexts [Freeman 1989]. Therefore, social networks are representations
+in which relevant aspects of social phenomenon in a specific scenario are expressed in
+
+ways more fit to the scientific scope [Hennig et al. 2012]. The networks are made of no-
+des (or vertices) and edges (or links) as their main elements. For our model, the nodes
+represent people, while the edges represent the relationships, that is, who is connected
+to whom in real life. To account for the complexity of people and their social dyna-
+mics, the model is built upon the assumption that relationships are usually homophilic
+[McPherson et al. 2001]. That is, people with similar interests and characteristics tend to
+build closer relationships. This will affect the amount of time people spend together.
+The difference between two persons traits is used to calculate their link strength
+as shown in Equation 1. ωi,j is the link strength between two nodes i and j. The network
+is bidirectional, that is, ωi,j = ωj,i. traitk
+i is the k-th trait for node i, where each node (or
+agent) has n traits. All trait values are float numbers between 0 and 1.
+ωi,j =
+Pn−1
+k=0 1 −|traitk
+i −traitk
+j|
+n
+(1)
+Each node represents a person with traits. The traits age, education level, socioe-
+conomic situation and gender are used to define the homophily and connection strength
+between the nodes. age is normalised using linear scaling. Gender is 0 for male and 1
+for female. The traits quarantine opinion (q) and threshold for changes (τ) are used to
+define how the opinions about social distancing spread through the connections.
+The
+network
+topologies
+used
+for
+this
+study
+are
+(1)
+Erdos-Renyi
+[Erd˝os and Rényi 1960],
+(2)
+Barabasi-Albert
+[Barabási and Albert 1999]
+and
+(3)
+Small-world [Watts and Strogatz 1998]. The different configurations proposed are im-
+portant to account for simulations of different social contexts. It is expected, for instance,
+that favelas (Brazilian slums) present a denser network than wealthier neighbourhoods
+where people live in buildings.
+3.2. Opinion Contagion Model
+As explained in Section 2, one of the most important ways of mitigating the spread of
+infectious diseases is by promoting social distancing among the population. There are two
+ways people can adhere to this behaviour: (1) voluntarily and (2) obligatory. Case (1) is a
+result of a person who is convinced that she should stay without physical social contact as
+a way of caring for her and society’s health. Case (2) is a result of an implemented policy
+by health authorities. In this case it is not acceptable for people to stay on the streets for
+the risk of a penalty (fine, arrest, etc). This model accounts for (1).
+The voluntary social distancing is a result of an efficient strategy by the health
+authorities on communicating the risks of the disease and instructing on how to proceed.
+In these cases, it is expected that most of the citizens will have enough information to
+trust the preventive measures and adopt them. The voluntary social distancing can be also
+chosen by social contagion. That is, if most people someone knows take the measures
+seriously, the chances to adherence are higher then if most of the person’s contacts are not
+following the protocol.
+To simulate these situations, we consider that each agent has an opinion variable
+about how willing is the agent to adopt a social distancing behaviour (agent’s opinion - q).
+This variable is 0 when the person is totally against the protocol, and 1 means total agree-
+
+ment with the need for it. Each agent has also a threshold (threshold for changes - τ) which
+defines when agents will change their status as people who are following the social dis-
+tancing protocol. Differential equations from the emotion contagion model presented by
+[Araújo and Treur 2016] combined with the spiral model presented by [Bosse et al. 2009]
+are used to describe the changes in agents opinions over time as shown below. The same
+approach has been used previously for behaviour contagion, emotion contagion and opi-
+nion contagion in social network contexts [Araújo 2018].
+As described in [Araújo and Treur 2016], the overall contagion process is calcu-
+lated in terms of the connection weight (ωi,j) given by equation 1. The impact caused
+by agent j on agent i is given by Equation 2, where qj is the opinion of agent j about
+adhering to the protocol.
+impactj,i(t) = ωi,jqj(t)
+(2)
+The overall contagion strength ωi to qi represents the total effect from all nodes
+connected to i. It is given by Equation 3.
+ωi =
+X
+j̸=i
+ωi,j
+(3)
+The overall impact caused by all neighbours of agent i is calculated as
+agg impacti, given in Equation 4.
+agg impacti(t) =
+X
+j̸=i
+ωi,jqj(t)
+ωi
+(4)
+The effect of the aggregated impact for changing the agents’ opinions is given by
+the advanced logistic function defined by q∗(Equation 5).
+q∗
+i = alogisticσ,τ(agg impacti)
+(5)
+where alogisticσ,τ is given by Equation 6,
+alogisticσ,τ(x) =
+
+1
+1 + e−σ(x−τi) −
+1
+1 + eστi
+
+(1 + e−στi)
+(6)
+where τi is the threshold for agent i. This will define from which point the influences
+from their peers start to affect their opinion. σ defines the steepness of the slope of the
+advanced logistic function. In this work we tested values between 1 and 10 for σ.
+The spirals model presented by [Bosse et al. 2009] have been used to account for
+the health authorities actions. β relates to how strongly the health authorities are engaged
+in reinforcing the social distancing protocol to the population. This value varies from 0
+to 10, and is equal to all agents. The dynamic temporal changes in the agents’ opinions is
+given by Equation 7.
+∆qi(t + ∆t) = qi(t) + ηi[βPI + (1 −β)NI −qi(t)]∆t
+(7)
+
+The upward and downward direction of the changes in the agents’ opinions de-
+pends on β, and the speed factor for the changes on parameter ηi. ηi depends on the
+current opinion of the agent, and is defined by a beta distribution function with parame-
+ters a and b equal to 5. That means that the closest the agent’s opinion is to one extreme,
+the slower the changes will occur.
+Finally, PI and NI (Equation 8) are the positive and negative impact of received
+opinions from the agent’s neighbours. If β = 1 the receivers are only susceptible to
+positive influences, and if β = 0 then the agent is only susceptible to negative influences.
+For this model we use the same β to everyone assuming it represents the efforts of health
+authorities on promoting the protocol.
+PI = 1 −(1 −q∗
+i )(1 −qi(t))
+NI = q∗
+i · qi(t)
+(8)
+At each time step, the model updates the agents’ opinions and decides if they are
+going to adhere to social distancing or not. The chances are calculated based on their
+opinion levels.
+3.3. Network-based interventions
+Intervention is an action designed to bring about change in a target. This work investiga-
+ted how interventions based on network traits will improve the overall social distancing
+adherence. The targeted agents in these simulations had their their social distancing opi-
+nion set to 1 with no possible changes throughout the simulation. For that, we tested
+4 scenarios: (a) no interventions, (b) boost the opinion of 10% of agents with higher
+betweenness centrality, (c) boost the opinion of 10% of agents with higher closeness
+centrality and (d) boost the opinion of 10% of agents with higher eigenvector centrality
+[Hennig et al. 2012].
+The interventions were performed in the 3 different network topologies (Barabasi-
+Albert, Erdos-Renyi and Small-world) and for 9 combinations of β and σ: β × σ: where
+β = {0.1, 0.5, 0.9}, σ = {1, 5, 10}. In total there were 108 scenarios. Each simulation
+was ran 100 times, with a total of 10,800 runs for the entire process of opinion change.
+The simulations stopped when the opinions were not altered anymore.
+4. Results
+This section will present the results obtained by the simulations. As previously explained,
+there were 108 different scenarios considering no interventions and other network-based
+interventions in the network. The aim is to describe how altering 10% of the nodes would
+contribute to a higher adherence to social distancing habits in a group of connected people.
+Firstly, it is important to understand the influence exerted by β and σ in the model.
+For that, the simulations were ran with no interventions for a different set of values for
+both variables:
+• β ∈{0.1, 0.3, 0.5, 0.7, 0.9}
+• σ ∈{1, 5, 10}
+
+As it is shown in Figure 1, a higher σ and β values (Beta and Sigma axis) improve
+the overall opinion of all agents (Opinion axis) on adhering to the protocol. More speci-
+fically, for β > 0.5 and σ > 5 the overall opinion becomes positive towards the adoption
+of social distancing behaviour.
+Figura 1. Overall average opinion for different values for σ (sigma) and β (beta)
+in a scenario with no interventions. Red surfaces show higher values for
+the opinions, while blue surfaces are lower values for opinions in each of
+the 3 studied topologies (Erdos-Renyi, Barabási-Albert and Small-world)
+Figure 2 shows the average and standard deviation of the 100 runs for each
+network topology without interventions. It is apparent that the turning point from ne-
+gative opinions on social distancing adherence to positive opinions is β > 0.5 and σ > 5,
+being the only exception the case when β = 0.7 and σ = 1. That would be explained
+by the fact that such a low σ would slow down the received influence from their peers,
+and even though β is high, it would not be sufficient to provide a positive outcome. The
+graphics in Figure 2 also show that the closer the parameters are to the extremes (0 or 1),
+the lower the standard deviation of the results.
+The simulations also aim to understand how can the spread of positive opinions
+about the social distancing be improved. For that we used a rate of 10% of the people in
+the network to become targets of the intervention. For this 10% the opinion is fixed to 1,
+meaning that these people are always partaking the social distancing. Table 1 shows in
+bold the strategies that worked the best for each combination of (β, σ) in each network
+topology. For the Barabasi-Albert topology, using the betweenness centrality as a target
+criteria has shown to boast the overall opinion in almost all scenarios. The eigenvector
+centrality, on the other hand, it is the criteria providing better results for a Erdos-Renyi
+topology. For the Small-world topology, betweenness centrality is a good choice if β <
+0.5, and eigenvector centrality otherwise. Closeness centrality was the best option in only
+2 out of the 81 possibilities of intervention.
+The codes,
+results obtained and other analysis discussed in this arti-
+
+Figura 2. Percentage of the agents in social distancing by the end of the simula-
+tion with no interventions for different combinations of β and σ.
+
+Network
+Barabasi-Albert
+Erdos-Renyi
+Small-world
+Beta
+Sigma
+Betweenness
+Closeness
+Eigenvector
+Betweenness
+Closeness
+Eigenvector
+Betweenness
+Closeness
+Eigenvector
+0.1
+1
+334.68%
+324.01%
+330.05%
+301.79%
+302.91%
+300.30%
+314.44%
+312.72%
+313.16%
+0.1
+5
+699.24%
+620.07%
+614.18%
+323.53%
+320.75%
+320.05%
+344.49%
+340.61%
+343.90%
+0.1
+10
+527.19%
+468.44%
+452.33%
+336.43%
+336.90%
+350.78%
+436.68%
+411.22%
+408.19%
+0.5
+1
+543.81%
+486.29%
+467.28%
+319.27%
+319.67%
+321.96%
+322.15%
+310.88%
+305.45%
+0.5
+5
+204.32%
+186.58%
+180.12%
+437.25%
+419.74%
+443.35%
+244.12%
+234.38%
+225.52%
+0.5
+10
+165.22%
+157.12%
+155.05%
+161.52%
+161.52%
+162.56%
+139.61%
+138.12%
+135.36%
+0.9
+1
+106.26%
+105.31%
+104.73%
+103.70%
+103.59%
+103.66%
+103.21%
+103.14%
+103.53%
+0.9
+5
+100.55%
+100.54%
+100.92%
+100.56%
+100.79%
+100.58%
+100.66%
+100.67%
+100.75%
+0.9
+10
+106.12%
+105.15%
+105.45%
+100.39%
+100.41%
+100.50%
+101.11%
+100.55%
+100.69%
+Tabela 1.
+Improvement of the overall opinion about adhering to social dis-
+tancing after applying network-oriented interventions (betweenness, clo-
+seness and eigenvector centralities) in different network topologies (Ba-
+rabási-Albert, Erdos-Renyi and Small-world).
+cle can be found in the repository https://github.com/ericinlinux/
+covid-social-contagion.
+5. Discussion
+We presented an network-oriented model for the spread of opinions about social dis-
+tancing behaviour adherence in a situation of a pandemic. The model used differential
+equations to describe how opinions spread based on peer interactions of two or more pe-
+ople in a network. This study is theoretical but inspired by the current situation of the
+world caused by the COVID-19 spread. This is an initial work investigating how the
+spread of opinions will interfere on the contamination rates using social networks as the
+representation of how people interact with each other.
+Regarding the Question 1, in Section 1, the results shown in here are two-folded.
+There is little evidence to say that one of the three network topologies favour the spread
+of the opinions better, but presents as an important outcome the necessity of engagement
+of the health authorities if they want to increase faster the adherence to social distancing
+of the general population. That is observed by the influence of β on the changes from a
+negative community opinion to a positive stand.
+This work also have shown how interventions based on network measures could
+increase the overall opinion of the whole group (Question 2, in Section 1). By targeting
+10% of the population and adapting their social distancing behaviour improves the overall
+opinion from 100% up to 700%. The costs of the interventions will be considered in future
+work, as well as different percentages of targeted people as it is important to define a better
+trade-off for governmental policies with optimal outcomes.
+The model for the spread of the virus [Klôh et al. 2020] is also going to be incor-
+porated to the model in future investigations, so we can understand how the model on
+opinions will affect the infection rates based when part of the population partaking in the
+protocol or not. Other aspects that will be included in the model are the obligatory social
+distancing in situations where people are penalised in case they break the protocol and
+how it would affect the whole society.
+Referências
+Araújo, E. (2018). Contagious: Modeling the Spread of Behaviours, Perceptions and
+Emotions in Social Networks. PhD thesis, Vrije Universiteit Amsterdam.
+
+Araújo, E. and Treur, J. (2016). Analysis and refinement of a temporal-causal network
+model for absorption of emotions. In International Conference on Computational Col-
+lective Intelligence, pages 27–39. Springer.
+Barabási, A.-L. and Albert, R. (1999). Emergence of scaling in random networks. science,
+286(5439):509–512.
+Bosse, T., Duell, R., Memon, Z. A., Treur, J., and Van Der Wal, C. N. (2009). A multi-
+agent model for emotion contagion spirals integrated within a supporting ambient agent
+model. In International Conference on Principles and Practice of Multi-Agent Systems,
+pages 48–67. Springer.
+Braunack-Mayer, A., Tooher, R., Collins, J. E., Street, J. M., and Marshall, H. (2013).
+Understanding the school community’s response to school closures during the h1n1
+2009 influenza pandemic. BMC public health, 13(1):344.
+Centola, D. (2018). How behavior spreads: The science of complex contagions, volume 3.
+Princeton University Press.
+Chhatwal, J. and He, T. (2015). Economic evaluations with agent-based modelling: an
+introduction. Pharmacoeconomics, 33(5):423–433.
+Dandekar, R. and Barbastathis, G. (2020). Quantifying the effect of quarantine control in
+covid-19 infectious spread using machine learning. medRxiv.
+Erd˝os, P. and Rényi, A. (1960). On the evolution of random graphs. Publ. Math. Inst.
+Hung. Acad. Sci, 5(1):17–60.
+Fang, Y., Nie, Y., and Penny, M. (2020). Transmission dynamics of the covid-19 outbreak
+and effectiveness of government interventions: A data-driven analysis.
+Journal of
+Medical Virology, 92(6):645–659.
+Freeman, L. C. (1989). Social networks and the structure experiment. Research methods
+in social network analysis, pages 11–40.
+Hennig, M., Brandes, U., Pfeffer, J., and Mergel, I. (2012). Studying social networks: A
+guide to empirical research. Campus Verlag.
+Klôh, V., Silva, G., Ferro, M., Araújo, E., de Melo, C. B., de Andrade Lima, J. R. P., and
+Martins, E. R. (2020). The virus and socioeconomic inequality: An agent-based model
+to simulate and assess the impact of interventions to reduce the spread of covid-19 in
+rio de janeiro, brazil. Brazilian Journal of Health Review (BJRH), pages 3647 – 3673.
+http://www.brjd.com.br/index.php/BJHR/article/view/9209.
+Koo, J. R., Cook, A. R., Park, M., Sun, Y., Sun, H., Lim, J. T., Tam, C., and Dickens, B. L.
+(2020). Interventions to mitigate early spread of sars-cov-2 in singapore: a modelling
+study. The Lancet Infectious Diseases.
+Kucharski, A., Russell, T., Diamond, C., Liu, Y., Edmunds, J., Funk, S., Eggo, R., Sun,
+F., Jit, M., Munday, J., Davies, N., Gimma, A., Zandvoort, K., Gibbs, H., Hellewell, J.,
+Jarvis, C., Clifford, S., Quilty, B., Bosse, N., and Flasche, S. (2020). Early dynamics
+of transmission and control of covid-19: a mathematical modelling study. The Lancet
+Infectious Diseases.
+
+Li, L., Yang, Z., Dang, Z., Meng, C., Huang, J., Meng, H., Wang, D., Chen, G., Zhang,
+J., Peng, H., and Shao, Y. (2020). Propagation analysis and prediction of the covid-19.
+Infectious Disease Modelling, 5:282 – 292.
+Lin, Q., Zhao, S., Gao, D., Lou, Y., Yang, S., Musa, S. S., Wang, M. H., Cai, Y., Wang,
+W., Yang, L., and He, D. (2020). A conceptual model for the coronavirus disease 2019
+(covid-19) outbreak in wuhan, china with individual reaction and governmental action.
+International Journal of Infectious Diseases, 93:211 – 216.
+McPherson, M., Smith-Lovin, L., and Cook, J. M. (2001). Birds of a feather: Homophily
+in social networks. Annual review of sociology, 27(1):415–444.
+Saunders-Hastings, P., Hayes, B. Q., et al. (2017). Modelling community-control strate-
+gies to protect hospital resources during an influenza pandemic in ottawa, canada. PloS
+one, 12(6).
+Sokolowski, J. A. and Banks, C. M. (2011). Principles of modeling and simulation: a
+multidisciplinary approach. John Wiley & Sons.
+Treur, J. (2020). NETWORK-ORIENTED MODELING FOR ADAPTIVE NETWORKS:
+Designing Higher-order Adaptive Biological,... Mental and Social Network Models.
+Springer.
+van Woudenberg, T., Simoski, B., Araújo, E., Bevelander, K., Burk, W., Smit, C., Buijs,
+L., Klein, M., and Buijzen, M. (2019).
+Simulated social network interventions to
+promote physical ativity: Who should be the influence agents?
+Journal of Medical
+Internet Research, 21.
+Walker, P. G., Whittaker, C., Watson, O., Baguelin, M., Ainslie, K., Bhatia, S., Bhatt, S.,
+Boonyasiri, A., Boyd, O., Cattarino, L., et al. (2020). The global impact of covid-19
+and strategies for mitigation and suppression. Technical Report 12, Imperial College
+London.
+Watts, D. J. and Strogatz, S. H. (1998). Collective dynamics of ‘small-world’networks.
+nature, 393(6684):440–442.
+Webster, R. K., Brooks, S. K., Smith, L. E., Woodland, L., Wessely, S., and Rubin, G. J.
+(2020). How to improve adherence with quarantine: Rapid review of the evidence.
+Public Health.
+Wolfram, C. (2020). An agent-based model of covid-19. Complex Systems, 29:87–105.
+Zhou, X., Ma, X., Hong, N., Su, L., Ma, Y., He, J., Jiang, H., Liu, C., Shan, G., Zhu, W.,
+Zhang, S., and Long, Y. (2020). Forecasting the worldwide spread of covid-19 based
+on logistic model and seir model. medRxiv.

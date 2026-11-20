@@ -1,0 +1,778 @@
+Análise sobre Viés de Gênero no Youtube:
+Um Estudo sobre as Eleições Presidenciais de 2018 e 2022
+Andressa Kappaun1, Jonice Oliveira1
+1Programa de Pós-Graduação em Informática (PPGI)
+Universidade Federal do Rio de Janeiro (UFRJ)
+Rio de Janeiro – RJ – Brazil
+kappaun@ppgi.ufrj.br, jonice@dcc.ufrj.br
+Abstract. There is a lot of discussion about the role of social networks in so-
+ciety, as their algorithms end up reinforcing prevailing discourses and limiting
+the circulation of minority social group agendas. This study investigates the
+presence of gender bias through sentiment analysis of comments on YouTube
+videos produced by news channels containing the names of men and/or women
+in the video titles. To this end, the Brazilian scenarios of the 2018 and 2022
+presidential elections were chosen, using the pySentimiento sentiment classifier
+with quantitative and statistical analyses through the chi-square test. The re-
+search results revealed the presence of gender bias for the 2022 data but were
+inconclusive for 2018.
+Keywords: gender bias; social networks; politics.
+Resumo. Muito se discute sobre o papel das redes sociais na sociedade atual,
+pois seus algoritmos acabam reforçando discursos predominantes e limitando
+a circulação de pautas minoritárias. Este trabalho investigou a presença de
+viés de gênero através da análise de sentimento dos comentários em vídeos
+do Youtube produzidos por canais de notícias contendo nome de homens ou
+mulheres no título dos vídeos. Para tal, foi escolhido os cenários brasileiros das
+eleições presidenciais de 2018 e 2022, utilizando classificador de sentimento
+pySentimiento com análises quantitativas e estatísticas através de teste de chi-
+quadrado. Os resultados da pesquisa revelaram que há presença de viés de
+gênero para os dados de 2022, porém, em 2018, foi inconclusivo.
+Palavras-chave: viés de gênero; redes sociais; política.
+1. Introdução
+As redes sociais estão cada vez mais presentes no cotidiano das pessoas, influenciando
+seus comportamentos, ideologia, relacionamentos entre outros. Muito se discute, atual-
+mente, sobre o papel dessas redes na sociedade, visto que além de reforçarem discur-
+sos predominantes nas sociedades, criam bolhas de engajamento dentro de grupos ho-
+mogêneos.
+Um relatório do We Are Social (2023)1 destaca que são 5.16 bilhões de internau-
+tas, o que representa 64% da população mundial. O relatório aponta ainda que 40% do
+tempo de internet pelos usuários corresponde a uso de redes sociais, sendo que o You-
+Tube®, rede especializada em conteúdos de vídeo, é a segunda mais utilizada. Estudo
+1Disponível em: https://wearesocial.com/uk/blog/2023/01/digital-2023/ Acesso em: 16/03/2023.
+
+publicado pelo Reuters Institute em parceria com Google News2 acrescenta que as redes
+sociais mais utilizadas entre os jovens são Instagram®, TikTok® e Youtube®, respectiva-
+mente, todas compostas majoritariamente por vídeos.
+De acordo com pesquisa recente realizada pelo Kantar IBOPE Media (2021)3,
+nunca os brasileiros utilizaram tanto conteúdo de vídeo quanto em 2020, chegando a
+99% do total de usuários de internet do país. Este consumo se deu em vários formatos
+(plataformas de streaming, redes sociais, videochamadas, etc.) e telas (televisões, tablets,
+celulares, etc.). Esta pesquisa também destaca que 80% dos brasileiros consumiram vídeo
+online gratuito, enquanto que a média mundial é de 65%. Em redes sociais, o consumo de
+vídeo dos brasileiros segue mais alto que a média mundial, respectivamente, 72% a 57%.
+De acordo com o We Are Social (2023)4, o Brasil teve um acréscimo de sete milhões de
+usuários de internet em 2023, em comparação com 2022 (mais 4%). Destes, quase 80%
+consomem conteúdos de vídeo no YouTube, sendo que a maioria são mulheres (52%).
+Alguns crimes foram potencializados recentemente, como a propagação de
+discursos de ódio e crimes de intolerância, principalmente xenofobia, misoginia,
+racismo, homofobia e transfobia [Stechemesser et al. 2020][Uyheng and Carley 2020].
+A ineficiência de mecanismos de punição para os que propagam preconceitos ou
+desinformação, facilitou a disseminação de discursos de ódio. As desinformações (fake
+news) são disseminadas nas redes sociais com o objetivo de atingir uma pessoa, ou
+determinado grupo, logo, “se relacionam impulsionando um ao outro de forma quase
+simbiótica” [Sirius 2019].
+A interação humana historicamente carrega preconceitos, não coincidentemente,
+[Stoica and Chaintreau 2019] apontam que os algoritmos de redes sociais podem aca-
+bar capturando e reproduzindo tais preconceitos através da digitalização das interações
+sociais e sistemas de recomendação.
+Destaca-se ainda que as interações huma-
+nas nas redes sociais são suscetíveis ao fenômeno de câmaras de eco (echo cham-
+bers) [Del Vicario et al. 2016], levando muitas pessoas a procurar por conteúdo ou
+participações em grupos que pensam de maneira similar à sua própria e costumam descar-
+tar outras fontes de informação. Os autores ressaltam que teorias conspiratórias ou fake
+news têm um engajamento maior de acordo com o tempo, em níveis maiores que uma
+notícia comprovada cientificamente.
+Alguns estudos apontam a diferença de interação de conteúdos sobre (ou de au-
+toria) homens e mulheres. Atualmente, de acordo com o We Are Social (2023), o You-
+Tube possui um número maior de usuários masculinos do que femininos, 46% e 54%,
+respectivamente. Os sistemas de recomendação das plataformas privilegiam o consumo
+e engajamento de conteúdo científico e tecnológico entre homens, contribuindo para o
+enviesamento de gênero no consumo de informação [Landrum 2021].
+Se há diferenças entre os gêneros no mundo virtual, há também no mundo físico.
+Em relação à desigualdade de gênero, no Brasil, de acordo com dados divulgados pelo
+2Disponível em: https://reutersinstitute.politics.ox.ac.uk/journalism-media-and-technology-trends-and-
+predictions-2022 Acesso em: 03/03/2023.
+3Disponível em: https://www.kantaribopemedia.com/consumo-de-video-bate-recorde-no-brasil Acesso
+em: 01/03/2023.
+4Disponível em: https://wearesocial.com/uk/blog/2023/01/digital-2023/ Acesso em: 16/03/2023.
+
+Instituto Brasileiro de Geografia e Estatística (IBGE)5, indicam que, apesar do percentual
+de mulheres que completaram a graduação, na faixa etária de 25 a 44 anos de idade, ser de
+21,5% e o de homens ser de 15,6%, no mercado de trabalho, as mulheres ganham menos.
+Os rendimentos médios do trabalho das mulheres correspondem em média a cerca de
+75% do que os homens recebem. Quanto à violência, de acordo com levantamento feito
+pelo G16, o feminicídio aumentou 5% em 2022, quando comparado ao ano anterior. O
+cenário não é diferente na esfera política, pesquisa realizada pelo GLOBO7 realizado em
+agosto de 2022 mostra que 87,5% das candidatas a cargos majoritários das eleições do
+mesmo ano sofreram algum tipo de ataque relacionado a gênero. A violência política de
+gênero tornou-se tão forte no Brasil - independente de viés político, região geográfica,
+raça ou classe social - que o Ministério Público Federal criou um grupo de trabalho para
+acompanhar os casos8. Nos últimos 2 anos foram registrados 112 casos, divididos em:
+33 de cunho moral (machismo, transfobia, racismo e outras formas de humilhação), 24
+de violência simbólica (como microfone silenciado ou tratamento diferenciado por pautas
+propostas por elas), 30 de cunho econômico e estrutural (divisão de recursos partidários),
+30 de violência psicológica (ameaças de estupro ou de morte, estímulo a crime de ódio) e
+7 de violência física (agressão física e assassinato).
+Conforme dados disponíveis no site eletrônico do Tribunal Superior Eleito-
+ral (TSE)9, nas eleições de 2018, o gênero feminino representava 53% do eleitorado.
+Entretanto, 34% das candidaturas registradas correspondiam ao gênero feminino.
+A
+composição das vagas eleitas para o Parlamento, por outro lado, reflete uma sub-
+representação ainda maior: das vagas em disputa, foram eleitas Senadoras e Deputadas
+Federais, respectivamente, 15% e 18% para as Casas Legislativas congressuais. Esta falta
+de representatividade gera um efeito cíclico, pois menos representatividade política re-
+sulta em menos ações públicas para defesa e igualdade e não há combate efetivo sobre os
+problemas mencionados.
+Desta maneira, urge a necessidade de aprofundar estudos sobre a representati-
+vidade de gênero no YouTube, adaptados para a realidade do Brasil. Em cenários re-
+centes de polarização política e ideológica, é fundamental investigar se os algoritmos
+de recomendação da plataforma reforçam os preconceitos e discriminações presentes na
+sociedade, em especial o machismo, a misoginia e o sexismo. Vale investigar o com-
+portamento e interações de usuários em vídeos do YouTube, de acordo com o gênero,
+para identificar padrões de consumo misóginos, machistas e/ou sexistas. Silva e Barbosa
+(2019) confirmam a relevância de estudos feitos sobre a análise de comentários em vídeos
+de YouTube para um cenário político. Sendo assim, o principal objetivo desta pesquisa é
+investigar se conteúdos digitais (vídeos) com nome de entidades de gêneros diferentes no
+título têm o mesmo sentimento na rede social YouTube, tendo como cenário as eleições
+5Disponível em: https://biblioteca.ibge.gov.br/visualizacao/livros/liv101551 informativo.pdf. Acesso
+em: 17/03/2023.
+6Reportagem disponível em: https://g1.globo.com/monitor-da-violencia/noticia/2023/03/08/brasil-bate-
+recorde-de-feminicidios-em-2022-com-uma-mulher-morta-a-cada-6-horas.ghtml
+7Reportagem
+disponível
+em:
+https://oglobo.globo.com/politica/noticia/2022/08/de-tentativas-de-
+mordaca-a-ameacas-de-morte-violencia-politica-contra-mulheres-chega-a-31-registros-em-um-ano-no-
+mpf.ghtml
+8Matéria
+no
+Jornal
+Hoje,
+dia
+14/03,
+disponível
+no
+Globoplay
+(48:53):
+https://globoplay.globo.com/v/11447803
+9Disponível em: https://sig.tse.jus.br/ords/dwapr/seai/r/sig-eleicao/home Acesso em: 17/03/2023
+
+presidenciais do Brasil, em 2018 e 2022.
+2. Trabalhos Correlatos
+Explorando a questão de inclusão/aceitação de gênero, foi constatado que mudanças
+simples no sistema de avaliação de artigos, como por exemplo a avaliação por pares
+e a desidentificação dos autores de submissão, podem aumentar significativamente a
+publicação de artigos desenvolvidos por mulheres [Bonifati et al. 2022]. Isto reforça o
+caráter machista, também dentro do meio acadêmico.
+Ainda neste meio, Débora Diniz, antropóloga e docente da Universidade de
+Brasília (UnB), vencedora do prêmio internacional Dan David Prize na categoria Igual-
+dade de Gênero, constatou que metade das publicações na primeira década da Revista
+Estudos Feministas (REF) estão concentradas na região Sudeste do Brasil. Uma ou-
+tra característica marcante destacada é que 88% dos artigos foram de autoria indivi-
+dual.
+Isso reforça a necessidade de incentivo à criação de grupos de pesquisa nesta
+temática, a fim de disseminar estes estudos para cada vez mais pesquisadores no Bra-
+sil [Diniz and Foltran 2004].
+Em [Salles and Pappa 2021] é levantada discussão sobre a presença de viés de
+gênero na Wikipédia em português, especificamente em biografias de pessoas de gênero
+feminino e masculino. Observando diferença nas palavras mais recorrentes na descrição
+de cada gênero e indagando se o fato é particular da plataforma ou apenas uma reprodução
+virtual do que é vivenciado na sociedade brasileira.
+Algoritmos de recomendação utilizados em redes sociais podem enfatizar/replicar
+disparidades na hierarquia de classes sociais e gênero [Stoica et al. 2018]. A importância
+do estudo dos autores sobre a disparidade de oportunidades iguais no meio online demons-
+tra e prova a existência de um “teto de vidro”, contendo majoritariamente a propagação
+de grupos minoritários.
+A existência de uma diferença de gênero na plataforma YouTube, principalmente
+entre os criadores com mais inscritos é clara. Abordando como essa diferença se ma-
+nifesta/materializa, foi analisado dois dos criadores com mais inscritos em 2014 (um de
+cada gênero) [Wotanis and McMillan 2014]. Constatando quatro vezes mais comentários
+hostis e/ou críticas proferidas aos criadores do sexo feminino em comparação a criadores
+do sexo masculino. Identificaram também que os feedbacks positivos e negativos da cri-
+adora feminina possuem uma conotação de objetificação, além de receber mais críticas e
+engajamentos negativos que o sexo oposto. Os autores finalizam ratificando que é clara a
+existência de uma diferença de gênero no YouTube.
+Em sequência ao estudo mencionado anteriormente, [Döring and Mohseni 2019]
+replicaram o método, em massa, e analisaram dados dos 100 maiores criadores
+(mais inscritos) de nove países, entre desenvolvidos e emergentes.
+Assim como
+[Wotanis and McMillan 2014], os autores destacaram que a proporção de criadores de
+conteúdo masculinos é significativamente maior do que os criadores femininos, nesse
+caso independentemente do país. O estudo também reafirma que a comunidade tende a
+ser mais hostil e negativa com criadores do sexo feminino.
+Em [Wegener et al. 2020] é estudado a representatividade de gênero dentro do
+YouTube, comparando com padrões previamente encontrados na televisão e no cinema.
+
+Os autores encontraram diferenças de representatividade de gênero semelhantes às en-
+contradas por [Döring and Mohseni 2019], onde canais de mulheres são significamente
+sub-representados, analisando vídeos mais populares no idioma alemão, tendo destaque
+apenas em tópicos limitados de assuntos de estereótipo feminino. No cenário brasileiro,
+[Plath et al. 2022] mostra a relevância de estudos na área de processamento de linguagem
+natural sobre discurso de ódio com foco no gênero feminino.
+Sendo assim, justifica-se a necessidade de aprofundar estudos sobre a represen-
+tatividade de gênero no YouTube, adaptados para a realidade do Brasil, algo pouco ex-
+plorado pela Literatura e proposto neste trabalho, com o recorte político-eleitoral (pre-
+sidenciáveis). Em cenários recentes de polarização política e ideológica, é fundamental
+investigar se os algoritmos de recomendação da plataforma reforçam os preconceitos e
+discriminações presentes na sociedade, em especial o machismo, misoginia e sexismo.
+3. Método
+O método proposto consiste na sistematização e análise dos dados coletados para análise
+quantitativa e estatística. Usamos teste de chi-quadrado, para a verificação da hipótese
+de existência de viés de gênero nos comentários publicados em vídeos do Youtube por
+canais de notícias com nomes de candidatos no título do vídeo. Tais vídeos são referentes
+às eleições presidenciais de 2018 e 2022. Todos os dados são públicos e gratuitos. A
+Figura 1 resume as etapas metodológicas descritas.
+Figura 1. Fluxograma metodológico da pesquisa.
+3.1. Obtenção dos dados
+Observando canais do YouTube que se auto-atribuem categoria de notícias e transmitiram
+conteúdo político no período das eleições, foram escolhidos os seguintes canais e seus
+respectivos identificadores (Tabela 1). O critério de seleção foi escolher canais de mídias,
+tradicionais ou independentes, que produzem jornalismo de amplo espectro ideológico ou
+neutro.
+Os dados do YouTube são provenientes da API de dados do YouTube V310. A
+coleta é realizada através dos endpoints de extração de dados do canal, listagem de vídeos
+do canal, dados de vídeo e comentários do vídeo da API. O estudo foi implementado em
+linguagem Python, executados na plataforma Google Collaboratory (Figura 2).
+10Disponível em: https://developers.google.com/youtube/v3
+
+Tabela 1. Canais selecionados para a coleta de dados.
+Canal
+Id
+revistaIstoe
+UC6Z3-B ybUirOnOoAP9Rz4w6
+poder360
+UCFCiSRbCVwQ BQaDQBYxN A
+infomoney
+UCxm0tptjIc76-i26EKQ9NpA
+roda viva
+UCNVsZnDXOM4PodYIEgM2e4w
+band jornalismo
+UCoa-D VfMkFrCYodrOC9-mA
+jovem pan news
+UCP391YRAjSOdM bwievgaZA
+uol
+UCVFbXI6Gu8U2f9Gjtxw4A-Q
+g1
+UCaGmdJSSiR7fkh2A-c6emsA
+vejapontocom
+UCV6Ue4o5UIeKQ3IEkjnXRlg
+jornal o globo
+UC-6xqzMBF2CXTImn a4aCVg
+metropoles
+UC9mdw2mmn49ZuqGOpSri7Fw
+Figura 2. Esquema ilustrativo de aquisiç ão dos dados através da API do Youtube.
+Para cada canal foram coletados a listagem dos vídeos postados nos anos de 2018
+e 2022 utilizando id do canal pré-processado (substituindo os dois primeiros caracteres
+por ‘UU’) através do endpoint playlistItems, em sequência extraindo as informações de-
+talhadas (likes, views, número de comentários, etc) de cada vídeo listado a partir do end-
+point videos. Por fim, obtêm-se os dados de comentários dos vídeos através do endpoint
+Comments.
+3.2. Anotação
+Baseando-se nos dados dos candidatos às eleições presidenciais de 2018 e 2022 disponi-
+bilizados no portal oficial do TSE11, foi atribuída manualmente a informação de gênero,
+resultando na seguinte distribuição: em 2018, foram 11 candidatos homens e 2 mulheres;
+em 2022, foram 7 candidatos homens e 4 mulheres.
+11https://sig.tse.jus.br/ords/dwapr/seai/r/sig-eleicao-resultados/resultado-da-elei%C3%A7%C3%A3o
+
+Na
+sequência,
+utilizando
+os
+dados
+de
+nome
+de
+urna
+e
+nome
+ci-
+vil.
+Foram
+criadas
+automaticamente
+expressões
+regulares
+para
+cada
+candi-
+dato
+no
+formato
+({nome_civil}|{nome_de_urna})
+,
+salvo
+nos
+ca-
+sos
+de
+nomes
+com
+tamanho
+igual
+ou
+inferior
+à
+quatro
+caracteres,
+onde
+foi
+utilizado
+o
+formato
+(((ˆ|\ |\D){nome_civil}($|\ |\D))|
+((ˆ|\ |\D){nome_de_urna}($|\ |\D)))
+A partir das expressões regulares relacionadas a candidatos cruzou-se as
+informações com objetivo de se identificar o nome dos candidatos no título do vídeo,
+capturando todos os comentários de cada vídeo para qualquer match positivo.
+Vali-
+dando manualmente batches de 100 vídeos de cada ano, foi observado que o nome
+de urna da candidata Vera12 acabou por se referir também a outras personalida-
+des famosas, que não a candidata.
+Por essa razão foi aplicada a expressão regular
+(vera fischer|vera magalh.es) para negativar os falsos positivos identifica-
+dos.
+3.3. Organização dos Grupos de Interesse
+Para melhor sistematização dos dados, optou-se por separá-los em três grupos, a saber: 1)
+grupo F: vídeos apenas com nome de mulheres candidatas no titulo; 2) grupo M: vídeos
+apenas com nome de homens candidatos no título; 3) grupo MF: vídeos que aparecem
+nomes de homens e de mulheres candidatas simultaneamente.
+3.4. Pré processamento
+Na etapa de pré processamento dos dados, foi efetuado filtro de vídeos com ao menos
+10 comentários publicados nos meses de julho, agosto, setembro e outubro, período onde
+foi observada melhor distribuição contínua de volume de vídeos por grupos de interesse
+(Tabela 2), além de ser o período oficial de início das campanhas eleitorais.
+Tabela 2. Canais selecionados para a coleta de dados.
+mês
+1
+2
+3
+4
+grupo
+M
+F
+MF
+M
+F
+MF
+M
+F
+MF
+M
+F
+MF
+2018
+videos
+2
+1
+0
+1
+1
+0
+9
+0
+1
+6
+4
+0
+prop
+66,67%
+33,33%
+0,0%
+50,0%
+50,0%
+0,0%
+90,0%
+0,0%
+10,0%
+60,0%
+40,0%
+0,0%
+2022
+videos
+207
+5
+0
+189
+4
+2
+189
+4
+0
+300
+27
+3
+prop
+97,64%
+2,36%
+0,0%
+96,92%
+2,05%
+1,03%
+97,93%
+2,07%
+0,0%
+90,91%
+8,18%
+0,91%
+mês
+5
+6
+7
+8
+grupo
+M
+F
+MF
+M
+F
+MF
+M
+F
+MF
+M
+F
+MF
+2018
+videos
+27
+6
+0
+32
+7
+0
+17
+2
+0
+62
+8
+1
+prop
+81,82%
+18,18%
+0,0%
+82,05%
+17,95%
+0,0%
+89,47%
+10,53%
+0,0%
+87,32%
+11,27%
+1,42%
+2022
+videos
+401
+28
+5
+341
+16
+2
+476
+31
+12
+877
+131
+41
+prop
+92,4%
+6,45%
+1,15%
+94,99%
+4,46%
+0,56%
+91,71%
+5,97%
+2,31%
+83,6%
+12,49%
+3,91%
+3.5. Classificação
+O classificador utilizado neste trabalho é o pySentimiento, que é disponibilizado na forma
+de Toolkit em Python para análise de sentimentos e processamento de linguagem natural
+focado em textos de redes sociais [Pérez et al. 2021]. Esta ferramenta foi escolhida por
+12Vera Lúcia Salgado, candidata à presidência pelo PSTU: https://www.gazetadopovo.com.br/eleicoes/2022/candidatos-
+a-presidente/vera-lucia-pstu/
+
+mês
+9
+10
+11
+12
+grupo
+M
+F
+MF
+M
+F
+MF
+M
+F
+MF
+M
+F
+MF
+2018
+videos
+98
+21
+3
+76
+5
+1
+17
+1
+0
+12
+0
+0
+prop
+89,33%
+17,21%
+2,46%
+92,68%
+6,1%
+1,22%
+94,44%
+5,56%
+0,0%
+100%
+0,0%
+0,0%
+2022
+videos
+953
+111
+96
+1739
+29
+68
+780
+8
+2
+570
+11
+25
+prop
+81,16%
+9,57%
+8,28%
+94,72%
+1,58%
+3,7%
+98,73%
+1,01%
+0,25%
+94,06%
+1,82%
+4,12
+possuir bom desempenho na análise de sentimentos em português-brasileiro, com confi-
+abilidade média (F1) de 75,3 com desvio padrão de 0,5. A tabela 3 ilustra uma pequena
+amostra da classificação aplicada a comentários de um dos vídeos utilizado no estudo.
+Tabela 3.
+Exemplos de comentários publicados no video (id Mp1bDDHNk) -
+Entitulado: ”Debate Globo: principais momentos com Lula, Bolsonaro,
+Soraya, Padre Kelmon, Ciro, Tebet e D’Avila”
+Comentário
+Negativo
+Neutro
+Positivo
+”Há me esqueci da candidata Bolsonara, não é? Soraia
+Eletrônica kkkkk vc respeite o padre sua demônia vc
+tem razão vc o mandou ir para inferno isso você disse
+a verdade, mas vc deveria ir traidora.”
+96,55
+2,67
+0,07
+”Odeio vocês mentirosos”
+97,44
+1,35
+1,20
+”Candidata bolsoraya kkkkk”
+4,61
+83,39
+11,99
+”Parece briga de lanche na escola kkkkkkkk”
+25,37
+64,58
+10,04
+”Adorei esse debate. Por mim podia virar a noite assistindo.”
+0,30
+0,64
+99,04
+”Muito bomm!!!! Lula ♡”
+0,15
+0,60
+99,23
+A classificação de sentimento foi aplicada para todos os comentários, onde para
+cada é atribuído um dicionário com as probabilidades de classificação de cada domínio
+entre positivo, neutro e negativo. Para determinar a proporção da análise de sentimento
+(Pv) de cada vídeo se dá por: Pv = N Comentários por sentimento ÷ Total Comentários
+para cada classe X possível sentimento (positiva, neutra ou negativa). Calculando a média
+geral de proporção de análise de sentimento (Mgp) como: Pv = Pv ÷ Total de Vídeos
+4. Resultados e Discussão
+4.1. Caracterização
+A partir dos dados do período de interesse observa-se uma proporção de comentários
+por grupo muito discrepante: o grupo M (homens) é muito maior ao ser comparado com
+o grupo F (mulheres). Vale destacar que as últimas duas eleições presidenciais foram
+marcadas pela polarização política entre dois candidatos homens. Os comentários nos
+vídeos de 2022 foram amplamente mais numerosos do que em 2018, o que ratifica o
+aumento do número de acessos a vídeos na internet em busca de informação, conforme
+apontado pela Literatura (Tabela 4).
+Tabela 4. Comentários divididos por grupo e por ano eleitoral.
+M
+F
+MF
+Total
+2018
+253
+36
+5
+294
+2022
+895595
+44055
+40016
+979666
+
+Quanto à classificação de sentimento dos comentários, há um predomínio claro
+dos negativos nas duas eleições analisadas (Figura 3). Interessante notar que na eleição
+de 2022, bem mais polarizada, a diferença entre os comentários negativos em relação aos
+demais é bem maior.
+Figura 3. Proporç ão de sentimento dos comentários por eleiç ão.
+Separando estes dados por grupos de interesse e por ano eleitoral, observa-se que,
+em 2022, no grupo F (mulheres), a proporção de comentários negativos ficou acima da
+média geral (52,02%), diferente dos outros dois grupos, que ficaram abaixo. Os co-
+mentários positivos do grupo F foram os únicos abaixo da média (Figura 4).
+Figura 4. Proporç ão de sentimento dos comentários por grupo em 2022.
+Em 2018, os resultados de 2022 se repetem, mais uma vez o grupo F foi o único
+com comentários negativos acima da média. Já a proporção de comentários positivos no
+grupo F ficou bem abaixo da média geral (Figura 5).
+4.2. Análise estatística
+Um teste de independência chi-square foi utilizado para conferir a relação entre vídeos
+com nomes apenas de mulheres, apenas homens ou ambos os gêneros no título e a in-
+cidência de comentários negativos. O teste chi-square, ou Chi Quadrado de Pearson,
+ajuda a entender se a associação entre duas variáveis categóricas é estatisticamente sig-
+nificativa. Ou seja, quando se deseja constatar se existe uma diferença real nos dados
+baseado em alguma afirmação ou conceito teórico. O resultado diz o quão provável é
+
+Figura 5. Proporç ão de sentimento dos comentários por grupo em 2018.
+para o dado observado se encaixar em uma distribuição esperada e é mensurado através
+da comparação entre um nível de significância (alfa) e o valor-p obtido no teste. Sendo
+assim, se o resultado for muito grande significa que não é possível estipular associação
+entre as variáveis de estudo; em contrapartida, se o resultado for menor que o alfa esti-
+pulado pode-se dizer que existe uma relação estatisticamente válida entre as variáveis de
+estudo e a hipótese nula é rejeitada. Neste artigo é assumido um alfa de 0,05, significando
+uma taxa de erro aceitável de até 5%.
+Focando na análise de sentimento negativa, dividimos os dados em duas catego-
+rias; “maior” e “menor ou igual” à média de proporção para cada grupo de interesse,
+sendo aproximadamente de 52,01% e 47,69% para os anos de 2022 e 2018, respectiva-
+mente (Tabela 5).
+Tabela 5. Dados de contingência (a) 2018 e (b) 2022.
+2018
+2022
+>
+<=
+>
+<=
+M
+127
+126
+M
+2078
+1967
+F
+20
+16
+F
+192
+110
+MF
+2
+3
+MF
+107
+110
+Obtendo para 2022 um Pvalor ≈0, 00016 e para 2018 um Pvalor ≈0, 74301.
+Assumindo um alfa de 5% e considerando a hipótese nula, a premissa onde não existe
+relação entre o gênero do candidato no título do vídeo e maior ocorrência de comentários
+negativos, podemos descartá-la com os dados obtidos em 2022. Implicando que pro-
+vavelmente essa diferença é um fenômeno que ocorre devido a ocorrência de nome de
+candidatas mulheres nos títulos do vídeo.
+O gênero do nome do candidato presente no título do vídeo influencia na polari-
+dade dos comentários? Há indícios que sim. Em ambos os anos a análise quantitativa
+mostra uma maior probabilidade de um vídeo com nome de candidata mulher no título
+receber comentários negativos.
+4.3. Conclusão
+Aplicando teste de independência chi-quadrado, observa-se para 2022 P < 0, 05 indi-
+cando uma relação estatística significativa entre vídeos com nome de mulheres no título
+
+e maior ocorrência de comentários com sentimento negativo. O mesmo teste aplicado
+aos dados referentes às eleições de 2018 retorna um P < 0, 74, não tendo uma relação
+estatística forte como observado em 2022. Pode-se afirmar que a premissa é inconclusiva
+sob os dados de 2018 e forte com os dados de 2022.
+5. Considerações Finais
+Este trabalho estuda a existência de viés de gênero no Youtube no cenário das eleições
+presidenciais de 2022 e 2018. Indagando a relação entre vídeos com nomes de can-
+didatos políticos de gêneros diferentes no título e ocorrência de comentários negativos.
+O método abordado envolve identificar vídeos do YouTube com nomes de candidatos
+políticos das eleições em questão, em sequência extrair os primeiros 500 comentários de
+cada vídeo e para cada aplicar o classificador de sentimentos pySentimiento para atri-
+buir um sentimento a cada comentário, podendo ser positivo, neutro e negativo. Após
+a classificação, os dados de sentimento dos comentários foram sumarizados por vídeo
+gerando uma distribuição de ocorrência de comentários por classe. Um teste de chi-
+quadrado é aplicado para cada conjunto de dados das eleições de cada ano a fim de provar
+uma relação estatisticamente válida.
+Os resultados foram satisfatórios e condizentes com o método proposto. Impor-
+tante observar o viés de gênero explicitado na Literatura internacional, só que na realidade
+brasileira, nas últimas eleições presidenciais, muito marcadas pela polarização e o uso de
+vídeos na internet. O método estatístico proposto provou-se sólido em apontar o viés de
+gênero nas eleições de 2022. No entanto, algumas considerações são pertinentes.
+Quanto às limitações do método, o fato de 2018 ter poucos vídeos e apenas duas
+candidatas mulheres pode ter influenciado em seus resultados inferiores aos observados
+em 2022. Vale mencionar que somente duas categorias de gênero foram consideradas
+(homem e mulher), o que não representa a diversidade das eleições analisadas. Outra
+dificuldade encontrada foi a similaridade de nomes dos candidatos com outras figuras
+políticas influentes (familiares, por exemplo), o que demanda mais cuidado nas análises
+para evitar eventuais falsos positivos. Além disso, não foram analisados o conteúdo dos
+vídeos. Uma questão a ser estudada no futuro é se a polarização dos sentimentos é indi-
+ferente (ou não) ao assunto abordado.
+Em relação às perspectivas desta pesquisa, pretende-se ampliar o escopo, con-
+siderando mais canais de notícias e agregando outras áreas políticas como executivo e
+legislativo (governadores, senadores e deputados). Importante também considerar ou-
+tros aspectos da audiência do vídeo, além dos comentários, como gênero de quem engaja
+através de reconhecimento de imagem da thumbnail da audiência e abordar outras carac-
+terísticas do texto comentado, como as emoções (raiva, tristeza, deboche, desconfiança,
+alegria, etc) e identificação do discurso de ódio.
+Agradecimentos
+Este trabalho foi apoiado em parte pelo programa Oracle Cloud, créditos e recursos re-
+lacionados fornecidos pelo programa Oracle for Research (CPQ-2160239). Além disso,
+agradecemos também ao CNPQ, CAPES e Winnin por todo apoio.
+
+Referências
+Bonifati, A., Mior, M. J., Naumann, F., and Sina Noack, N. (2022). How inclusive are
+we? ACM SIGMOD Record, 50(4):30–35.
+Del Vicario, M., Bessi, A., Zollo, F., Petroni, F., Scala, A., Caldarelli, G., Stanley, H. E.,
+and Quattrociocchi, W. (2016). The spreading of misinformation online. Proceedings
+of the national academy of Sciences, 113(3):554–559.
+Diniz, D. and Foltran, P. (2004). Gênero e feminismo no brasil: uma análise da revista
+estudos feministas. Revista Estudos Feministas, 12:245–253.
+Döring, N. and Mohseni, M. R. (2019). Male dominance and sexism on youtube: results
+of three content analyses. Feminist Media Studies, 19(4):512–524.
+Landrum, A. R. (2021). Are women a missing audience for science on youtube? an
+exploratory study. Frontiers in Communication, 6:610920.
+Pérez, J. M., Giudici, J. C., and Luque, F. (2021). pysentimiento: A python toolkit for
+sentiment analysis and socialnlp tasks. arXiv preprint arXiv:2106.09462.
+Plath, H. O., Paiva, M. E. O., Pinto, D. L., and Costa, P. D. (2022). Detecção de dis-
+curso de ódio contra mulheres em textos em português brasileiro: Construção da base
+mina-br e modelo de classificação.
+Revista Eletrônica de Iniciação Científica em
+Computação, 20(3).
+Salles, I. A. and Pappa, G. L. (2021). Viés de gênero em biografias da wikipédia em
+português. In Anais do X Brazilian Workshop on Social Network Analysis and Mining,
+pages 211–216. SBC.
+Sirius, A. (2019). Das fake news aos discursos de ódio: Uma análise à luz da constituição
+cidadã nas mídias sociais.
+Stechemesser, A., Wenz, L., and Levermann, A. (2020).
+Corona crisis fuels racially
+profiled hate in social media networks. EClinicalMedicine, 23.
+Stoica, A.-A. and Chaintreau, A. (2019). Fairness in social influence maximization. In
+Companion Proceedings of The 2019 World Wide Web Conference, pages 569–574.
+Stoica, A.-A., Riederer, C., and Chaintreau, A. (2018). Algorithmic glass ceiling in social
+networks: The effects of social recommendations on network diversity. In Proceedings
+of the 2018 World Wide Web Conference, pages 923–932.
+Uyheng, J. and Carley, K. M. (2020). Bots and online hate during the covid-19 pandemic:
+case studies in the united states and the philippines. Journal of computational social
+science, 3:445–468.
+Wegener, C., Prommer, E., and Linke, C. (2020). Gender representations on youtube: The
+exclusion of female diversity. M/C Journal, 23(6).
+Wotanis, L. and McMillan, L. (2014). Performing gender on youtube: How jenna marbles
+negotiates a hostile online environment. Feminist Media Studies, 14(6):912–928.

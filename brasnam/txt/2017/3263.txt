@@ -1,0 +1,663 @@
+Métricas para análise de poder em redes sociais e sua
+aplicação nas doações de campanha para o Senado Federal
+brasileiro
+Letícia Verona1, Jonice Oliveira1, Maria Luiza Machado Campos1
+Programa de Pós-Graduação em Informática (PPGI)
+Universidade Federal do Rio de Janeiro - (UFRJ) - Rio de Janeiro - RJ
+leticiaverona@ufrj.br, jonice@dcc.ufrj.br, mluiza@nce.ufrj.br
+Abstract. The analysis of how much one actor has over another is crucial to un-
+derstanding what interests their actions are subordinate to. This paper presents
+metrics based on the theoretical bases of sociology that reflect the imbalance
+between relationships, the main source of power in a social network. These me-
+trics are applyed to the relationship between each pair of nodes, and are compu-
+ted to accomplish the entire power structure of the network. As an instrument of
+empirical validation, a case study was made with the electoral donations recei-
+ved by parties and senators in the campaigns of 2010 and 2014. The application
+of the metrics allowed to highlight some corporate and party interests existing
+today in the Brazilian Federal Senate.
+Resumo. A análise de quanto poder um ator tem sobre o outro é fundamental
+para entender a que interesses suas ações estão subordinadas. Este trabalho
+apresenta métricas para a análise fundamentado em bases teóricas da sociolo-
+gia que refletem o desequilíbrio entre as relações, principal fonte de poder em
+uma rede social. Métricas que se aplicam ao relacionamento entre cada par de
+nós, e são calculadas em relação a toda a estrutura de poder da rede. Como
+instrumento de validação empírico foi feito estudo de caso com as doações elei-
+torais recebidas por partidos e senadores nas campanhas de 2010 e 2014. A
+aplicação das métricas permitiu evidenciar alguns interesses corporativos e
+partidários existentes hoje no Senado Federal brasileiro.
+1. Introdução
+Poder é a capacidade de um agente de impor a sua vontade sobre a de outro, baseando-se
+em forças de dominação intrínsecas à sociedade [Castells 2011]. Um dos aspectos evi-
+denciado por teorias sociológicas, como em [Emerson 1976] é que o poder em uma rede
+social é um processo dinâmico, um embate entre forças que competem para obter mais
+influência em seu favor. O controle e a troca de recursos são pontos pivotais na obtenção
+de poder. Sejam recursos financeiros, controle de disseminação de mídia, regulamentação
+de leis ou qualquer outro recurso de valor para a rede, quem controla e negocia estes re-
+cursos se fortalece. Para realizar essas trocas são necessárias habilidades específicas para
+a sociedade em rede: fazer conexões com outras redes, proteger seus parceiros de outros
+competidores, e se possível, controlar os protocolos de negociação e comunicação. Bus-
+camos através destas bases teóricas analisar o poder estabelecido em uma rede onde a
+XXXVII Congresso da Sociedade Brasileira de Computação
+544
+
+transferência de recursos ocorre: a rede formada pelas doações de campanha ao Senado
+em 2010 e 2014.
+A natureza competitiva da obtenção de poder é relacional, logo o poder não é um
+atributo absoluto de um ator da rede. O poder é exercido por um agente sobre outro e
+deve ser medido em relação a aresta, e não aos nós da rede. Para medir este poder em
+uma rede de troca de recursos propomos explorar uma métrica de avaliação de quanto a
+troca em questão é importante para cada um dos nós da relação. Para tal, considerando
+que a rede é direcional, criamos duas medidas auxiliares: influencia política (political
+influence) e barganha (bargain), ambas calculadas sobre a aresta, em direções opostas. O
+poder (power) é a relação (ou desequilíbrio) entre estes dois fatores. Para ser aderente às
+bases teóricas utilizadas, uma premissa é que a aresta tenha o significado específico, que
+é a transferência de recursos de valor entre os nós.
+A rede social das doações de campanha para o Senado Federal brasileiro nas cam-
+panhas de 2010 e 2014 foi analisada, buscando entender quais são os interesses e forças
+que atuam sobre os legisladores e o quanto sua independência pode ser aferida. Os resul-
+tados da análise mostraram que as grandes empresas doadoras concentram suas doações
+em grandes partidos, buscando controle global e diversificado sobre os senadores. Em-
+presas locais e de menor porte fazem doações mais personalizadas a comitês individuais.
+Alguns senadores possuem uma situação de independência e outros têm um vínculo mais
+estreito com o partido. Por fim, partidos grandes atuam como pontes de recursos entre
+as grandes empresas e os partidos menores, obtendo poder sobre eles. O estudo permitiu
+a obtenção de um mapa de intenções e interesses do Senado e mostrou ser eficiente para
+entender as dinâmicas de troca de recursos.
+O restante do artigo está organizado da seguinte maneira: na Seção 2 é apresen-
+tada a formulação teórica sobre poder. Na Seção 3 o processo de análise é detalhado e
+suas fórmulas apresentadas. O estudo de caso e a rede social do Senado Federal são apre-
+sentados na Seção 4. Na Seção 5 são apresentados os resultados da análise e finalmente,
+na Seção 6 são discutidas as limitações do trabalho e sugeridas futuras análises.
+2. Abordagens para análise de poder
+Poder é um conceito amplamente discutido em diversas áreas das ciências humanas, como
+a filosofia e a psicologia. Este estudo possui foco na avaliação de poder em redes sociais
+e para embasar a análise realizada buscamos trabalhos cujo aspecto social do poder fosse
+discutido. As causas e feitos do poder em relações sociais estão presentes em trabalhos
+das áreas de sociologia e economia há décadas [Marx and Engels 1968] [Hindess 1996]
+[French et al. 1959]. O tema foi re-potencializado pela configuração da sociedade em
+rede nas últimas décadas e passou a interessar pesquisadores da Ciência da Computação.
+Está fora do escopo deste estudo uma revisão de literatura sobre um assunto tão vasto,
+porém algumas correntes principais de pensamento são descritas a seguir, especialmente
+aquelas em cujas bases o presente estudo se apoia.
+Manuel Castells talvez seja o sociólogo mais influente na análise e compreensão
+da sociedade contemporânea como uma sociedade em rede. Apesar disto, curiosamente
+a interface do seu trabalho com a área de análise de redes sociais é pequena, como deta-
+lhado em [Anttiroiko 2015]. Para ele, a rede baseada nas tecnologias de informação pos-
+sibilitou organizacionalmente a transformação da sociedade. Sociedade que migrou das
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+545
+
+relações fundamentadas em localização espacial e em relações de produção para fluxos de
+informação e poder. Um de seus trabalhos [Castells 1996b] é um marco na representação
+abstrata da sociedade como uma rede de nós interconectados. Enfatiza que esta socie-
+dade conectada é uma sociedade capitalista em progressão, onde o capital se torna mais
+forte ao formar redes, enquanto o lado trabalho se torna mais fraco com o individualismo
+crescente [Castells 1996a]. Vai além, dizendo que os processos globais são cada vez mais
+regidos por redes econômicas e de informação que medem o valor de pessoas, grupos
+sociais e até países por sua utilidade (use value) na rede.
+Ainda para Castells, o poder segue a lógica da construção da rede. “Em um mundo
+conectado, a habilidade de exercitar controle sobre os outros reside em dois mecanismos
+básicos: (a) a habilidade de programar ou reprogramar as redes em termos de seus objeti-
+vos e protocolos; e (b) a habilidade de conectar e assegurar a cooperação entre diferentes
+redes através da combinação de recursos ao mesmo tempo que isola de outras através de
+competição estratégica” [Castells 2011]. Estas duas habilidades estão nomeadas como
+programming e switching respectivamente. Ao regular as redes sociais online através da
+constante reformulação de protocolos ou formatos de mensagens, corporações de mídia
+estão exercendo seu poder de programação, pois as mensagens devem se adaptar ao novo
+formato imposto (técnico ou de conteúdo). Assim como [MacLuhan et al. 1967], Castells
+coloca o poder da comunicação no meio e não no conteúdo. Estas corporações deci-
+dem sobre o conteúdo e formato a partir do que vai ao encontro de seus interesses e dos
+objetivos que eles determinam para a rede: lucro, poder e fabricação de cultura.
+Para [Emerson 1976] o poder é definido como uma capacidade estrutural que pro-
+move a distribuição desigual de recursos, favorecendo alguns atores em detrimento de
+outros. Em sua Teoria do Poder-Dependência ele enfatiza que o poder é uma propriedade
+relacional dependente dos recursos trocados e controlados. Atores que têm múltiplas
+possibilidades de parceiros para negociação e controlam recursos de alto valor são tidos
+como poderosos na sua rede de troca. O poder dos indivíduos é interdependente, pois está
+implícito nas relações sociais.
+Em [Willer 1999] estes elementos - controle de recursos e opções de negociação -
+são enriquecidos com o elemento da vantagem, supondo que atores que possuem opções
+alternativas vantajosas na negociação obtém mais poder no relacionamento através de
+mecanismos de confrontação. Em [Easley and Kleinberg 2010] os autores discutem como
+o poder se manifesta entre pares ligados por arestas em uma rede social através de uma
+relação de troca. Mais ainda, em como indica a ascendência de um nó sobre o outro,
+especialmente o desequilíbrio da relação.
+Especificamente, agentes políticos possuem controle sobre regulamentações,
+empréstimos de bancos públicos, gestão de obras e muitos outros recursos de grande
+valor. Para obterem suas posições, através de nomeações ou eleições precisam de re-
+cursos financeiros obtidos de outros agentes (por exemplo organizações religiosas, co-
+merciais, militares) cujos interesses ele representam. Nesta relação, o político busca ma-
+ximizar sua autonomia e o agente externo busca aumentar sua chance de manipulação.
+[Castells 1996b].
+Trabalhos recentes usaram dados de doações de campanha a políticos para analisar
+a conexão de políticos com corporações. Em [Mancuso et al. 2016] os dados de doações
+XXXVII Congresso da Sociedade Brasileira de Computação
+546
+
+nas eleições para deputado federal em 2010 são usados para indicar quais são os partidos
+mais dependentes das corporações em geral dentro do espectro político brasileiro. No es-
+tudo [Boas et al. 2014] é explicitada a relação entre as doações de campanha e contratos
+firmados com o poder público. Também é destacada a longeva relação entre políticos de
+carreira e determinadas empresas, mostrando uma relação de benefício mútuo, frequen-
+temente desvinculada dos interesses da população. O presente estudo difere dos citados
+pois se propõe calcular o grau de dependência/independência que cada partido ou senador
+possui.
+3. Métricas para a aresta: influência, barganha e poder
+Com estes conceitos teóricos no horizonte propomos a criação da métrica poder (power),
+com três características importantes: (i) as hipóteses sobre a natureza do poder herdam
+conceitos sociológicos e assumem que o significado da aresta é a transferência de recursos
+dentro da rede; (ii) é uma métrica relacional e portanto atribuída às arestas e não aos nós; e
+(iii) é relativa e não absoluta, de maneira que a mudança em uma aresta se propaga e afeta
+todas as relações de poder da rede. Foram criadas duas métricas auxiliares que atuam
+sobre a relação entre os nós: influência política (political influence) e poder de barganha
+(bargain). Estas métricas possuem a mesma mecânica e a distinção de nomenclatura
+reflete apenas a direção da aresta, que reflete de onde vem e para onde vai o recurso
+financeiro.
+A influência política (political influence) do nó a em relação ao nó b é um atributo
+da aresta na mesma direção da mesma. Na Equação 1, Wedgeab é o peso da aresta que
+liga a e b, e Windegreeb é o grau ponderado de entrada, que corresponde ao total de
+recursos recebido por b. Significa o quanto esta troca com a representa em relação a tudo
+que b recebeu. Quanto maior este número, mais a influencia as decisões de b.
+Simetricamente, o poder de barganha (bargain) aplica uma relação no sentido
+oposto da aresta, ou seja, no sentido oposto da transferência de recursos, como pode ser
+visto na Equação 2. Indica o quanto esta mesma troca com b representa sobre o total de
+recursos transferidos por a.
+politicalInfluenceab = (Wedgeab/Windegreeb)
+(1)
+bargainba = (Wedgeab/Woutdegreea)
+(2)
+Finalmente, o poder relacionado com a aresta segue na mesma direção da mesma e
+deve refletir o desequilíbrio entre estes dois fatores. Quanto menos equilibrada a relação,
+mais empoderado será um dos nós no relacionamento. O poder (power - Ψab) de a sobre
+b pode ser descrito pela Equação 3.
+Ψab = politicalInfluenceab −bargainba
+(3)
+A relação é mais equilibrada quando a Ψab se aproxima de 0. Valores acima de 0
+indicam que o nó que é a fonte de recursos é mais poderoso e valores abaixo de 0 indicam
+que apesar de estar recebendo recursos, o nó destino tem mais poder. Como exemplo de
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+547
+
+cálculo seguindo este método, podemos examinar uma rede de troca de recursos simples
+como a exibida na Figura 1. Queremos responder sobre quais interesses se dá a atuação do
+nó D. Para fazer isto medimos a relação deste nó com os vizinhos que transferem recursos
+para ele, como pode ser visto nos cálculos a seguir.
+Figura 1. Exemplo de uma rede de troca de recursos simples
+politicalInfluencead = 10/20 = 0, 5
+(4)
+politicalInfluencefd = 10/20 = 0, 5
+(5)
+bargainda = 10/30 = 0, 33
+(6)
+bargaindf = 10/10 = 1
+(7)
+Como o peso das arestas vindas de A e F são iguais, a influência política destes nós
+sobre D é idêntica. Porém como A possui outras opções de troca, o poder de barganha de
+D com este nó é menor do que com F, que só troca com ele e isto interfere decisivamente
+no poder exercido sobre D.
+Ψad = 0, 5 −0, 33 = 0, 17
+(8)
+Ψfd = 0, 5 −1 = −0, 5
+(9)
+4. A rede social do Senado Federal e seus doadores eleitorais
+A Lei de Acesso à Informação, Lei no 12.527, de 18.12.2011 garante ao cidadão bra-
+sileiro o acesso a qualquer informação pública que esteja dentro dos limites descritos
+na lei.
+Candidatos a cargos executivos e legislativos devem fornecer à justiça elei-
+toral a prestação de contas de sua campanha e o Superior Tribunal Eleitoral através
+do seu Repositório de Dados Eleitorais disponibiliza esta informação publicamente
+[Tribunal Superior Eleitoral 2016]. Esses dados na sua forma bruta são difíceis de en-
+tender, analisar e visualizar. Este estudo busca trazer à tona as relações de poder que
+envolvem os senadores e as empresas mostrando o que motiva decisões que afetam toda
+XXXVII Congresso da Sociedade Brasileira de Computação
+548
+
+a população. Para tal, as doações recebidas pelos atuais senadores e seus partidos são o
+objeto desta análise. O objetivo é determinar o poder que as doações de cada empresa
+geram.
+A rede social dos senadores, partidos e doadores construída sobre estes dados e
+baseada no valor das doações busca responder às seguintes questões: (i) quais são as
+empresas que mais doam e como distribuem suas doações; (ii) qual é o papel dos partidos
+e das suas lideranças na distribuição das doações; (iii) qual o grau de poder que cada
+empresa possui sobre cada senador.
+Para discutirmos como as métricas se aplicam neste caso: uma empresa tem in-
+fluência política sobre o partido ou o senador que recebe os seus recursos. Um partido
+pode ter influência política sobre o outro, através da transferência de doações. A in-
+fluência política, conforme discutido na Seção 3, é calculada usando a relação entre o
+peso da aresta em questão e o total de doações recebidas por este nó, considerando que
+os nós competem entre si. Simetricamente, se a empresa doa para somente um senador, o
+mesmo ganha poder de barganha com a empresa em questão.
+Um senador pode ter muito poder de barganha sobre uma empresa, pois a mesma
+concentra suas doações nele. Entretanto se o senador depende dessas doações de maneira
+significativa, temos um equilíbrio na relação e portanto o nível de poder da empresa sobre
+o senador é pequeno. Um senador que depende exclusivamente do seu partido está em
+uma situação de poder em relação ao partido muito diferente daquele que financia sua
+própria campanha. Um senador que tem muitos grandes financiadores tem uma posição
+mais empoderada em relação a cada empresa do que aquele que depende exclusivamente
+de uma empresa para viabilizar seus gastos de campanha.
+4.1. Metodologia de construção da rede social
+Para construção da rede social dos senadores, partidos e seus doadores foram utilizados
+os dados do Tribunal Superior Eleitoral com as doações de campanha para as eleições de
+2010 e 2014. Para efeito desta análise foram usadas as doações aos partidos e comitês
+eleitorais e as doações diretas aos comitês de campanha dos senadores. Os dados utili-
+zados foram limitados a doações acima de dez mil reais. Cabe ressaltar que não foram
+incluídas na rede doações feitas para comitês individuais de cargos do executivo e de
+candidatos a deputado estadual e federal.
+Com estes dados foram criados nós para cada senador, cada partido e cada doador.
+Ligando estes nós, arestas direcionadas na direção da doação e com o peso correspondente
+ao valor doado. Em alguns registros dos dados era indicado o doador originário. Neste
+caso a doação foi transformada em duas arestas, uma para a doação original (da empresa
+para o comitê original) e outra para a transferência (do comitê original para o segundo
+comitê). Partidos políticos possuem vários CNPJs espalhados por diretórios regionais
+que foram unificados no nó que corresponde ao partido.
+Para realização deste estudo foi utilizado o software Gephi com o plugin SigmaJS
+para geração da visualização da rede.
+4.2. Resultados
+A rede construída pode ser visualizada na Figura 2. Para efeitos de visualização, a cor
+do nó indica o tipo de nó (partido, senador ou doador) e o tamanho do nó é calculado
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+549
+
+com base no grau ponderado do mesmo, que neste caso significa também o montante em
+dinheiro que trafegou por aquele nó.
+Figura 2. Detalhe da rede social do Senado Federal: partidos e doadores de
+campanha, indicando a posiç ão dos três maiores partidos.
+A visualização da rede gerada está disponível1, bem como os dados que geram o
+grafo representando a rede gerada em formato .gephi2.
+5. Análise de Resultados
+Antes de aplicar as métricas de poder, analisamos a rede do Senado em relação a algumas
+métricas tradicionais de análise de redes sociais. Primeiro, foram verificadas as maiores
+empresas doadoras. A presença de duas empresas de alimentos na lista das dez maiores
+empresas doadoras chamou a atenção, além do já esperado maciço volume de dinheiro
+vindo de empreiteiras.
+Em relação às métricas, notamos que em alguns casos o volume de dinheiro doado
+(grau ponderado de saída) não tem uma relação direta com a métrica de hub do nó. Um
+exemplo é mostrado na Tabela 1: a Construtora Andrade Gutierrez S.A., apesar de ter
+efetuado quase o dobro de doações em volume de dinheiro possui um índice hub menor
+que a Construtora Norberto Odebrecht S.A..
+1http://bit.ly/2pDFPtd
+2http://bit.ly/2ppIk6H
+XXXVII Congresso da Sociedade Brasileira de Computação
+550
+
+Tabela 1. Maiores empresas doadoras
+Empresa
+Ramo
+Grau saída
+Grau ponderado (saída)
+Hub
+JBS S.A.
+Alimentos e Bebidas
+39
+R$ 431.835.228,00
+0,098
+Construtora Andrade Gutierrez S.A.
+Empreiteira
+15
+R$ 212.460.000,00
+0,081
+Construtora Queiroz Galvão S.A.
+Empreiteira
+16
+R$ 126.908.162,00
+0,087
+Construtora OAS S.A.
+Empreiteira
+23
+R$ 105.303.088,00
+0,082
+Construtora Norberto Odebrecht S.A.
+Empreiteira
+25
+R$ 95.937.824,00
+0,092
+Arcelormittal Brasil S.A.
+Minério e aço
+20
+R$ 81.015.280,00
+0,079
+UTC Engenharia S.A.
+Empreiteira
+21
+R$ 61.478.640,00
+0,079
+Carioca Nielsen Engenharia S.A.
+Empreiteira
+19
+R$ 59.680.000,00
+0,086
+Cervejaria Petrópolis S.A.
+Alimentos e Bebidas
+9
+R$ 54.669.608,00
+0,047
+Amil Assistência Médica Internacional S.A.
+Saúde
+11
+R$ 53.148.000,00
+0,075
+As grandes empresas concentram suas doações em partidos e não em comitês
+individuais. Uma interpretação seria a grande força dos líderes de partidos junto a estas
+empresas. Outra interpretação possível é que as empresas buscam dissimular seu vínculo
+direto com um ou outro senador. Na Tabela 2 podem ser vistos os montantes recebidos
+pelos três partidos mais fortes do Congresso Nacional.
+Tabela 2. Maiores partidos em recebimentos de doaç ão
+Partido
+Grau Entrada
+Grau ponderado Entrada
+Authority
+Hub
+PSDB
+746
+R$ 861.763.078,00
+0,601
+0,057
+PMDB
+579
+R$ 857.877.510,00
+0,444
+0,070
+PT
+472
+R$ 397.102.206,00
+0,396
+0,034
+Outro item curioso que a rede nos mostra é que os grandes partidos (PMDB, PSDB
+e PT) atuam como financiadores de campanha dos partidos menores, atuando como in-
+termediários entre os mesmos e as grandes empresas. Claramente podemos ver aqui um
+esforço para obter o que Castells chamou de poder de switching, onde o nó que faz a
+conexão entre redes ganha força e protege seus interesses. Na Tabela 3 podemos ver que
+entre os 10 maiores destinos dos grandes partidos estão outros partidos.
+Tabela 3. Maiores destinos de recursos dos partidos PMDB, PSDB e PT
+PMDB
+Valor doado
+PSDB
+Valor doado
+PT
+Valor doado
+PSB
+R$ 18.075.976,00
+José Serra
+R$ 17.218.456,00
+Lindbergh Farias
+R$ 17.965.000,00
+Renan Calheiros
+R$ 6.296.796,00
+Itamar Franco
+R$ 8.771.137,00
+Marta Suplicy
+R$ 8.635.000,00
+Simone Tebet
+R$ 6.020.000,00
+Aécio Neves
+R$ 5.363.215,00
+Maria de Fatima
+R$ 3.610.000,00
+Eunicio Lopes
+R$ 5.600.000,00
+Cassio Cunha Lima
+R$ 3.900.000,00
+José Pimentel
+R$ 3.610.000,00
+Edison Lobão
+R$ 5.600.000,00
+Flexa Ribeiro
+R$ 3.000.000,00
+Gleise Hoffman
+R$ 3.420.000,00
+José Maranhão
+R$ 3.400.000,00
+Lucia Costa
+R$ 1.800.000,00
+Paulo Rocha
+R$ 2.850.000,00
+Acir Gurcaz
+R$ 1.866.656,00
+Paulo Bauer
+R$ 1.360.000,00
+PC DO B
+R$ 2.195.538,00
+Carlos Braga
+R$ 1.780.000,00
+Alvaro Dias
+R$ 1.200.000,00
+PCB
+R$ 2.100.000,00
+DEM
+R$ 1.600.000,00
+PDT
+R$ 816.000,00
+José Wellignton
+R$ 1.615.000,00
+Jader Barbalho
+R$ 1.200.000,00
+PSD
+R$ 576.000,00
+PR
+R$ 1.542.200,00
+A análise descrita até aqui permitiu responder a duas das perguntas formuladas
+neste estudo: (i) quais são as empresas que mais doam e como distribuem suas doações e
+(ii) qual é o papel dos partidos e das suas lideranças na distribuição das doações. A terceira
+pergunta - qual o grau de poder que cada empresa possui sobre cada partido e senador -
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+551
+
+será respondida avaliando cada aresta ligada aos 81 senadores, formando uma matriz que
+pode ser considerada um mapa de intenções do Senado Brasileiro. Por limitações de
+espaço deste artigo apresentaremos essa matriz apenas para alguns relacionamentos entre
+empresas-partidos e empresas-senadores.
+Na Tabela 4 podemos ver que a empresa JBS S.A. possui poder (métrica posi-
+tiva) sobre quase todos os partidos, com exceção do PSDB e PMDB, com uma diferença
+significativa em relação às outras duas empresas apresentadas.
+Tabela 4. Empresas e seu poder em relaç ão aos maiores partidos do Senado
+Empresa
+PSDB
+PMDB
+PT
+PSD
+PSB
+PP
+PR
+DEM
+PTB
+PDT
+JBS S.A.
+-0,032
+-0,082
+0,001
+0,131
+0,020
+0,188
+0,142
+0,001
+0,062
+0,146
+Const. Andrade Gutierrez S.A.
+-0,354
+-0,401
+-0,069
+-0,003
+-0,001
+-0,001
+0,001
+0,018
+0,034
+sem aresta
+Amil Assis. Méd. Internac. S.A.
+-0,180
+-0,399
+-0,053
+-0,021
+-0,014
+-0,024
+-0,045
+-0,015
+-0,006
+sem aresta
+As Tabelas 5, 6 e 7 mostram o perfil de alguns senadores em relação aos seus
+maiores doadores. Analisando os dados é possível perceber que Renan Calheiros é for-
+temente vinculado ao seu partido, que exerce alto poder sobre o senador, praticamente
+sem nenhuma disputa com empresas externas. Já no caso de Lindbergh Farias, apesar
+do partido ser a força mais potente, vemos empresas atuando com poder positivo sobre
+o senador. Em contraste, o senador Blairo Maggi não possui nenhum ator que possua
+ascendência sobre ele nos termos da nossa análise. Detendo um volume enorme de recur-
+sos, o senador é empoderado em relação a todos os atores, inclusive o seu partido. Isto
+pode ser visto pelos valores negativos da métrica, que indicam que o lado que recebe o
+recurso é mais forte que o lado que distribui.
+Tabela 5. Perfil de poder de Renan Calheiros e seus maiores doadores
+Doador
+poder
+PMDB
+0,879
+Franere Com. Const. e Imobiliária Ltda.
+-0,96
+SOTAN - Sociedade de Táxi Aéreo do Nordeste Ltda.
+-0,99
+Tabela 6. Perfil de poder de Lindbergh Farias e seus maiores doadores
+Doador
+poder
+PT
+0,455
+Camargo Correa S.A.
+0,025
+UTC Engenharia S.A.
+0,024
+Tabela 7. Perfil de poder de Blairo Maggi e seus maiores doadores
+Doador
+poder
+Recursos próprios
+-0,827
+Construtora Sanches Tripoloni Ltda.
+-0,886
+Amaggi Exportação e Importação Ltda.
+-0,908
+XXXVII Congresso da Sociedade Brasileira de Computação
+552
+
+É possível avaliar ainda o poder que os partidos exercem uns sobre os outros, uma
+vez que identificamos que grandes partidos agem neste sentido. A Tabela 8 mostra como
+os principais partidos atuam sobre os demais. A disputa de poder é bastante evidente pelos
+valores praticamente em equilíbrio da métrica, com alguns destaques: PSDB, PMDB e PT
+distribuem recursos principalmente para partidos cujo alinhamento não é claro, como PR,
+PTB e PDT. Partidos com uma posição mais alinhada com determinado ator não recebem
+recursos de seus adversários. É o caso do DEM e Solidariedade, que não recebem recursos
+do PT, assim como o PC do B, que não recebe recursos do PSDB e PMDB.
+Tabela 8. Partidos e seu poder em relaç ão a outros partidos
+Partido
+PP
+PR
+DEM
+SD
+PROS
+PTB
+PDT
+PC do B
+PSDB
+-0,0023
+-0,0062
+-0,0014
+-0,0002
+-0,0002
+-0,0013
+-0,0024
+sem aresta
+PMDB
+sem aresta
+-0,0033
+-0,0076
+-0,0014
+-0,0047
+-0,0005
+0,0024
+sem aresta
+PT
+sem aresta
+-0,0164
+sem aresta
+sem aresta
+sem aresta
+-0,0002
+0,0013
+0,0292
+PSD
+sem aresta
+sem aresta
+sem aresta
+sem aresta
+sem aresta
+-0,1634
+sem aresta
+-0,0985
+PSB
+-0,0232
+sem aresta
+sem aresta
+-0,0214
+-0,0013
+sem aresta
+sem aresta
+-0,0369
+6. Conclusões e Trabalhos Futuros
+Para avaliar as métricas propostas este estudo criou e analisou a rede de poder do Senado
+Federal em relação às empresas que doaram recursos para as campanhas de 2010 e 2014.
+Buscou-se avaliar quanto poder as empresas têm sobre partidos e senadores, através da
+visão de reciprocidade desta relação. A análise revelou alguns dados interessantes: nem
+sempre o maios valor doado corresponde a um maior poder sobre o partido ou senador;
+os grandes partidos têm muito poder sobre os partidos menores, intermediando a relação
+entre os mesmos e as empresas; alguns senadores se destacam de seus partidos; gran-
+des empresas doadoras tendem a concentrar as doações em partidos e não em comitês
+individuais de senadores.
+É importante frisar que a métrica poder (power) é um atributo da relação entre
+os nós e não dos nós em si. Uma limitação deste trabalho é que o cálculo não leva em
+conta o número de parceiros, apenas o volume de recursos. Um refinamento na fórmula
+de modo a considerar o número de opções de troca seria consistente com a base teórica
+utilizada. Outro ponto é que sua verificação foi feita em uma rede social específica e uma
+avaliação mais genérica certamente se faz necessária. A verificação da relação entre a
+métrica power e as métricas de hub e authority dos nós ligados pode trazer vínculos entre
+a micro-estrutura da rede e a relação de poder, bem como a revisão de outras métricas
+frequentemente usadas para análise de influência.
+Do ponto de vista dos dados eleitorais, esta análise pode ser expandida para os
+políticos em todas as esferas, incluindo as eleições municipais. Um exercício interes-
+sante pode ser verificar hipoteticamente como a exclusão de um nó importante afetaria
+as relações de poder da rede. Por fim, um importante passo é a criação de um método
+simples e público de visualização desta rede de poder de maneira que o cidadão esteja
+ciente dos interesses que motivam cada um de seus representantes.
+Referências
+Anttiroiko, A. (2015). Castells’ network concept and its connections to social, economic
+and political network analyses. Journal of Social Structure, 16(11):1–18.
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+553
+
+Boas, T. C., Hidalgo, F. D., and Richardson, N. P. (2014). The spoils of victory: campaign
+donations and government contracts in brazil. The Journal of Politics, 76(02):415–429.
+Castells, M. (1996a). The network society. Backwell, Oxford.
+Castells, M. (1996b). The Rise of the Network Society. The information age: Economy,
+society, and culture. Backwell, Oxford.
+Castells, M. (2011). Network theory— a network theory of power. International Journal
+of Communication, 5:15.
+Easley, D. and Kleinberg, J. (2010). Networks, crowds, and markets: Reasoning about a
+highly connected world. Cambridge University Press, Cambridge.
+Emerson, R. M. (1976). Social exchange theory. Annual review of sociology, 2(1):335–
+362.
+French, J. R., Raven, B., and Cartwright, D. (1959). The bases of social power. In Studies
+in social power, volume 7. Institute for Social Research, The University of Michigan.
+Hindess, B. (1996). Discourses of power from Hobbes to Foucault. Backwell, Oxford.
+MacLuhan, M., Fiore, Q., and Agel, J. (1967). The medium is the massage. Random
+House, New York.
+Mancuso, W. P., Figueiredo Filho, D. B., Speck, B. W., Silva, L. E. O., and Rocha, E. C. d.
+(2016). Corporate dependence in brazil’s 2010 elections for federal deputy. Brazilian
+Political Science Review, 10(3).
+Marx, K. and Engels, F. (1968). Karl Marx and Frederick Engels: selected works in one
+volume, volume 184. International Publishers, New York.
+Tribunal Superior Eleitoral (2016).
+Repositório de dados eleitorais.
+Disponível em
+http://divulgacandcontas.tse.jus.br. Acessado em 01 novembro de 2016.
+Willer, D. (1999). Network exchange theory. Greenwood Publishing Group.
+XXXVII Congresso da Sociedade Brasileira de Computação
+554

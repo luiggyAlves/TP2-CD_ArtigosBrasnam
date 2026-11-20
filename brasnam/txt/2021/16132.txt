@@ -1,0 +1,535 @@
+Não se perca no debate! 
+Mineração de Argumentação em Redes Sociais 
+João Pedro da Silva Sousa1, Rodrigo Costa Uchoa do Nascimento1, Renata Mendes 
+de Araujo1,2,†, Orlando Bisacchi Coelho1 
+1Faculdade de Computação e Informática - Universidade Presbiteriana Mackenzie 
+2Programa de Pós-Graduação em Sistemas de Informação da EACH/USP. São Paulo, 
+SP, Brasil 
+joaops.sousa@outlook.com, rodrigo.costa9620@gmail.com, 
+renata.araujo@mackenzie.br, orlandoc@mackenzie.br 
+Abstract. Argumentation Mining is a subject at the intersection of 
+Computational Linguistics and Data Science that is quite relevant for decision 
+making and includes tasks such as identification and retrieval of the structure 
+of an argument and each participant’s utterance polarities. This work is a first 
+step towards establishing an Argumentation Mining process focused on 
+arguments in social networks aimed at recognizing the structure of the debates 
+that occur in the networks. The results of this process are then input to a debate 
+visualization tool, Visu, as a way to foster the understanding of debates between 
+users of social media. 
+Resumo. Mineração de Argumentação é uma área de pesquisa entre 
+Linguística Computacional e Ciência de Dados, com grande importância para 
+processos de tomada de decisão, possibilitando a identificação e recuperação 
+da estrutura do diálogo e da polaridade dos argumentos usados pelos 
+participantes. Este trabalho é um primeiro passo para construir um processo 
+de análise de discussões em redes sociais com base na Mineração de 
+Argumentação visando compreender a estrutura da discussão que se estabelece 
+nas redes. Os resultados obtidos nesse processo são usados para alimentar a 
+ferramenta de visualização de discussões Visu, de modo a facilitar o 
+acompanhamento e entendimento das discussões em redes sociais. 
+1. Introdução 
+Vemos, em nossa sociedade, um debate contínuo de valores, conflitos e ideais que 
+refletem, em grande parte, visões individualistas e particulares sobre conceitos, fatos e 
+situações, caracterizando uma tendência de fragmentação e polarização. Isso é observável 
+no discurso intenso que se estabelece e é estimulado pela tecnologia, a Web e as redes 
+sociais. Essas questões têm sido discutidas em estudos relacionados ao discurso 
+sociopolítico e suas implicações [UFRJ 2020]. 
+Apesar do grande acesso aos canais de fala e expressão, nota-se um descompasso 
+entre os atores desta rede – muito se fala, mas será que se dialoga? O que coloca em 
+questão o quanto esse discurso está permitindo que a sociedade debata, compreenda e 
+entenda pontos de vista, principalmente os distintos aos seus. A dinâmica de interação 
+nas redes sociais, usualmente por threads e feeds, ao se tornar intensa e com um número 
+ 
+† Bolsista DT-CNPq, processo #313210/2019-5.
+
+grande de usuários, dificulta ou mesmo impossibilita acompanhar a totalidade de uma 
+discussão. Dessa forma, a informação obtida por meio das discussões existentes tende a 
+não ser interpretada por completo pelos usuários. 
+Em um trabalho de pesquisa anterior, foi desenvolvida uma ferramenta, Visu‡, 
+para o estudo do impacto de visualizações para o entendimento de uma discussão a partir 
+de um conjunto de mensagens provenientes de redes sociais [Tavares et. al. 2014]. Uma 
+limitação dessa ferramenta está no processo de extração e análise de dados, já que a 
+inserção do conjunto de mensagens depende de intervenção manual, desde sua obtenção 
+até o processamento responsável por classificar as falas no corpus em análise. 
+A área de Mineração de Argumentação (MA) é uma área multidisciplinar onde se 
+encontram a Linguística Computacional e a Ciência de Dados, que tem como objetivo 
+identificar, extrair e compreender a estrutura de argumentação em discussões, usando, 
+dentre outras, técnicas de processamento de texto e análise de sentimentos [Lawrence e 
+Reed 2020] [Lytos et.al 2019] [IBM 2020]. Este trabalho surge com o objetivo de 
+compreender as técnicas de MA e explorar sua aplicação em um processo para a análise 
+de discussões em redes sociais seguindo o fluxo (pipeline) proposto por Lippi e Torroni 
+[2016]. A proposta é que os resultados obtidos na execução deste processo possam 
+alimentar a ferramenta Visu com os dados para a visualização da discussão. O processo 
+explorado, e aqui reportado, envolve a extração dos dados das redes sociais - os textos 
+dos diálogos - e uma das etapas fundamentais do processo de Mineração de 
+Argumentação: a classificação da polaridade dos argumentos presentes nesses diálogos. 
+Este artigo se estrutura como se segue: a Seção 2 apresenta o contexto do 
+problema da pesquisa, o acompanhamento de discussões em redes sociais. A Seção 3 
+descreve a ferramenta Visu e as visualizações propostas para o entendimento de 
+discussões. A seção 4 apresenta o conceito e objetivos da área de MA. A seção 5 discute 
+trabalhos relacionados. A seção 6 apresenta o processo explorado nesta pesquisa, 
+incluindo as etapas de extração de dados e identificação de posições. A seção 7 conclui o 
+trabalho com as considerações finais, limitações e trabalhos futuros. 
+2. Discussões em redes sociais 
+Nos últimos anos, é possível notar o papel das redes sociais como forma de construir 
+discussões envolvendo assuntos cotidianos, alguns extremamente polêmicos [Skoric, 
+Zhu, Goh e Pang 2015]. Geralmente, o modo de exibição das falas (e, consequentemente, 
+da discussão) adotado em redes sociais é o feed, que funciona como um mural das notícias 
+mais recentes que se atualiza conforme o usuário navega. Além da organização em feeds, 
+as redes sociais também exibem as manifestações de seus usuários de uma maneira que é 
+possível agrupar comentários e respondê-los diretamente no fluxo da discussão; essa 
+forma de exibição é chamada de thread. Em threads, os comentários ficam com uma 
+estrutura similar à de uma árvore, onde um comentário pode ser um nó com ramificações, 
+ou apenas uma folha isolada. 
+Contudo, as mídias sociais não foram desenvolvidas especificamente com o 
+objetivo de promover o entendimento do debate e das discussões que acontecem nas 
+redes. Isto porque os mecanismos de feeds e threads não são capazes de identificar 
+relações de argumentação mais complexas entre as falas dos participantes da rede. Há 
+ 
+‡ https://ciberdem.mack.com.br/index.php/ferramentas/
+
+uma contínua cadeia de falas vinculadas à dimensão da temporalidade, muitas vezes sobre 
+temas similares, mas a argumentação - a troca de palavras em controvérsia - tão 
+importante para o entendimento mútuo, é obscurecida. 
+Compreender a argumentação é importante para que o participante possa se 
+posicionar na discussão, fortalecer ou rever uma opinião e influenciar os demais 
+participantes, visando favorecer a sua visão de solução em uma tomada de decisão ou no 
+debate sobre assuntos cotidianos [Garcia e Klein, 2015]. Identificar essas informações é 
+uma tarefa difícil, pois requer analisar toda a discussão e relacionar as várias mensagens 
+para tentar inferir sobre essas informações que não ficam explicitadas na superfície 
+textual. Quanto mais mensagens trocadas, mais esforço é necessário para compreender a 
+conversação e, consequentemente, acompanhar a discussão. 
+3. Visualização de discussões: a ferramenta Visu 
+A ferramenta de visualização de discussões Visu [Tavares et. al. 2012] [Tavares et. al. 
+2014], foi desenvolvida com o objetivo de extrair e apresentar informações de uma 
+discussão em redes sociais, que ajudem a compreender a dinâmica de discussões políticas. 
+Cada informação recebe uma visualização respectiva a suas necessidades: (1) Árvore de 
+Polêmicas: uma estrutura em árvore que apresenta a relação entre os argumentos da 
+discussão mantendo a ordem de acontecimentos e a polaridade de suas relações. Cada nó 
+da árvore representa um argumento e sua coloração representa a polaridade em relação 
+ao anterior. (2) Popularidade: representa o número de referências a um argumento na 
+discussão, considerando a polaridade de suas respostas. (3) Participação: agrupa as 
+manifestações, independentemente de sua natureza, identificando os participantes mais 
+engajados na discussão. Cada “bolha” representa um usuário, e seu tamanho varia de 
+acordo com o número de manifestações. (4) Alianças e Confrontos: agrupa os 
+relacionamentos entre os usuários, levando em conta as manifestações entre eles. Cada 
+nó representa um usuário, e as linhas, a relação de aliança ou confronto entre os usuários 
+de acordo com as cores (verde/vermelho). 
+Experimentos realizados com a ferramenta [Tavares et. al. 2014] concluíram que 
+as visualizações propostas, quando comparadas à forma típica de discussão em mídias 
+sociais (especificamente, o Facebook), possibilitam uma identificação mais acurada e 
+rápida das informações de interesse definidas, com impactos no entendimento mútuo e 
+tomada de decisões. No entanto, a forma de extração de informações das mídias para a 
+ferramenta é realizada de forma manual, inviabilizando as possibilidades de compreender 
+discussões acontecendo nas redes de forma contínua e dinâmica. 
+As visualizações na ferramenta são apresentadas a partir de estrutura de dados de 
+entrada que seguem modelos típicos de estruturação de discussão [Burgess Yakemovic e 
+Conklin 1990], e contém: id (identificador da mensagem), remetente (nome do 
+participante que enviou a mensagem), data (data de envio da mensagem), horário (horário 
+de envio da mensagem), conteúdo (conteúdo da mensagem), tópico (tópicos os quais a 
+mensagem está inserida), posição (posição adotada na mensagem, que pode ser de apoio, 
+crítica ou neutra) e destinatário (id da mensagem destinatária). 
+4. Mineração de Argumentação 
+Argumentação é o processo pelo qual argumentos são construídos, compartilhados e 
+avaliados a partir de outros argumentos [Palau e Moens 2009]. Uma argumentação se
+
+estrutura a partir de evidências, premissas, fatos e falas que suportam ou não uma 
+determinada alegação, em uma cadeia de raciocínio que leva à conclusão de discussões e 
+à tomada de decisão. A argumentação tem papel importante nas atividades humanas, tanto 
+sociais, políticas, jurídicas, científicas como de negócios, e tem sido compreendida como 
+uma área de pesquisa que surge com base em campos como a Retórica e a Filosofia, mas 
+que hoje inclui estudos de Processamento de Linguagem Natural, modelos teóricos de 
+discussão e de recuperação de informações [Palau e Moens 2009] [Lawrence et. al. 2012] 
+[IBM 2020]. O objetivo da MA é detectar a estrutura de argumentação de um documento 
+ou de uma base de discussões. Ela tem como áreas antecessoras a Mineração de Opiniões 
+e a Análise de Sentimentos, entre outras [Lawrence e Reed 2020] [Lytos et.al. 2019]. 
+As questões principais que envolvem a Mineração de Argumentação incluem 
+[Palau e Moens 2009] [Lawrence e Reed 2020]: i) a existência e a qualidade do corpus 
+de treinamento e testes; e ii) as etapas do processo de mineração. Pelo fato de ser uma 
+área ainda recente, ainda não há um conjunto de datasets ideal, datasets (corpora, já que 
+seriam datasets textuais) que possam ser usados para comparações do desempenho de 
+ferramentas distintas, embora haja esforços da comunidade no sentido de gerá-los. 
+Em linhas gerais, o processo de MA pode ser visto com um pipeline que leva de 
+documentos textuais não estruturados a um argumento estruturado, que pode ser 
+representado como um grafo de argumento, onde os nós são os argumentos e as relações 
+entre os argumentos são as arestas [Lippi e Torroni 2016]. Esse pipeline é composto por 
+duas macro-etapas: i) a detecção da sentença argumentativa, isto é, dos trechos de um 
+dado corpus onde residem os argumentos, e suas respectivas fronteiras, e ii) a previsão 
+da estrutura global da argumentação, as relações entre os vários argumentos usados ao 
+longo de uma argumentação. A primeira macro-tarefa, a detecção da sentença 
+argumentativa, por sua vez, se caracteriza por duas tarefas: i) a extração das sentenças 
+argumentativas e ii) a detecção das fronteiras entre essas sentenças argumentativas. Uma 
+das tarefas essenciais na extração das sentenças argumentativas é a identificação da 
+polaridade, ou análise de sentimentos, das sentenças que efetivamente são 
+argumentativas, exatamente o foco do trabalho aqui reportado. 
+Lytos e colegas [2019] instanciam o referencial desenvolvido por Lippi e Torroni 
+[2016] para a mineração de argumentação em redes sociais, propondo um referencial em 
+quatro passos, que consiste em: i) detecção de argumento; ii) identificação das relações, 
+isto é, a previsão da estrutura do argumento; iii) detecção de postura (stance) e iv) tarefas 
+relacionadas a confiabilidade. Detecção de argumento corresponde à detecção da 
+sentença argumentativa, no referencial de Lippi e Torroni. O segundo passo, a 
+identificação das relações, consiste na identificação das eventuais relações de apoio, 
+ataque ou neutras expressas em cada uma das sentenças argumentativas previamente 
+identificadas. Já a detecção de postura se propõe a caracterizar a estrutura global da 
+argumentação, bem como se a argumentação, em sua totalidade, é favorável, contrária ou 
+neutra em relação a seu tópico. Por fim, o quarto passo funciona como uma etapa opcional 
+onde se encontram tarefas como detecção de rumor, marketing viral e detecção de fake 
+news, entre outras. Apesar de técnicas de análise de sentimento serem utilizáveis nos 
+passos (ii) e (iii) do referencial, o trabalho aqui reportado está focado no passo (ii) 
+identificação de relações. Essas etapas desafiam, em grau crescente de complexidade, as 
+técnicas atuais de Processamento de Linguagem Natural, ao ponto de provocar o 
+surgimento de uma comunidade de pesquisa específica ao tema [ArgMining 2021].
+
+4.1. Desafios de Mineração de Argumentação em redes sociais 
+As tarefas de mineração de argumentação são impactadas pelo grau de coesão e do texto 
+sendo analisado [Lytos et. al. 2019]. O cenário em redes sociais foge dos padrões 
+esperados, criando alguns desafios para o processo de análise e validação. 
+O primeiro desafio é a maneira que as informações estão dispostas na rede - 
+informações fragmentadas que se perdem com o tempo. O uso de threads favorece o 
+entendimento de apenas uma das várias linhas de pensamento sendo discutidas (iniciadas 
+pelo autor da thread), o que torna difícil conectar diferentes linhas de argumentos para 
+formação de uma discussão. Além disso, é comum a presença de falas isoladas no 
+discurso, ou seja, apesar de agregarem para a discussão com um comentário, eles não se 
+conectam com nenhum outro argumento prévio, como se seus autores estivessem falando 
+sozinhos. Para a solução deste desafio, é necessário organizar os dados disponíveis 
+usando alguma estratégia que seja capaz de conectar o diálogo. Uma abordagem simples 
+e eficaz é escolher uma rede social em que os usuários naturalmente debatem de forma 
+mais organizada, por exemplo, a rede social Reddit, onde os usuários tendem a 
+argumentar sobre determinados tópicos de maneira mais próxima de um debate do que 
+no Twitter, que apesar de possuir um volume maior de manifestações, geralmente estas 
+não estão relacionadas diretamente [Abbott et. al. 2016]. 
+O segundo desafio surge devido à informalidade da linguagem utilizada nas redes 
+sociais. Enquanto as estratégias iniciais da MA trabalhavam com textos formais, como 
+sentenças de tribunais ou projetos de lei [Lytos et. al. 2019], a problemática atual está na 
+maneira como a discussão é feita, com presença de gírias, abreviações, diversos erros 
+gramaticais etc. As estratégias usadas para contornar a linguagem informal no texto são 
+uma adaptação do processo de normalização de texto, já utilizado frequentemente em 
+MA. Dessa forma, algumas gírias ou variações linguísticas são reduzidas a palavras mais 
+adequadas ao dicionário da língua. Entretanto, devido a esse processamento de texto, em 
+alguns casos é possível haver perda de informação por alterar o significado da frase dentro 
+do contexto de uma discussão. 
+Uma vez contornados os desafios, abre-se o caminho para análise de polaridade 
+dos argumentos da discussão identificada. Existem algumas formas de abordar a etapa de 
+classificação de discussões em um processo de MA; entre elas está o processo de análise 
+de sentimento [Paltoglou e Thelwall 2012] [Zhai e Massung 2016] [Agarwal et. al. 2011], 
+utilizado neste trabalho. 
+5. Trabalhos Relacionados 
+O desafio de acompanhar e entender discussões no cenário de interações das redes sociais 
+é observado no trabalho de Rodrigues et al. [2013] que, utilizando a rede social Twitter, 
+constroem uma técnica de identificação de sentimentos baseada nas postagens da rede em 
+que, com o uso de tokenização e expressões regulares, medem qual o sentimento sobre 
+determinado tópico com base na quantidade de sentimentos positivos ou negativos 
+identificados nas postagens. O trabalho de Nascimento et. al. [2020] complementa a 
+técnica de análise de sentimentos com o uso de uma ferramenta capaz de extrair os valores 
+lexicais das palavras, com a mesma finalidade de identificar sentimentos em argumentos. 
+O trabalho de Dusmanu et. al. [2017] apresenta métodos de detecção de argumentos nas 
+discussões, usando um modelo de argumento proposto por Toulmin [2003], na rede social 
+Twitter. O escopo do trabalho se resume à tarefa de classificar os argumentos de um
+
+conjunto como informativos ou não-informativos, ao, por exemplo, diferenciar 
+argumentos que contenham links externos, imagens ou informações não relacionadas aos 
+argumentos que contribuem para a discussão. 
+No geral, ferramentas de mineração de argumentação visam entender a 
+argumentação, definir uma estrutura de um argumento ou classificar aqueles relevantes 
+para a discussão. Nosso diferencial é usar técnicas de Análise de Sentimentos baseadas 
+em Aprendizagem de Máquina para compreender o posicionamento de cada falante sobre 
+o tema abordado, através das polaridades das falas e como as outras falas dos participantes 
+da discussão são influenciadas entre si. 
+6. Explorando um Processo de Detecção de Argumentos 
+Exploramos o pipeline definido por Lippi e Torroni (2016) de forma a obter os dados 
+requeridos pela ferramenta Visu (falas, emissor-receptor das falas e polaridade das falas). 
+Desta forma, para a etapa de detecção das sentenças argumentativas, previstas no pipeline, 
+consideramos como sentenças cada uma das falas dos participantes na discussão. Para 
+cada uma delas, utilizamos técnicas de análise de sentimentos para determinar sua 
+polaridade. Foram utilizadas técnicas de análise de sentimento para definir a polaridade 
+das manifestações no discurso, utilizando o otimizador SGD [Pedregosa et al. 2011] para 
+a classificação, treinado com as discussões já classificadas presentes na base IAC. 
+Em relação à etapa de previsão da estrutura global da argumentação, definida pelo 
+pipeline, o processo compreendeu a identificação simples do direcionamento das falas 
+entre os participantes, conforme requerido pela Visu. Foram utilizados os identificadores 
+extraídos junto com os textos das redes sociais, de modo a criar uma estrutura de dados 
+capaz de apontar a relação entre um argumento e outro na discussão, mantendo a estrutura 
+de threads da discussão. 
+A base utilizada para o experimento foi a Internet Argument Corpus (IAC) 
+[Walker et.al. 2012], contendo discussões com um teor politizado, porém amplas o 
+bastante para que pudéssemos usá-la em debates mais genéricos. 
+O ferramental desenvolvido para apoio ao processo está disponível em: 
+https://github.com/ciberdem/MineracaoDiscussoesRedesSociais A pesquisa segue uma 
+metodologia experimental (Figura 1), cujos passos são descritos nas seções a seguir. 
+ 
+Figura 1. Processo experimental para mineração de argumentação em redes sociais. 
+6.1. Seleção de bases 
+O desafio da etapa de seleção consiste em encontrar conjuntos de dados que envolvam 
+efetivamente o contexto de uma discussão, para uso nos processos de treinamento e testes
+
+dos modelos e aplicação em um contexto real. Um aspecto importante aqui, foi a escolha 
+de uma base que estivesse anotada com a polaridade de cada posicionamento emitido, 
+indicando se argumentos tinham um teor positivo, negativo ou neutro. Além disso, existe 
+uma escassez de bases de discussões anotadas e contextualizadas com a proposta deste 
+projeto, nos limitando a usar bases extraídas do IMDb e posteriormente, do IAC. Dessa 
+forma, ganhou-se tempo de desenvolvimento, pois a base pôde definir um contexto para 
+as discussões analisadas, bem como remover a necessidade de anotar os argumentos 
+manualmente para base de treinamento para as etapas seguintes. 
+Inicialmente foi usada uma base rotulada do site IMDb [Maas et.al 2011], 
+contendo avaliações dos usuários sobre diversos filmes, bem como o teor da crítica, 
+indicado como positiva ou negativa. Apesar de ser uma base satisfatória, ela não atendia 
+completamente às necessidades do trabalho, pois para desempenho e métricas 
+satisfatórias, era preciso uma base com foco exclusivamente em discussões. Ao final do 
+projeto, a função da base IMDb serviu apenas como métrica de comparação de resultados 
+dado que não haviam outras bases para realizar tal comparação. 
+Dentre algumas outras bases encontradas, a que mais atendia os requisitos do 
+trabalho era a IAC [Walker et. al. 2012], composta exclusivamente por discussões de 
+variados assuntos retirados de fóruns de redes sociais, com a presença de rótulos 
+condizentes com a polaridade esperada dos argumentos. Assim, a base IAC compôs os 
+conjuntos de treinamento e teste. 
+6.2. Extração e limpeza dos dados 
+Para extração dos dados, a ferramenta de extração (scraper) foi construída utilizando a 
+linguagem de programação Python, em conjunto com uma API da rede social Reddit 
+através da biblioteca PRAW [Boe e Payne 2016]. A partir de um link para um post de 
+discussões no Reddit, a ferramenta extrai os comentários das postagens mantendo a 
+estrutura de relação entre eles, como, por exemplo: autor, data e hora, conteúdo do texto, 
+referências e citações a outros usuários ou seus comentários. O scraper mantém a 
+estrutura de discussão dentro do modelo lógico utilizado pela ferramenta Visu. 
+Para utilização dos dados, tanto os extraídos via scraper construído, quanto os 
+obtidos pela base IAC, foi necessário usar uma etapa de pré-processamento, para remover 
+algumas características indesejadas que podem impactar o resultado das classificações. 
+Para a base IAC, foi necessário remover do texto elementos como links, caracteres 
+especiais e elementos de formatação do texto. Quanto às bases extraídas do Reddit via 
+scraper, foi preciso remover comentários vazios espalhados no meio dos argumentos, 
+devido a uma característica da rede social que permite exclusão futura de comentários 
+quando os usuários são banidos da plataforma. Quando removidos da discussão, seus 
+argumentos têm o texto oculto, porém, mantêm algumas informações dos usuários que o 
+publicaram. 
+6.3. Classificação dos argumentos 
+Quanto ao método de classificação dos argumentos, de acordo com os requisitos da 
+ferramenta Visu, a classificação se deu sentença a sentença, fornecendo três rótulos que 
+caracterizavam a polaridade de um argumento: apoio, oposição ou neutro. A primeira 
+alternativa envolvia uma biblioteca do Python chamada NLTK [2021], que se encarrega 
+da etapa de classificação. Entretanto, a falta de customização de parâmetros e a
+
+impossibilidade de treinamento dos modelos usados para a classificação descartaram a 
+alternativa. Apesar da biblioteca apresentar um bom desempenho para classificações de 
+frases simples, as barreiras apresentadas não permitem o uso desse mesmo método para 
+classificar argumentos de uma discussão com a mesma acurácia. 
+A solução escolhida para o classificador foi o SVM, com base no otimizador SGD 
+implementado pela biblioteca Scikit-learn [Pedregosa et. al. 2011], usando métodos de 
+classificação linear. SGD é um classificador linear muito usado em problemas de 
+processamento de linguagem natural e classificação de textos, principalmente pela sua 
+eficiência e facilidade de lidar com bases de dados de grande porte. Por meio da 
+exploração automática dos hiperparâmetros, foi possível encontrar parâmetros para o 
+modelo de aprendizado de máquina que configuram uma boa solução, mantendo o 
+equilíbrio entre o ajuste ao conjunto de treinamento e a capacidade de generalização. 
+Para treinar o modelo do SGD, usando como conjunto de dados a base IAC, a 
+entrada passa por quatro tipos de processos de Text Vectorization, e o processo com maior 
+assertividade na pontuação de validação é escolhido para o Hyperparameter Tuning. Com 
+os parâmetros mais otimizados definidos, é possível carregar e treinar o modelo de SGD 
+para a classificação dos argumentos extraídos via scraper. Os resultados da classificação 
+são finalmente exportados para um arquivo alimentando a ferramenta Visu. 
+6.3.1. Assertividade das classificações 
+Como resultados iniciais, o algoritmo classificador SGD utilizou como conjunto de dados 
+a base do site IMDb, obtendo uma assertividade de 90% com os conjuntos de teste do 
+mesmo contexto, como observado em sua matriz de confusão (Figura 2a). Entretanto, 
+dois problemas dificultaram o uso da base IMDb como a principal base de treinamento 
+para as classificações: os rótulos de classificação presentes na base IMDb possuem apenas 
+polaridades de oposição e apoio, assim não conseguindo representar um posicionamento 
+real dos participantes. 
+Utilizando a base IAC como dataset de treinamento, ao redefinir os parâmetros 
+fornecidos pelo Hyperparameter Tuning, a precisão inicial obtida foi de 70%, e após o 
+balanceamento correto dos dados rotulados, a precisão do modelo subiu para 74,3% 
+usando os conjuntos de testes fornecidos. Os parâmetros finais, definidos pelo tuning, 
+foram: modelo linear de classificação modified_huber e taxa de aprendizado adaptive. 
+Com os três rótulos para a classificação de polaridade dos argumentos (apoio, 
+oposição e neutro) introduzidos pela base IAC, é possível obter uma fidelidade maior dos 
+posicionamentos dos participantes das discussões analisadas. Observando a matriz de 
+confusão dos resultados obtidos (Figura 2b), os pontos que mais diminuem a precisão do 
+algoritmo estão entre as classificações de oposição e neutras. Enquanto argumentos de 
+apoio são classificados corretamente na maioria das vezes, argumentos neutros ou de 
+oposição têm uma linha tênue de separação no modelo linear do algoritmo.
+
+(a) Matriz de confusão do conjunto de 
+testes do modelo com a base IMDb 
+(b) Matriz de confusão do conjunto de 
+testes do modelo com a base IAC 
+Figura 2. Matrizes de confusão do conjunto de testes do modelo. 
+Quando comparamos o desempenho de ambos os modelos para classificar as 
+extrações do Reddit, cuja discussão aborda o adiamento das eleições dos Estados Unidos 
+em 2020, observando uma amostra desta classificação (Tabela 1), a adição da polaridade 
+“neutra” é a principal diferença entre os resultados das classificações; em alguns casos 
+introduzindo classificações diametralmente opostas. Apesar da métrica de precisão obtida 
+com a base IAC ser menor que a obtida pela base IMDb, os resultados de classificação da 
+base IAC, em um cenário real, são mais versáteis e fidedignos para análise dos 
+argumentos, pois não necessariamente todo argumento se posiciona sobre um assunto. 
+Tabela 1. Comparação das classificações realizadas pelo algoritmo treinado 
+pelas bases IAC e IMDb. 
+ 
+6.4. Visualização dos dados na ferramenta Visu 
+Os resultados provenientes da classificação dos argumentos precisam de uma formatação 
+específica para serem aceitos pela ferramenta Visu. O arquivo contém os seguintes dados 
+para o processamento (Tabela 2): identificador, autor, data, hora, mensagem, assunto, 
+polaridade e destinatário. Os dados são resultado do processo de mineração de 
+argumentação e análise de sentimentos, gerando uma tabela que é formatada para texto 
+bruto, indentado por espaçamentos e tabulações.
+
+Tabela 2. Dados exportados para a ferramenta Visu. 
+ 
+7. Conclusão 
+Com o desenvolvimento deste trabalho, exploramos uma primeira visão de um pipeline 
+capaz de extrair e classificar argumentos de discussões de redes sociais, para alimentar a 
+ferramenta de visualização de dados de discussões Visu. Os resultados obtidos 
+demonstram uma precisão de 74% na identificação das polaridades dos argumentos, 
+criando assim uma alternativa confiável à classificação manual feita para alimentar a 
+ferramenta de visualização pelos criadores, atingindo os objetivos propostos. Porém, o 
+processo possui algumas limitações que podem ser aperfeiçoadas em trabalhos futuros. 
+A precisão das classificações pode ser incrementada se utilizada com um conjunto 
+de dados de discussão maior. As maiores bases de discussões, fornecidas pelo projeto 
+IAC [Walker et. al. 2012], não foram utilizadas por limitações de hardware para 
+processamento. A matriz de confusão obtida com as classificações do algoritmo SGD, 
+treinado pela base IAC, também indica limitações do modelo obtido quanto às fronteiras 
+de separação entre as classes. Em particular, há um grau de confusão entre argumentos 
+com polaridades de oposição e neutras maior do que o desejado, prejudicando a precisão 
+da classificação para estas polaridades. Além disso, uma análise qualitativa pode ser feita 
+a fim de compreender quais estruturas linguísticas não estão sendo identificadas. 
+Trabalhos futuros podem explorar o método de classificação por regressão 
+logística do classificador SGD. Durante o desenvolvimento, o modelo apenas recebeu 
+parâmetros de configuração para modelos de classificação lineares. Além disso, um 
+hardware mais potente seria mais apropriado para que o treinamento das bases seja menos 
+oneroso. Um trabalho derivado do presente trabalho, e já em desenvolvimento, concebido 
+como um aprimoramento experimental deste, consiste na aplicação de técnicas de deep 
+learning para aperfeiçoar a classificação de polaridade dos argumentos. 
+Quanto às visualizações obtidas pelo Visu, é necessário realizar ajustes quanto à 
+capacidade de exibição gráfica para um volume maior de dados. O foco da ferramenta foi 
+um conjunto pequeno de argumentos, então os gráficos exibidos não são escaláveis. 
+Assim, apesar de conseguir gerar gráficos com um número elevado de argumentos, a 
+visualização dos dados fica prejudicada por problemas de renderização e resolução. 
+As soluções desenvolvidas abrem espaço para estudos posteriores na área de MA, 
+além de possibilitar a popularização deste e de outros campos de Ciência de Dados para 
+o público geral. De fato, pelo contexto inserido no trabalho envolver redes sociais, surgem
+
+espaços de comunicação com o público que podem despertar o interesse para este e outros 
+cenários de conhecimento. 
+Referências 
+Abbott, R., Ecker, B., Anand, P. e Walker, M. (2016) “Internet argument corpus 2.0: An 
+sql schema for dialogic social media and the corpora to go with it.” In Proceedings of 
+the Tenth International Conference on Language Resources and Evaluation (LREC'16) 
+(pp. 4445-4452), https://www.aclweb.org/anthology/L16-1704/ 
+Agarwal, A., Xie, B., Vovsha, I., Rambow, O. e Passonneau, R. (2011) “Sentiment 
+analysis of twitter data.” In Proceedings of the Workshop on Languages in Social 
+Media, LSM’11, https://dl.acm.org/doi/10.5555/2021109.2021114 
+ArgMining 
+(2021) 
+“The 
+8th 
+Workshop 
+on 
+Argumentation 
+Mining”, 
+https://2021.argmining.org/ 
+Boe, B. e Payne, J. (2016) "PRAW: The Python Reddit API Wrapper" GitHub. 
+https://github.com/praw-dev/praw 
+Burgess Yakemovic, K. C. e Conklin, E. J. (1990) “Report on a development project use 
+of an issue-based information system.” In Proceedings of the 1990 ACM conference 
+on 
+Computer-supported 
+cooperative 
+work 
+(pp. 
+105-118), 
+https://doi.org/10.1145/99332.99347 
+Dusmanu, M., Cabrio, E. e Villata, S. (2017) “Argument mining on Twitter: Arguments, 
+facts and sources." In Proceedings of the 2017 Conference on Empirical Methods in 
+Natural Language Processing (pp. 2317-2322), http://dx.doi.org/10.18653/v1/D17-
+1245 
+Garcia, A. C. e Klein, M. (2015) “Making sense of large-group discussion using 
+automatically generated RST-based explanations”. Available at SSRN 2554838, 
+http://dx.doi.org/10.2139/ssrn.2554838 
+IBM 
+(2020) 
+“Project 
+Debater”, 
+https://www.research.ibm.com/artificial-
+intelligence/project-debater/index.html 
+Lawrence, J., Bex, F., Reed, C. e Snaith, M. (2012) “AIFdb: Infrastructure for the 
+Argument Web.” In COMMA (pp. 515-516), https://doi.org/10.3233/978-1-61499-
+111-3-515. 
+Lawrence, J. e Reed, C. (2020) “Argument mining: A survey.” Computational 
+Linguistics, 45(4), 765-818, https://doi.org/10.1162/coli_a_00364 
+Lippi, M. e Torroni, P. (2016) “Argument Mining: State of the art and emerging trends.” 
+ACM 
+Transactions 
+on 
+Internet 
+Technology, 
+16 
+(2), 
+2016, 
+http://dx.doi.org/10.1145/2850417 
+Lytos, A., Lagkas, T., Sarigiannidis, P. e Bontcheva, K. (2019) “The evolution of 
+argumentation mining: From models to social media and emerging tools.” Information 
+Processing & Management, 56(6), 102055, https://doi.org/10.1016/j.ipm.2019.102055 
+Maas, A., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y. e Potts, C. (2011) “Learning 
+word vectors for sentiment analysis”. In Proceedings of the 49th annual meeting of the
+
+association for computational linguistics: Human language technologies (pp. 142-
+150), https://www.aclweb.org/anthology/P11-1015 
+Nascimento, R. S., Nascimento, G., Carvalho, F. e Guedes, G. (2020). “Mineração de 
+Opiniões com LIWC: abordagem prática sobre sistemas judiciais eletrônicos 
+brasileiros”. In Anais do IX Brazilian Workshop on Social Network Analysis and 
+Mining (pp. 132-141). SBC, https://doi.org/10.5753/brasnam.2020.11169 
+NLTK (2021) “Natural Language Toolkit.”, https://www.nltk.org/ 
+Palau, R. M. e Moens, M. F. (2009) “Argumentation mining: the detection, classification 
+and structure of arguments in text”. In Proceedings of the 12th international conference 
+on 
+artificial 
+intelligence 
+and 
+law 
+(pp. 
+98-107), 
+https://doi.org/10.1145/1568234.1568246 
+Paltoglou, G. e Thelwall, M. (2012) “Twitter, MySpace, Digg: Unsupervised sentiment 
+analysis in social media”. ACM Transactions on Intelligent Systems and Technology 
+(TIST), 3(4), 1-19, https://doi.org/10.1145/2337542.2337551 
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., ... e 
+Duchesnay, E. (2011) “Scikit-learn: Machine learning in Python". The Journal of 
+machine 
+Learning 
+research, 
+12, 
+2825-2830, 
+https://dl.acm.org/doi/10.5555/1953048.2078195 
+Rodrigues, A. O., de Melo-Minardi, R. C. e Junior, W. M. (2013) “Como nos Sentimos: 
+Uma Ferramenta de Mineração Visual de Sentimentos no Twitter”. In Anais do II 
+Brazilian Workshop on Social Network Analysis and Mining (pp. 91-102). SBC, 
+https://sol.sbc.org.br/index.php/brasnam/article/view/6836 
+Skoric, M. M., Zhu, Q., Goh, D. e Pang, N. (2016) “Social media and citizen engagement: 
+A 
+meta-analytic 
+review”. 
+New 
+Media 
+& 
+Society, 
+18(9), 
+1817-1839. 
+http://dx.doi.org/10.1177/1461444815616221. 
+Tavares, R. L, Pimentel, M., Araujo, R. M. (2012) “Visualização de Informações em 
+Discussões Políticas". In: Brazilian Symposium on Collaborative Systems. São Paulo. 
+Sociedade 
+Brasileira 
+de 
+Computação. 
+pp. 
+---. 
+http://sws2012.ime.usp.br/sbsc/SBSC2012/data/4890a075.pdf 
+Tavares, R. L, Pimentel, M., Araujo, R. M. (2014) “Visualizing Clashes and Alliances in 
+Social Networks of Political Discussions”. Social Networking, v. 03, p. 94-101. 
+http://dx.doi.org/10.4236/sn.2014.32012 
+Toulmin, S. E. (2003). “The uses of argument”. Cambridge university press. 
+https://doi.org/10.1080/00048405985200191 
+UFRJ. (2020) “Media Lab”, https://medialabufrj.net/ 
+Walker, M. A., Tree, J. E. F., Anand, P., Abbott, R. e King, J. (2012) “A Corpus for 
+Research on Deliberation and Debate.” In LREC (Vol. 12, pp. 812-817), 
+https://www.aclweb.org/anthology/L12-1643/ 
+Zhai, C. e Massung, S. (2016) "Opinion Mining and Sentiment Analysis. Text Data 
+Management and Analysis: A Practical Introduction to Information Retrieval and Text 
+Mining. "Association for Computing Machinery and Morgan & Claypool, 
+https://doi.org/10.1145/2915031.2915050

@@ -1,0 +1,414 @@
+Detecção de comunidades em redes complexas para 
+identificar gargalos e desperdício de recursos em sistemas de 
+ônibus 
+Carlos Caminha, Vasco Furtado, Vládia Pinheiro, Caio Ponte
+Laboratório de Engenharia do Conhecimento – Universidade de Fortaleza 
+(UNIFOR) – Caixa Postal 60811-905 – Edson Queiroz, Fortaleza – CE – 
+Brazil
+Abstract. Recently it was found that the most part of the population of the world 
+is in large metropolises. This population growth brings with it a series of 
+challenges and public transport appears as a recurrent solution to tackle 
+mobility problems in these big cities. In this work, we carried out a case study 
+to help to understand the shortcomings of public transportation in a city via the 
+mining of complex networks representing the supply and demand of public 
+transport. A process of characterization of the supply and demand networks of 
+the bus system of a large Brazilian metropolis was conducted and it also shed 
+light on the potential overload of demand and waste in the supply of resources 
+that can be mitigated through strategies of supply and demand balance. 
+Resumo. Recentemente foi constatado a maioria da população do globo 
+terrestre está nas grandes metrópoles. Esse crescimento populacional traz 
+consigo uma série de desafios e o transporte público aparece como uma solução 
+recorrente para atacar problemas de mobilidade nessas grandes cidades. Neste 
+trabalho, foi realizado um estudo de caso para ajudar a compreender as 
+deficiências do transporte público através da mineração de redes complexas 
+que representam oferta e demanda de transportes públicos. Foi conduzido um 
+processo de caracterização de redes de oferta e demanda do sistema de ônibus 
+de uma grande metrópole brasileira e o mesmo lançou uma luz sobre potencial 
+sobrecarga da demanda e desperdício na oferta de recursos que podem ser 
+mitigados com estratégias de equilíbrio entre oferta e demanda. 
+1. Introdução
+A era da informação digital trouxe a necessidade de, a partir de dados diversos e 
+volumosos, criar meios para gerar conhecimento e aplicá-lo com eficácia. Uma das áreas 
+que melhor exemplificam esse contexto é a mobilidade urbana. Sensores e meios digitais 
+registram informações diárias sobre trilhas de pessoas, tornando-se uma entrada rica para 
+a realização de estudos para a compreensão da mobilidade humana e seu impacto no 
+transporte público. 
+Um exemplo de sistema largamente sensoriado é o sistema de ônibus de uma 
+grande metrópole. Com sensores como GPS (Global Positioning System), que registram 
+por onde os veículos trafegam, e sistema de bilhetagem, que registram o pagamento e 
+tarifas por parte dos passageiros, são gerados diariamente imensos bancos de dados e um 
+grande desafio é extrair informações que tenham potencial de identificar falhas que 
+deixam usuários do sistema insatisfeitos, como por exemplo a superlotação de veículos. 
+532
+XXXVII Congresso da Sociedade Brasileira de Computação
+
+Ao longo dos anos inúmeros trabalhos trataram de analisar oferta e demanda de 
+sistemas de ônibus [Chang and Schonfeld 1991], [Oppenheim 1995], [Domencich and 
+McFadden 1975] e dois aspectos se mostraram particularmente desafiadores ao avaliar 
+ocupação extrema (veículos lotados ou vazios). Primeiro, a ausência de sensores que 
+permitam que a demanda seja mensurada por completo. Em muitos sistemas de 
+bilhetagem só é registrado o momento em que o usuário sobe nos veículos, sendo 
+necessário fazer uso de heurísticas para estimar onde o usuário desceu [Gordillo 2006], 
+[Hua-ling 2007]. Essa limitação dificulta a avaliação da lotação dos veículos, obrigando 
+analistas a comparar a oferta, que é completamente conhecida, com a demanda que muitas 
+vezes é analisada com amostras pouco significativas. O segundo desafio ao avaliar 
+ocupação extrema em redes de transporte coletivo é que a complexidade das conexões 
+desses sistemas dificulta a percepção de gargalos. Nesse tipo de sistema é comum avaliar 
+conexões fracas de oferta como possíveis pontos de gargalo, no entanto somente uma 
+avaliação topológica dos subcomponentes que cercam essas arestas pode confirmar a 
+existência do problema [GAO et al 2005]. 
+Diante dessa problemática, uma estratégia que se mostra adequada para 
+compreensão desse tipo de fenômeno é a utilização de redes complexas. O potencial 
+desse tipo de instrumento para tratar problemas que exigem a necessidade de abstração 
+de aspectos como o desconhecimento de parte dos dados, aliado a riqueza de métricas e 
+algoritmos já existentes no estado da arte, justificam sua aplicação para resolver uma série 
+de problemas. Observa-se recentemente uma quantidade significativa de trabalhos que 
+modelam redes para compreensão de sistemas complexos no contexto de transporte aéreo 
+[Wang et al. 2011], ferroviário [Lenormand et al. 2014], urbano [Munizaga and Palma 
+2012] e bicicletas [Hamon et al. 2013]. Em geral, estes estudos visam caracterizar redes 
+utilizando métricas como a distribuição de peso, comprimento médio do caminho e 
+coeficiente de agrupamento. O trabalho de [Sienkiewicz and Hołyst 2005], por exemplo, 
+comparou o sistema de transporte público em 22 cidades da Polônia. Entre outras 
+características, os autores mostraram que a distribuição de graus e pesos segue uma lei de 
+potência hierarquicamente organizada. 
+O trabalho apresentado em [Elmasry and McCann 2003] é particularmente 
+relevante neste contexto e é complementar ao nosso. O artigo apresenta um algoritmo 
+para detectar gargalos em uma rede congestionada de grande escala comutada por 
+pacotes. A abordagem baseia-se na estimativa do valor esperado de atraso em trechos da 
+rede (trechos estes representados por arestas de um grafo) e na conversão deste valor 
+esperado para um peso por ligação. 
+Neste artigo, temos como principal objetivo compreender como a oferta do 
+sistema de ônibus de uma grande metrópole se relaciona com a sua respectiva demanda. 
+Será descrita uma experiência com a cidade de Fortaleza, uma grande metrópole 
+brasileira, no âmbito do seu projeto para Smart City. Usando uma rede de oferta 
+reconstruída a partir de dados de GPS de ônibus em [Caminha et al. 2016], e uma rede 
+que representa a demanda do sistema de ônibus na cidade estimada a partir de um 
+algoritmo heurístico em [Caminha et al. 2017], foi realizada uma caracterização que 
+revelou um desequilíbrio global do sistema. Além disso, uma estratégia baseada em 
+detecção de comunidades nos levou a identificar trechos da rede de transporte público 
+com problemas, como gargalos e/ou desperdício de recursos. 
+533
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+
+Além desta introdução, este artigo é divido em cinco seções. Na seção dois são 
+descritos os conjuntos de dados utilizados. Na seção três são detalhadas as estratégias 
+utilizadas para encontrar desequilíbrios globais nas redes de oferta e demanda. Na seção 
+quatro é descrito como foram utilizadas técnicas de detecção de comunidades para 
+encontrar pontos da rede onde potencialmente existem gargalos ou desperdício de 
+recursos. Por fim, na seção cinco, são feitas as considerações finais acerca deste trabalho. 
+2. Conjunto de dados 
+A rede de oferta pode ser definida como um grafo dirigido, G (V, E), com vértices, v (∈ 
+V), representando as paradas e arestas de ônibus, e (∈ E), entre dois pontos de ônibus. 
+Formalmente o peso da aresta, 𝑤𝑣𝑖→𝑣𝑗, representa a oferta de ônibus entre duas paradas 
+de ônibus vi e vj (∈ V). Esta oferta foi calculada a partir do somatório do peso das linhas 
+de ônibus, 𝑤𝐿𝑖, que passam por dois pontos de ônibus. Formalmente 𝑤𝑣𝑖→𝑣𝑗= ∑
+𝑤𝐿𝑖
+𝑁
+𝑖=1
+, 
+onde N é o número total de linhas de ônibus que visitam, em sequência, vi e vj. Por sua 
+vez, o peso das linhas de ônibus, é calculado a partir do produto da quantidade de veículos 
+alocados na linha 𝐿𝑖, 𝑉𝐿𝑖, pelo número de viagens que cada veículo faz em um dia em 𝐿𝑖, 
+𝐶𝐿𝑖. Ou seja, 𝑤𝐿𝑖= 𝑉𝑖𝐶𝑖. Ao todo, essa rede possui 4783 vértices e 5876 arestas e foi 
+produzida em [Caminha et. al. 2016]. 
+ 
+A rede de demanda foi produzida em [Caminha et al. 2017]. No processo de 
+reconstrução dos caminhos dos usuários foi suposto que as trajetórias dos usuários de 
+ônibus são definidas pela composição das rotas dos ônibus que os levam entre seu pares 
+origem-destino. Neste contexto, foram reconstruídas as trajetórias de usuários de ônibus 
+como um grafo dirigido G (V, E), onde V e E são o conjunto de vértices v e arestas e, 
+respectivamente. Uma aresta e entre os vértices vi e vj é definida pelo par ordenado (vi, 
+vj). Nessa rede, os vértices representam paradas de ônibus e as arestas representam a 
+demanda de usuários de ônibus entre dois pontos de ônibus consecutivos. Para cada 
+aresta, e, que liga um par ordenado (vi, vi) é definido um peso, 𝑤𝐸𝑖𝑗, que soma o total de 
+usuários que passaram por e. Ao todo, essa rede possui os mesmos 4783 vértices e 5876 
+arestas existentes na rede de oferta. O único aspecto que difere as redes é o peso das 
+arestas, na rede de oferta esse peso é mensurado em quantidade de veículos que ofertam 
+rotas e na rede de demanda o mesmo é mensurada em quantidade de pessoas que passaram 
+dentro dos ônibus. Vale ainda ressaltar que a rede de demanda representa apenas uma 
+amostra da necessidade da população, mesmo assim [Caminha et al. 2017] argumentam 
+que sua amostra representa 40% da demanda de ônibus da cidade, uma das maiores 
+amostras de demanda de sistema de ônibus que se tem notícia. 
+ 
+Tanto a rede de oferta quanto a rede de demanda possuem dados do dia 11 de 
+março de 2015. Uma quarta-feira, dia útil na cidade. A Figura 1 ilustra a disposição 
+geográfica das paradas de ônibus e suas conexões. 
+534
+XXXVII Congresso da Sociedade Brasileira de Computação
+
+Figura 1. Estrutura da rede de ônibus de fortaleza. Os vértices foram georreferenciados 
+para melhor visualização. 
+3. Caracterização de redes de oferta e demanda para encontrar desequilíbrios 
+globais 
+Nesta seção será descrito o processo de caracterização das redes oferta e demanda do 
+sistema de ônibus de Fortaleza. Para permitir comparações, os pesos das arestas das duas 
+redes foram normalizados. Na rede de demanda, para cada aresta, 𝒆𝒅,o peso, 𝒘𝒅, que 
+descreve a demanda de passageiros entre dois pontos de ônibus, foi normalizado pela 
+razão 𝒘𝒅/𝒘𝒅𝒎𝒂𝒙 onde 𝒘𝒅𝒎𝒂𝒙 é o maior peso registrado na rede. Para a rede de oferta 
+utilizou-se a mesma estratégia para calcular o peso que, nesse caso, representa a 
+quantidade de ônibus disponíveis. Note-se que ambas as redes têm a mesma distribuição 
+de graus, isto é, para cada aresta na rede de oferta há uma aresta correspondente na rede 
+de demanda, essas redes diferem somente em relação aos seus pesos de arestas. 
+ 
+A Figura 2 ilustra a distribuição de pesos das arestas para as duas redes. E (a) 
+observa-se uma lei de potência [Barabási et al. 2000] [Clauset et al. 2009] com exponente 
+α = -2.90 para a rede de oferta. Este resultado sugere que esta rede foi projetada para 
+oferecer um elevado número de recursos em poucos lugares e poucos recursos em vários 
+locais. Da mesma forma, uma lei de potência pode ser observada para a rede de demanda 
+na Figura 2 (b). O exponente α = -1.97 indica que há poucos lugares com alta demanda e 
+vários lugares com baixa demanda. Em (a), a linha verde mostra a regressão aplicada aos 
+dados da rede de oferta. Em (b) a regressão é representada pela linha laranja para os dados 
+da demanda. As linhas tracejadas azuis representam os intervalos de confiança estimados 
+com o método de Nadaraya Watson [Nadaraya 1964] [Watson 1964]. As distribuições 
+foram geradas usando 50 beans logarítmicos. 
+ 
+535
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+
+Figura 2. Distribuição de pesos das arestas das redes de oferta e demanda. 
+ 
+Apesar das distribuições apresentarem similaridade em termos de escala, isso não 
+implica necessariamente que as redes estejam equilibradas. A primeira sugestão de 
+desequilíbrio é a diferença entre os expoentes, o volume de concentração em poucos 
+lugares é muito mais intenso na rede de oferta. A Figura 3 ilustra a diferença na inclinação 
+das retas estimadas. A linha verde ilustra a regressão estimada na rede de oferta e a linha 
+laranja é a regressão estimada para a distribuição dos pesos das arestas da rede de demanda. 
+ 
+Figura 3. Comparação entre as escalas das leis de potência encontradas. 
+ 
+Ainda na distribuição de pesos das arestas das redes, na Figura 4 é ilustrada a 
+distribuição cumulativa desses dados. A curva laranja mostra que a rede de demanda 
+acumula mais arestas com pesos pequenos que a rede de oferta, as probabilidades são 
+iguais nas duas redes e arestas com peso 0,16. Essa é outra sugestão de desequilíbrio 
+devido às diferenças entre as probabilidades acumuladas em ambas as redes. 
+536
+XXXVII Congresso da Sociedade Brasileira de Computação
+
+Foi investigado também se as redes poderiam ser divididas em comunidades com 
+alto coeficiente de agrupamento e baixa conectividade com outras comunidades. Para a 
+rede de oferta isso pode indicar a existência de áreas onde o suprimento de ônibus é 
+privilegiado (dentro das comunidades) e também gargalos (arestas fracas) entre essas 
+áreas. Foi utilizado o algoritmo [Blondel et al. 2008] para detectar as comunidades. Esse 
+algoritmo faz uso de um método heurístico baseado na otimização da modularidade de 
+grafos. A modularidade de um conjunto de vértices é medida por um valor real entre 0 e 
+1, sendo calculada pela relação entre a quantidade de arestas que conectam os elementos 
+do conjunto entre si pelo total das arestas do conjunto de vértices [Girvan 2002] 
+[Wilkinson 2004]. O algoritmo pode ser dividido em duas fases que são repetidas 
+iterativamente. Na primeira fase é atribuída uma comunidade diferente para cada nó de 
+rede. Assim, nesta divisão inicial há tantas comunidades quanto vértices. Para cada nó i é 
+considerado cada um de seus vizinhos j, e é avaliado o ganho de modularidade ao mover i 
+de sua comunidade para a comunidade de j. O nó i é então colocado na comunidade para 
+o qual esse ganho é máximo, mas somente se esse ganho for positivo. Se nenhum ganho 
+positivo é possível, o nó i permanece em sua comunidade original. Este processo é aplicado 
+a todos os vértices repetidamente até que nenhuma melhoria possa ser alcançada e assim 
+a primeira fase é completada. A segunda fase do algoritmo consiste na construção de uma 
+nova rede cujos vértices são comunidades encontradas durante a primeira fase. Para fazer 
+isso, os pesos das conexões entre os novos vértices são dados pela soma do peso das 
+conexões entre os vértices nas duas comunidades correspondentes. As conexões entre os 
+vértices da mesma comunidade são representadas por auto relacionamentos. As fases são 
+repetidas até que a modularidade global máxima seja encontrada. 
+ 
+ 
+Figura 4. Distribuições cumulativas dos pesos das arestas nas redes estudadas. 
+ 
+A Figura 5 ilustra o aumento da modularidade quando a rede é dividida em mais 
+comunidades. A linha verde ilustra a modularidade da rede de oferta na medida em que a 
+537
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+
+rede é dividida em mais comunidades. A linha laranja ilustra o comportamento de 
+modularidade da rede de demanda. A modularidade da rede de oferta é maior do que a 
+rede de demanda em praticamente todas as configurações, mais precisamente, as 
+modularidades das redes só convergem quando o número de comunidades e inferior a 10, 
+aproximadamente. Esse resultado revela que a rede de oferta parece ser projetada para 
+atender a movimentos mais curtos do que o fato de que as pessoas precisam. Os valores 
+de modularidade encontrados na rede de oferta indicam que as arestas dentro das 
+comunidades dessa rede são mais fortes do que as arestas encontradas nas comunidades 
+da rede de demanda, possivelmente porque os usuários do sistema de ônibus viajam por 
+trechos mais logos que o esperado, aumentando o peso das arestas nesses locais e 
+impedindo que algoritmos de detecção de comunidade encontrem configurações 
+modulares como as encontradas na rede de oferta. 
+ 
+Figura 5. Comparação entre a modularidade das duas redes. 
+4. Detecção de comunidades para encontrar gargalos e desperdício de 
+recursos 
+Verificou-se que a demanda e a oferta de ônibus em Fortaleza é significativamente 
+alterada em intervalos de três horas, com picos de uso das 5:00 às 8:00 e das 17:00 às 
+20:00. Por esse motivo foram geradas redes de oferta e demanda para os seguintes 
+intervalos de tempo: De 2:01 às 5:00; 5:01 às 8:00; 8:01 às 11:00, 11:01 às 14:00; 14:01 
+às 17:00.; 17:01 às 20:00; 20:01 às 23:00; e das 23:01 as 2:00. O intervalo onde a rede é 
+mais utilizada é de 5:01 às 8:00, por esse motivo vamos concentrar nossa análise neste 
+período. 
+ 
+Em redes equilibradas, onde a oferta cresce em proporção direta ao crescimento 
+da demanda, espera-se que haja uma relação isométrica entre volumes de oferta e 
+demanda [Banavar et al 2002]. A Figura 6 ilustra a correlação entre os pesos das arestas 
+das redes de oferta e demanda no intervalo das 5:01 às 8:00 da manhã. Cada ponto preto 
+538
+XXXVII Congresso da Sociedade Brasileira de Computação
+
+representa uma aresta. O eixo x representa o peso de arestas na rede de oferta e o eixo y 
+o peso de arestas na rede de demanda. A linha vermelha é a regressão aplicada aos dados. 
+As linhas tracejadas a azul ilustram os intervalos de confiança estimados com o método 
+Nadaraya Watson. Os dados são mostrados em escala logarítmica. A baixa correlação, R2 
+= 0,53, revela um crescimento não correlacionado, indicando mais uma vez desequilíbrio 
+entre oferta e demanda. O valor de β = 1.24, para uma equação do tipo 𝑌= 𝑎𝑋𝛽, não 
+revela qualquer relação isométrica [Kleiber 1961]. Acima da reta vermelha (regressão 
+linear) estão as arestas (ou trechos da rede), onde a demanda é proporcionalmente maior 
+que a oferta. No entanto, chama a atenção para a maior concentração de pontos abaixo da 
+linha de regressão, indicando que há partes da cidade em que os recursos oferecidos são, 
+proporcionalmente, maiores do que a demanda existente na região. Isso sinaliza que se 
+pode melhor atender a demanda da rede sem a necessidade de aumentar o custo 
+operacional da mesma, apenas tentando equilibrar a oferta em algumas partes da cidade. 
+ 
+ 
+Figura 6. Correlação entre o volume de suprimento e o volume de demanda em todas as 
+arestas da rede no intervalo das 5:00 às 8:00 da manhã. 
+ 
+Na Figura 7 (a) são ilustrados trechos da rede de oferta onde a mesma está 
+sobrecarregada, esses trechos são percorridos por linhas de ônibus que possivelmente 
+estão com veículos lotados. Esses trechos foram identificados a partir das arestas 
+removidas pelo método de detecção de comunidades, detalhado na seção anterior. Uma 
+aresta fraca removida (por um método de detecção de comunidades) da rede de oferta 
+pode significar um gargalo de oferta, pois essa aresta conecta movimentos 
+intercomunidades que já se mostraram predominantes [Caminha et al 2016]. Em todas as 
+arestas removidas foi calculado o índice de sobrecarga 𝐼𝑆= 𝑤𝑠/𝑤𝑠𝑚𝑎𝑥 − 𝑤𝑑/𝑤𝑑𝑚𝑎𝑥. 
+Arestas com 𝐼𝑆< 0 são trechos onde proporcionalmente a oferta e maior que a demanda, 
+539
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+
+e potencialmente onde estão os gargalos. Observou-se ainda que as linhas de ônibus que 
+possuem gargalo normalmente levam pessoas ao centro da cidade (destacado pelo círculo 
+vermelho). 
+ 
+Na Figura 7 (b) são ilustrados trechos da rede onde potencialmente os ocorrem 
+desperdício de recursos, ou seja, ônibus vazios. Esses trechos foram identificados a partir 
+das arestas removidas pelo método de detecção de comunidades, agora na rede de 
+demanda. Métodos de detecção de comunidades removem conexões fracas entre 
+componentes com alto coeficiente de agrupamento, que no caso da rede de demanda são 
+sub-regiões de fluxo intenso de passageiros. Nesse contexto, as arestas eliminadas pelo 
+método em questão representam trechos da rede de baixo fluxo de passageiros, onde 
+potencialmente podem ocorrer desperdícios de recursos. De forma similar ao que foi feito 
+na oferta, calculamos o índice de desperdício 𝐼𝐷= 𝑤𝑑/𝑤𝑑𝑚𝑎𝑥 − 𝑤𝑠/𝑤𝑠𝑚𝑎𝑥, onde 
+arestas com 𝐼𝐷< 0 representam trechos onde proporcionalmente a demanda e maior que 
+a oferta, e por consequência onde estão sendo desperdiçados recursos. 
+ 
+ 
+Figura 7. Trechos da rede onde foram encontrados gargalos e desperdício de recursos. 
+ 
+O índice, 𝐼𝑆, proposto identificou que as linhas 503, 029, 014, 605, 725, 379, 087, 
+325, 316, 013, 130, 815, 030, 077, 011, 650, 755, 361, 612 e 075 têm trechos em seus 
+itinerários onde os veículos se encontram lotados. Já 𝐼𝐷 identificou que as linhas 394, 
+315, 024, 220, 605, 709, 087, 013, 050, 311 e 317 estão em algum momento de seu 
+itinerário praticamente vazias. Em validação in loco com profissionais da ETUFOR 
+(Empresa de Transporte Urbano de Fortaleza) nos foi reportado que é conhecido que em 
+alguns dias da semana as linhas 503, 029, 014, 605, 725, 379, 087, 325, 316, 013, 130, 
+815, 030, 077, 075 e 011 estão lotadas nos trechos destacados. Quanto as linhas 650, 755, 
+361 e 612 os profissionais se mostraram surpresos que as mesmas estejam lotadas, e 
+informaram que as mesmas serão avaliadas em ações futuras. Sobre as linhas com poucos 
+passageiros os profissionais preferiram não opinar. Foi justificado que é difícil saber se 
+uma linha está com poucos passageiros em um determinado horário, pois esse fato não 
+gera reclamação por parte dos usuários. 
+540
+XXXVII Congresso da Sociedade Brasileira de Computação
+
+5. Considerações finais 
+Este trabalho explorou a oferta e a demanda do sistema de ônibus de Fortaleza, uma 
+grande metrópole brasileira. Algoritmos e métricas de redes complexas foram usados para 
+explorar o desequilíbrio entre o que o poder público oferece e o que a população necessita. 
+Em nível macro, as diferenças entre as redes de oferta e demanda em suas respectivas 
+distribuições de densidade de pesos das arestas, distribuições cumuladas de peso das 
+arestas e nível de modularidade, revelaram um desequilíbrio global no sistema. Em nível 
+micro, foi desenvolvido um modelo que faz uso de técnicas de detecção de comunidades 
+para identificar onde estão os gargalos e onde estão sendo desperdiçados recursos. Esse 
+modelo se mostrou promissor mesmo em situações onde não é possível ter informações 
+completas a respeito da demanda de passageiros. 
+Como trabalhos futuros, foi identificada a necessidade de construir um simulador capaz 
+de reproduzir a dinâmica da mobilidade humana, através do sistema de ônibus, em uma 
+grande metrópole, fazendo uso de mineração de dados para estimar funções de 
+probabilidade que representem a demanda real de um sistema de ônibus. De posse desse 
+simulador, será possível validar a aplicação de técnicas de balanceamento da rede de 
+oferta, testando o seu equilíbrio com a rede de demanda. Paralelamente será possível 
+também alterar sinteticamente a demanda a fim de enquadrá-la na oferta, em um cenário 
+real, a alteração da demanda pode ser alcançada através da execução políticas públicas, 
+como criação de terminais em pontos ótimos de baldeação, campanhas de educação no 
+uso do sistema e micro intervenções no espaço urbano (e.g. incentivo fiscal para criação 
+de oportunidades de emprego em áreas em que a oferta é subutilizada). 
+ 
+References 
+Banavar, J. R., Damuth, J., Maritan, A., and Rinaldo, A. (2002). Supply–demand balance 
+and metabolic scaling. Proceedings of the National Academy of Sciences, 99(16), 
+10506-10509. 
+Barabási, A. L., Albert, R., and Jeong, H. (2000). Scale-free characteristics of random 
+networks: the topology of the world-wide web. Physica A: statistical mechanics and 
+its applications, 281(1), 69-77. 
+Blondel, V. D., Guillaume, J. L., Lambiotte, R., and Lefebvre, E. (2008). Fast unfolding 
+of communities in large networks. Journal of statistical mechanics: theory and 
+experiment, 2008(10), P10008. 
+Caminha, C., Furtado, F., Pinheiro, V., and Ponte, P. (2016) Micro-interventions in urban 
+transportation from pattern discovery on the flow of passengers and on the bus 
+network. In Smart Cities Conference (ISC2), 2016 IEEE International, pp. 1–6, IEEE. 
+Caminha C, Furtado V, Pequeno THC, Ponte C, Melo HPM, Oliveira EA, et al. (2017) 
+Human mobility in large cities as a proxy for crime. PLoS ONE 12(2): e0171609. 
+doi:10.1371/journal.pone.0171609 
+Chang, S. K., and Schonfeld, P. M. (1991). Multiple period optimization of bus transit 
+systems. Transportation Research Part B: Methodological, 25(6), 453-478. 
+541
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining
+
+Chaves, L. (2015). Analisando a mobilidade de pesquisadores através de registros 
+curriculares na Plataforma Lattes. IV Brazilian Workshop on Social Network Analysis 
+and Mining (BraSNAM 2015) 
+Clauset, A., Shalizi, C. R., and Newman, M. E. (2009). Power-law distributions in 
+empirical data. SIAM review, 51(4), 661-703. 
+Domencich, T. A., and McFadden, D. (1975). Urban travel demand-a behavioral analysis 
+(No. Monograph). 
+Elmasry, G. F., and McCann, C. J. (2003, October). Bottleneck discovery in large-scale 
+networks based on the expected value of per-hop delay. In Military Communications 
+Conference, 2003. MILCOM'03. 2003 IEEE (Vol. 1, pp. 405-410). IEEE. 
+GAO, Z. Y., Wu, J. J., Mao, B. H., and Huang, H. J. (2005). Study on the complexity of 
+traffic networks and related problems [J]. Communication and Transportati0n Systems 
+Engineering and Information, 2, 014. 
+Girvan, M., and Newman, M. E. (2002). Community structure in social and biological 
+networks. Proceedings of the national academy of sciences, 99(12), 7821-7826. 
+Gordillo, F. (2006). The value of automated fare collection data for transit planning: an 
+example of rail transit od matrix estimation (Doctoral dissertation, Massachusetts 
+Institute of Technology). 
+Hamon, R., Borgnat, P., Flandrin, P., and Robardet, C. (2013). Networks as signals, with 
+an application to a bike sharing system. In Global Conference on Signal and 
+Information Processing (GlobalSIP), 2013 IEEE (pp. 611-614). IEEE. 
+Hua-ling, R. (2007, August). Origin-destination demands estimation in congested 
+dynamic transit networks. In Management Science and Engineering, 2007. ICMSE 
+2007. International Conference on (pp. 2247-2252). IEEE. 
+Kleiber, M. (1961). The fire of life. An introduction to animal energetics. The fire of life. 
+An introduction to animal energetics. 
+Lenormand, M., Tugores, A., Colet, P., and Ramasco, JJ (2014). Tweets na estrada. PloS 
+one , 9 (8), e105407. 
+Munizaga, M. A., and Palma, C. (2012). Estimation of a disaggregate multimodal public 
+transport Origin–Destination matrix from passive smartcard data from Santiago, Chile. 
+Transportation Research Part C: Emerging Technologies, 24, 9-18. 
+Nadaraya, E. A. (1964). On estimating regression. Theory of Probability & Its 
+Applications, 9(1), 141-142. 
+Oppenheim, N. (1995). Urban travel demand modeling: from individual choices to 
+general equilibrium. John Wiley and Sons. 
+Sienkiewicz, J., and Hołyst, J. A. (2005). Statistical analysis of 22 public transport 
+networks in Poland. Physical Review E, 72(4), 046127. 
+Wang, J., Mo, H., Wang, F., and Jin, F. (2011). Exploring the network structure and nodal 
+centrality of China’s air transport network: A complex network approach. Journal of 
+Transport Geography, 19(4), 712-721. 
+542
+XXXVII Congresso da Sociedade Brasileira de Computação
+
+Watson, G. S. (1964). Smooth regression analysis. Sankhyā: The Indian Journal of 
+Statistics, Series A, 359-372. 
+Wilkinson, D. M., and Huberman, B. A. (2004). A method for finding communities of 
+related genes. proceedings of the national Academy of sciences, 101(suppl 1), 5241-
+5248. 
+543
+6º BraSNAM - Brazilian Workshop on Social Network
+Analysis and Mining

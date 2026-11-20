@@ -1,0 +1,813 @@
+Conteúdo Informativo, Audiência Polarizada:
+Desacoplamento no Debate sobre Vacinas no YouTube
+Brasileiro Pós-Pandemia
+Thales H. Silva1, Julio C. S. Reis2, Jonatas H. Santos1, Philipe F. Melo2, Clara G. Tavares1,
+João F. H. Olivetti2, Matheus G. Guimaraes1, Gláucio S. Souza1, Filipe Zanovello1,
+Marco A. G. Rodrigues1, Marcos A. Gonçalves1, Fabrício Benevenuto1, Cristiano X. Lima1
+1 Universidade Federal de Minas Gerais (UFMG)
+2 Universidade Federal de Viçosa (UFV)
+{thaleshenrique,jonatashds}@ufmg.br
+{jreis, philipe.freitas, joao.olivetti}@ufv.br
+{clara21ufmg, guimaraesmatheus22,glaucio.gss,filipebessa9}@gmail.com
+magro.mg@terra.com.br,{mgoncalv,fabricio}@dcc.ufmg.br, cxlima@ufmg.br
+Abstract. Vaccine hesitancy remains one of the major public health challen-
+ges in the post-pandemic era.
+In this study, we analyze the Brazilian You-
+Tube ecosystem from 2024 to 2025 to investigate how vaccine-related narratives
+are produced and received. We construct a large-scale dataset of videos and
+comments, combining topic modeling (BERTopic) and Large Language Models
+(LLMs) for semantic filtering and stance detection. Our results reveal a structu-
+ral mismatch between content production and audience reception. While videos
+are predominantly informational and institutionally aligned, audience engage-
+ment is more polarized and often dominated by anti-vaccine sentiment. Ap-
+proximately 59% of comments express opposition to vaccination. Notably, this
+behavior emerges even without explicit misinformation, suggesting that users
+reinterpret content through ideological and experiential perspectives. These fin-
+dings indicate that YouTube functions not only as an information channel but
+also as a space where reactive narratives are amplified, sustaining vaccine he-
+sitancy. More broadly, exposure to informational content does not necessarily
+lead to agreement, highlighting a gap between dissemination and persuasion on
+digital platforms.
+Resumo. A hesitação vacinal permanece como um dos principais desafios
+de saúde pública no cenário pós-pandêmico. Neste trabalho, analisamos o
+ecossistema brasileiro do YouTube entre 2024 e 2025 para compreender como
+narrativas sobre vacinação são produzidas e apropriadas pela audiência.
+Para isso, construímos um conjunto de dados em larga escala de vídeos e
+comentários, combinando modelagem de tópicos (BERTopic) e Modelos de
+Linguagem de Grande Porte (LLMs) para filtragem semântica e detecção de
+posicionamento.
+Os resultados evidenciam um desacoplamento estrutural
+entre produção de conteúdo e recepção da audiência.
+Enquanto os vídeos
+são predominantemente informativos e alinhados a fontes institucionais, o
+engajamento do público é mais polarizado, frequentemente dominado por posi-
+cionamentos contrários à vacinação. Aproximadamente 59% dos comentários
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+1
+
+expressam opiniões contrárias. Esse padrão ocorre mesmo sem desinformação
+explícita, sugerindo que os usuários reinterpretam o conteúdo a partir de
+narrativas ideológicas e experiências pessoais. As descobertas indicam que
+o YouTube atua não apenas como canal de disseminação de informação, mas
+também como espaço de amplificação de discursos reativos que sustentam a
+hesitação vacinal. De forma mais ampla, a exposição a conteúdos informativos
+não implica necessariamente concordância, evidenciando uma lacuna entre
+disseminação de informação e persuasão em plataformas digitais.
+1. Introdução
+A vacinação é um dos principais pilares da saúde pública moderna. Apesar de o Brasil
+possuir um histórico de excelência nesse campo, especialmente por meio do Programa
+Nacional de Imunizações (PNI), o país tem registrado quedas nas coberturas vacinais nos
+últimos anos [Arroyo et al. 2020], agravadas pelo impacto da pandemia de COVID-19
+[Gontijo et al. 2024]. Isso ocorre em paralelo à consolidação da hesitação vacinal e da
+desconfiança pública como desafios centrais para a saúde [Ramos et al. 2023].
+Esse fenômeno está intrinsecamente associado à transformação do ecossistema in-
+formacional contemporâneo. O debate sobre saúde tem migrado de canais institucionais
+para plataformas digitais, que passaram a desempenhar um papel central na mediação da
+informação [Carvalho et al. 2022; Cavalini et al. 2024; Santos et al. 2026]. Nesse con-
+texto, a disseminação de conteúdos imprecisos ou enganosos contribui para o que a Or-
+ganização Mundial da Saúde (OMS) denomina “infodemia” [World Health Organization
+2020], caracterizada por uma superabundância de informações que dificulta a distinção
+entre evidência científica e desinformação [Borges do Nascimento et al. 2022].
+Embora haja uma vasta literatura dedicada à análise da desinformação durante o
+período crítico da pandemia, ainda há lacunas importantes na compreensão do cenário
+pós-pandêmico, no qual a hesitação vacinal persiste de forma estrutural [Pennisi et al.
+2024]. Em particular, permanece pouco explorado como diferentes camadas do ecossis-
+tema digital — como a produção de conteúdo e a recepção da audiência — interagem
+na construção desse fenômeno. O YouTube, ao combinar um repositório massivo de
+conteúdo audiovisual com mecanismos de interação direta via comentários, oferece uma
+oportunidade única para investigar essa dinâmica [Mejova and Tizzani 2025].
+Neste trabalho, argumentamos que o ecossistema do YouTube apresenta um desa-
+coplamento estrutural entre a produção de conteúdo e a recepção da audiência no contexto
+da vacinação. Enquanto os vídeos tendem a adotar uma postura predominantemente infor-
+mativa e alinhada a instituições de saúde, a audiência manifesta um discurso significati-
+vamente mais polarizado, frequentemente permeado por narrativas ideológicas, desconfi-
+ança e teorias conspiratórias. Logo, este trabalho contribui ao demonstrar empiricamente
+esse desacoplamento no cenário pós-pandêmico, por meio de uma análise integrada de
+conteúdo e recepção da audiência em larga escala.
+Para investigar essa hipótese, construímos e analisamos um conjunto de dados iné-
+dito de vídeos e comentários sobre vacinação no YouTube brasileiro, coletados no período
+pós-pandêmico (2024–2025). Propomos uma arquitetura metodológica híbrida que inte-
+gra (i) coleta de dados via API oficial da plataforma, (ii) filtragem semântica assistida por
+modelos de linguagem, e (iii) técnicas avançadas de Processamento de Linguagem Natu-
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+2
+
+ral (PLN), incluindo modelagem de tópicos com BERTopic e detecção de posicionamento
+com LLMs. O emprego de LLMs se justifica pela natureza ruidosa do discurso digital. A
+presença de sarcasmo, narrativas implícitas, gírias e grafias alternativas limita o desem-
+penho de classificadores tradicionais. Esse desenho permite analisar de forma integrada
+tanto as narrativas produzidas quanto a resposta da audiência. A partir dessa abordagem,
+este trabalho busca responder às seguintes questões de pesquisa (QPs): QP1: Quais são
+os principais temas e narrativas do discurso sobre vacinas no YouTube brasileiro no pe-
+ríodo pós-pandêmico? QP2: Qual é o posicionamento predominante da audiência nos
+comentários em relação à imunização?
+Nossos resultados revelam um cenário altamente polarizado, marcado por um con-
+traste sistemático entre conteúdo e recepção. Enquanto os vídeos analisados priorizam in-
+formações institucionais e educativas, aproximadamente 59% dos comentários expressam
+posicionamentos contrários à vacinação. Esse padrão evidencia que, mesmo na ausência
+de desinformação explícita no conteúdo audiovisual, a audiência reinterpreta e ressigni-
+fica essas informações por meio de narrativas ideológicas e experiências pessoais. Esse
+comportamento sugere que o YouTube atua não apenas como um canal de disseminação
+de informação, mas também como um espaço de amplificação de discursos reativos que
+sustentam a hesitação vacinal. De forma geral, as descobertas deste estudo contribuem
+para o entendimento do papel das plataformas digitais na manutenção de narrativas antiva-
+cina no cenário pós-pandêmico, destacando a necessidade de abordagens que considerem
+não apenas o conteúdo publicado, mas também a dinâmica de interação com a audiência.
+O restante do artigo está estruturado da seguinte forma: a Seção 2 apresenta os
+trabalhos relacionados; a Seção 3 descreve a metodologia proposta; a Seção 4 apresenta
+os resultados experimentais; e a Seção 5 conclui o trabalho e discute direções futuras.
+2. Trabalhos Relacionados
+A literatura recente sobre desinformação vacinal evidencia a complexidade do fenômeno
+caracterizado como “infodemia” pela Organização Mundial da Saúde [World Health Or-
+ganization 2020]. Embora revisões sistemáticas, como [Borges do Nascimento et al.
+2022], apontem para a necessidade de abordagens multifatoriais, a maior parte dos estu-
+dos concentra-se em analisar aspectos isolados do problema, como propagação, detecção
+automatizada ou fatores comportamentais, frequentemente no contexto da pandemia de
+COVID-19.
+No eixo de dinâmicas de propagação, diversos trabalhos utilizam Análise de Redes
+Sociais (SNA) para mapear a estrutura e evolução das narrativas antivacina. Estudos
+longitudinais em plataformas como Twitter/X mostram que fontes de baixa credibilidade
+tendem a alcançar ampla difusão [Pierri et al. 2023], além de evidenciarem a existência de
+comunidades organizadas que sustentam discursos conspiratórios [Sharma et al. 2022].
+No contexto brasileiro, análises em larga escala caracterizam o debate público durante
+a pandemia [Malagoli et al. 2021; Oliveira et al. 2022]. No entanto, essas abordagens
+concentram-se predominantemente em informações estritamente textuais e em períodos
+críticos da pandemia, limitando a compreensão do cenário pós-pandêmico e de outras
+formas de interação, como comentários em vídeos.
+No que diz respeito a modelos computacionais, há avanços significativos no uso
+de técnicas de Processamento de Linguagem Natural (PLN) para detecção de desinforma-
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+3
+
+ção e posicionamento. Métodos baseados em classificadores tradicionais [Schmidt et al.
+2024] e abordagens mais recentes com LLMs [Ghosh and Mitra 2024; Oliveira et al. 2026]
+demonstram bons resultados na identificação de conteúdo alinhado ou contrário à vaci-
+nação. Ainda assim, esses trabalhos tendem a focar exclusivamente na classificação de
+conteúdo, sem explorar a relação entre diferentes camadas do ecossistema digital, como
+a produção de conteúdo e a recepção da audiência. Além disso, desafios recentes, como
+a geração de conteúdo sintético por LLMs [Silva et al. 2025], reforçam a necessidade de
+análises mais estruturais e interpretativas.
+Por fim, estudos no eixo sócio-comportamental destacam o papel de fatores polí-
+ticos, culturais e midiáticos na propagação da hesitação vacinal, especialmente em países
+do Sul Global [Kim et al. 2023]. Trabalhos em plataformas como WhatsApp e Telegram
+revelam padrões de coordenação e disseminação de conteúdo alarmista [Cavalini et al.
+2024; Santos et al. 2025], enquanto análises retóricas mostram como narrativas antivacina
+se apropriam de fontes de autoridade para ganhar legitimidade [D’Almonte et al. 2023].
+Embora essas abordagens contribuam para entender o fenômeno em diferentes contextos,
+elas raramente consideram de forma integrada a interação entre conteúdo institucional e
+resposta da audiência em plataformas híbridas como o YouTube.
+Em particular, estudos recentes no YouTube [Mejova and Tizzani 2025] indicam
+que conteúdos pró-vacinação tendem a ser produzidos por instituições e educadores, en-
+quanto discursos contrários emergem com maior força na interação dos usuários. No
+entanto, tais análises ainda são limitadas em escopo temporal e não exploram sistemati-
+camente o cenário pós-pandêmico.
+Diferentemente desses trabalhos, este estudo propõe uma análise integrada do
+ecossistema do YouTube brasileiro no período pós-pandêmico (2024–2025), conside-
+rando simultaneamente as narrativas presentes nos vídeos e o posicionamento da audiên-
+cia nos comentários. Ao combinar modelagem de tópicos e detecção de posicionamento
+com LLMs, mostramos evidências de um desacoplamento estrutural entre produção de
+conteúdo e recepção da audiência, oferecendo uma nova perspectiva para compreender a
+persistência da hesitação vacinal em ambientes digitais.
+3. Metodologia
+Esta seção descreve a metodologia utilizada para responder às questões de pesquisa pro-
+postas. O fluxo de trabalho foi estruturado de forma sequencial e complementar através
+das seguintes etapas: inicialmente, realizou-se uma etapa de extração de vídeos e comen-
+tários diretamente da plataforma do YouTube; em seguida, implementou-se uma filtragem
+semântica assistida por um modelo de linguagem (LLM) para garantir a pertinência do
+conteúdo; a terceira etapa consistiu na validação estatística da eficácia desse classifica-
+dor; e, por fim, foi realizada a análise exploratória e extração de conhecimento dos dados
+vacinais. A Figura 1 resume os passos executados e detalhados a seguir.
+3.1. Coleta de Dados
+De forma similar a trabalhos anteriores sobre o tema [Santos et al. 2025], a extração dos
+dados foi conduzida através de palavras-chave no contexto de vacinas. Foram definidos
+os termos de busca “vacina”, “vacinas” e “vacinação” com filtros de idioma (i.e., pt-BR)
+e geolocalização restritos ao contexto brasileiro e recuperados os vídeos via API oficial
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+4
+
+Figura 1. Visão geral do pipeline para coleta, filtragem e análise de vídeos e
+comentários sobre vacinação no YouTube.
+do YouTube1. O recorte temporal abrangeu o período de janeiro de 2024 a setembro
+de 2025. Essa delimitação visa dissociar o estudo do ápice da pandemia de COVID-
+19, permitindo, assim, uma análise inédita das dinâmicas no cenário pós-pandêmico. O
+conjunto resultante engloba os metadados dos vídeos (título, descrição, canal, data de
+publicação, visualizações, curtidas, duração) e seus respectivos comentários (conteúdo
+textual, autor, data e curtidas). O volume de dados coletados inicialmente consistiu em
+cerca de 21 mil vídeos e 350 mil comentários associados, conforme a Tabela 2.
+3.2. Filtragem Semântica com LLMs
+Apesar da restrição por palavras-chave, a coleta inicial capturou conteúdos não relaciona-
+dos ao foco do trabalho em saúde pública, como materiais sobre imunização animal, usos
+metafóricos, fictícios ou de contextos humorísticos. Para limpar esses ruídos e garantir
+a validade da análise, implementou-se uma etapa de filtragem semântica automatizada.
+Essa triagem foi executada pelo modelo GPT-4o-mini, via API da OpenAI2, o qual foi
+instruído a avaliar a pertinência temática de cada registro com base no título e na descri-
+ção do vídeo3. O uso do GPT-4o-mini justifica-se pelo fato de ele apresentar desempenho
+comparável ao de modelos maiores com uma fração do custo por token [OpenAI 2024].
+Além disso, um modelo generativo consegue lidar com nuances no texto e evita a ne-
+cessidade de treinar um classificador supervisionado do zero, o que exigiria milhares de
+instâncias manualmente anotadas.
+Considerando a inviabilidade de validar manualmente as 21 mil instâncias, optou-
+se pela verificação de uma amostra de 385 registros, garantindo um intervalo de confiança
+de 95% e margem de erro de 5%. Para a seleção, utilizou-se a Amostragem Estratificada
+baseada na proporção de rótulos preditos, método considerado mais robusto que a amos-
+tragem aleatória simples para fins de auditoria [Lohr 2021]. Em seguida, a amostra dos
+385 itens foi avaliada por três anotadores humanos, considerando o voto majoritário entre
+eles para estabelecer um consenso. Dado que não era viável aplicar modelos maiores e
+mais caros (i.e., GPT-4.1 e GPT-5-mini) no conjunto completo, optou-se por avaliá-los
+nessa amostra, o que oferece uma evidência razoável de como teria sido o desempenho
+deles nos dados totais.
+Observa-se que, de forma geral, os classificadores apresentaram um grau de con-
+cordância razoável uns com os outros, com o GPT-4o-mini e o GPT-4.1 apresentando
+1https://developers.google.com/youtube/v3
+2https://developers.openai.com/api/docs/models/gpt-4o-mini
+3Os prompts exatos, roteiros de código e dados coletados estão disponíveis no seguinte repositório:
+https://github.com/thaleshqs/youtube_vaccine_analysis
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+5
+
+Tabela 1. Coeficiente kappa de Cohen entre diferentes classificadores.
+GPT-4o-mini
+GPT-4.1
+GPT-5-mini
+Humanos
+GPT-4o-mini
+–
+0,677
+0,609
+0,697
+GPT-4.1
+0,677
+–
+0,89
+0,697
+GPT-5-mini
+0,609
+0,89
+–
+0,67
+Humanos
+0,697
+0,697
+0,67
+–
+melhores resultados. Em particular, o coeficiente kappa de Cohen entre o voto majoritá-
+rio dos anotadores humanos e o GPT-4o-mini foi de 0,697. Isso confirma que esse modelo
+tem um desempenho substancial para essa tarefa, segundo a escala proposta por [Landis
+and Koch 1977].
+Após a fase de pré-processamento e filtragem, o conjunto de dados foi consolidado
+em 14.970 vídeos e 237.678 comentários, conforme a Tabela 2.
+Tabela 2. Sumarização do conjunto de dados.
+Etapa da coleta
+Nº de vídeos
+Nº de comentários
+Coleta inicial
+21.183
+351.039
+Após remoção
+14.970
+237.678
+3.3. Análise Exploratória dos Dados
+Tendo-se o conjunto filtrado, a partir da extração de metadados, foi realizado o cálculo
+de métricas descritivas a fim de caracterizar o volume e as proporções de engajamento do
+material coletado, conforme sumarizado na Tabela 3.
+Tabela 3. Análise exploratória dos vídeos relevantes (C.V. = Coef. de Variação).
+Métrica
+Média
+Mediana
+Desvio Padrão
+C.V.
+Visualizações
+23.881,11
+140,00
+539.887,26
+22,61
+Curtidas
+555,67
+5,00
+13.195,98
+23,75
+Comentários
+16,86
+0,00
+220,62
+13,08
+Duração (s)
+386,49
+115,00
+1169,78
+3,03
+Para compreender a dinâmica de participação dos usuários nos comentários e a
+distribuição das interações, modelou-se então o volume de comentários por usuário. Para
+isso, foi utilizada a Função de Distribuição Acumulada (CDF) associada a projeções em
+escala logarítmica. Esse passo permite identificar a assimetria do engajamento e verificar
+a presença de padrões de cauda longa na rede.
+Adicionalmente, foram aplicadas algumas técnicas de PLN voltadas à extração de
+hashtags e frequências de termos. A geração de nuvens de palavras (word clouds) foi
+implementada como uma etapa exploratória visual, visando mapear os grupos de termos
+mais proeminentes no discurso da audiência (comentários).
+No que se refere à resposta da QP1 sobre a identificação de temas e narrativas,
+adotou-se a arquitetura de modelagem neural de tópicos com o BERTopic [Grootendorst
+2022]. Foram executadas múltiplas iterações do modelo, submetendo a ajustes de hi-
+perparâmetros críticos, particularmente o número de vizinhos na etapa de redução de
+dimensionalidade (UMAP) [McInnes et al. 2018] e o tamanho mínimo de agrupamento
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+6
+
+(HDBSCAN) [McInnes et al. 2017]. Esse refinamento teve como objetivo otimizar a
+coerência espacial, evitando a fragmentação excessiva de temas correlatos e também a
+mistura de assuntos divergentes em clusters mais genéricos.
+3.4. Detecção de Posicionamento da Audiência
+Para responder à QP2, referente ao posicionamento do público, a metodologia foi estrutu-
+rada em três etapas. Inicialmente, os comentários que tratavam explicitamente do tema fo-
+ram selecionados. Para tal, aplicou-se um filtro baseado nos radicais vacin* (abrangendo
+variações como vacina, vacinação, vacinado e outras grafias como v4cina e vachina) e
+imunizar, resultando num subconjunto de 48.209 mensagens.
+Na sequência, procedeu-se à classificação automática de todo o subconjunto por
+meio do modelo GPT-4o-mini, instruído via prompt a categorizar cada comentário em
+uma das três classes mutuamente exclusivas: Favorável (Positivo na notação original),
+Contrário (Negativo) ou Neutro. Nessa etapa, não foi possível aplicar outros modelos
+com custos maiores devido à limitação de recursos.
+Com base na distribuição de classes produzida pelo modelo, foi então realizada
+uma amostragem estratificada de 500 comentários, preservando as proporções observadas
+em cada categoria. Essa amostra foi submetida à avaliação independente por três anota-
+dores humanos, que classificaram os comentários segundo o mesmo esquema categórico.
+O rótulo final (ground truth) foi definido por maioria simples entre os avaliadores. Em
+12 instâncias, verificou-se discordância total (cada anotador atribuiu uma classe distinta);
+tais casos foram rotulados como inconclusivos e excluídos das análises subsequentes.
+A concordância entre as classificações humanas e as predições do modelo foi ava-
+liada por meio do coeficiente kappa de Cohen, resultando num valor de 0,56, o que in-
+dica concordância moderada. Apesar dessa limitação, os padrões agregados observados
+permanecem consistentes, sendo suficientes para sustentar as conclusões do estudo. A
+Tabela 4 apresenta a matriz de confusão entre as classificações humanas (linhas) e as pre-
+dições do modelo (colunas). Observa-se que o modelo apresenta elevado desempenho na
+identificação de comentários contrários (187 classificações corretas), mas tende a clas-
+sificar comentários neutros como contrários (69 casos), indicando um viés em direção à
+classe negativa. Além disso, há confusões relevantes entre as classes favorável e neutro,
+o que sugere limitações na distinção de posicionamentos menos polarizados.
+Tabela 4. Matriz de confusão – Classificação manual (lin.) vs. automática (col.).
+Modelo
+Humanos
+Favorável
+Contrário
+Neutro
+Favorável
+72 (57.6%)
+33 (26.4%)
+20 (16.0%)
+Contrário
+0 (0.0%)
+187 (94.9%)
+10 (5.1%)
+Neutro
+4 (2.4%)
+69 (41.6%)
+93 (56.0%)
+Esse desenho metodológico permite responder diretamente às questões de pes-
+quisa, sendo a modelagem de tópicos utilizada para caracterizar as narrativas (QP1) e a
+detecção de posicionamento empregada para analisar a recepção da audiência (QP2).
+4. Resultados
+A análise das métricas de interação nos vídeos revela uma grande discrepância na dis-
+tribuição do engajamento, com apenas uma minoria tendo quantidade significativa de
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+7
+
+visualizações, curtidas e comentários, conforme a Figura 2. Isso é reforçado pelos per-
+centis superiores da distribuição, sendo que 90% dos vídeos atingiram aproximadamente
+no máximo 4.293 visualizações, 153 curtidas e 9 comentários, indicando que apenas uma
+pequena fração dos vídeos concentra níveis mais elevados de interação. Esse padrão
+também é refletido no distanciamento entre valores de média e mediana, sendo expli-
+citado pelos altos valores de desvio padrão. Esse padrão indica que a visibilidade e o
+engajamento estão concentrados em um subconjunto reduzido de conteúdos, o que pode
+influenciar quais narrativas ganham maior alcance na plataforma.
+Um fenômeno análogo de concentração desigual também foi identificado em re-
+lação às interações dos usuários. A Figura 3 ilustra essa disparidade através da função de
+distribuição acumulada. Os dados indicam que a base de usuários é predominantemente
+passiva: 90% realizaram até dois comentários, enquanto 99% contribuíram com até oito.
+(a) Visualizações
+(b) Curtidas
+(c) Comentários
+Figura 2. Funções de distribuição acumulada (CDF) - Engajamento dos vídeos.
+Figura 3. CDF do # de comentários por usuário.
+A análise dos links compartilhados nos comentários, presente na Tabela 5, revela
+baixa incidência de URLs em relação ao total de interações. Esse padrão sugere que a par-
+ticipação da audiência ocorre predominantemente por meio de manifestações discursivas
+diretas — como opiniões, relatos pessoais e posicionamentos — em vez da redistribuição
+de conteúdo externo. Ademais, isso pode indicar que o YouTube funciona mais como um
+espaço de interpretação e debate do que de curadoria de informações, reforçando o caráter
+discursivo e reativo da audiência, em linha com a predominância de narrativas polarizadas
+e emocionalmente carregadas nos comentários. Isso representa um contraste com outras
+plataformas digitais, como o X/Twitter, WhatsApp ou Facebook, nas quais há um grande
+compartilhamento de fontes externas.
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+8
+
+Tabela 5. Top domínios mais compartilhados nos comentários dos vídeos.
+Domínio
+Frequência
+enfrenteenfermagem.com.br
+476
+youtube.com
+259
+enfrenteenfermagemcontinuada.com
+72
+ncbi.nlm.nih.gov
+40
+bit.ly
+28
+gov.br
+24
+Outros domínios
+453
+Figura 4. WordCloud das hashtags mais frequentes nos comentários.
+Por fim, gerou-se uma nuvem de palavras a partir das hashtags mais frequentes nos
+comentários dos vídeos (Figura 4). A análise desses termos se motiva pela utilização de
+hashtags como descritores concisos do assunto, permitindo identificar rapidamente temas
+recorrentes. Percebe-se uma coexistência de tópicos sobre a importância das vacinas e
+discussões politizadas, com menções ao ex-presidente Bolsonaro e outras autoridades.
+Essa análise preliminar fornece um panorama inicial das narrativas presentes, que são
+exploradas de forma mais estruturada na modelagem de tópicos a seguir.
+4.1. Modelagem de Tópicos
+Para responder à QP1, a arquitetura BERTopic foi aplicada aos títulos dos vídeos. Através
+de sua utilização, identificaram-se os assuntos discutidos por criadores de conteúdo vaci-
+nal no YouTube brasileiro. A metodologia seguiu o fluxo padrão de remoção de ruídos
+(links e stopwords), vetorização dos textos, redução de dimensionalidade e agrupamento
+semântico. Em seguida, o mesmo método foi aplicado nos comentários dos vídeos, pos-
+sibilitando a análise do discurso da audiência engajada com tais vídeos. Foram identifica-
+dos 12 agrupamentos nos comentários, e 16 nos títulos dos vídeos. Após uma verificação
+manual, os tópicos 9 e 10 dos comentários foram omitidos, pois evidenciaram grande pre-
+sença de ruído, ou seja, não relacionados ao tema de interesse. Os resultados detalhados
+estão presentes nas Tabelas 6 e 8. Além disso, a Tabela 7 apresenta alguns exemplos de
+comentários para cada tópico.
+Para uma melhor interpretação dos tópicos identificados, agrupamos os temas em
+categorias semânticas mais amplas. Nos comentários, observa-se predominância de: (i)
+desconfiança política e institucional, (ii) narrativas conspiratórias e desinformação (e.g.,
+segurança vacinal, autismo), (iii) relatos pessoais e experiências individuais, e (iv) conteú-
+dos informativos ou neutros. Em contraste, os títulos dos vídeos concentram-se majorita-
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+9
+
+Tabela 6. Tópicos gerados pelo BERTopic a partir dos comentários.
+Quant.
+Rótulo
+Palavras-Chave
+141018
+0_deus_vai_bolsonaro_parabéns
+deus, vai, bolsonaro, parabéns, tudo, bem, nada, todos, tomei, pessoas
+48303
+1_vacina_vacinas_covid_tomar
+vacina, vacinas, covid, tomar, tomei, anos, pessoas, vírus, tomar vacina, nunca
+9740
+2_brasil_brasileiro_brasileiros_-
+povo
+brasil, brasileiro, brasileiros, povo, presidente, bolsonaro, vacina, brasileira,
+lula, povo brasileiro
+3910
+3_vídeo_vídeos_video_youtube
+vídeo, vídeos, video, youtube, amo, canal, parabéns, bom, videos, amo vídeos
+2863
+4_dengue_vacina dengue_vacina_-
+mosquito
+dengue, vacina dengue, vacina, mosquito, contra dengue, covid, contra, governo,
+mosquitos, vacinas
+753
+5_herpes_zoster_herpes zoster_va-
+cina
+herpes, zoster, herpes zoster, vacina, contra herpes, vacina contra, plano nacio-
+nal, nacional imunizações, imunizações, pressionar
+668
+6_pandemia_carnaval_durante pan-
+demia_durante
+pandemia, carnaval, durante pandemia, durante, covid, pessoas, mortes, antes
+pandemia, época pandemia, época
+433
+7_baleia_cartão_cartão vacina_ba-
+leias
+baleia, cartão, cartão vacina, baleias, golpe, bolsonaro, importunação, vacina,
+importunação baleia, joias
+393
+8_autismo_autista_autistas_vaci-
+nas
+autismo, autista, autistas, vacinas, crianças, anos, diagnóstico, filho, causa, au-
+mento
+250
+11_macaco_macacos_tailândia_-
+mordida
+macaco, macacos, tailândia, mordida, ver, mico, raiva, zebra, mordam, ver ma-
+caco
+Tabela 7. Exemplos de comentários dos tópicos.
+ID do Tópico
+Exemplo
+0
+Ninguém deve ser obrigada a nada, deixem as pessoas escolherem se querem ou não
+1
+Mesmo sem terem terminados todos os testes de efeitos colaterais, isso não é vacina.
+2
+pq estão perseguindo as crianças brasileiras? Não da mais pra ter filho nesse Bostil
+3
+Meu filho tem 11 anos... É obrigatório também??? Pois ele fala no vídeo que é obrigatório até 6 anos
+4
+O bom é que onde moro não tem surto de dengue então vai demorar uns 20 anos até chegar aqui
+5
+Queremos vacina pra herpes zoster.
+6
+É isso aí, próxima pandemia vem dos EUA. kkkkk
+7
+Dr, a balela é grande, o certo é: o propósito é um só, dizimar a população.
+8
+Agora mesmo que os casos de autismo aumentam. Só observem
+11
+Na verdade, é a parte estúpida da população que tem de pedir desculpas à minoria inteligente. Foram eles que se
+comportaram como macacos amestrados.
+riamente em comunicação institucional, campanhas de saúde pública e informações sobre
+vacinas específicas. Essa diferença reforça o desacoplamento estrutural entre produção
+de conteúdo e recepção da audiência.
+A comparação entre os tópicos extraídos dos títulos dos vídeos e dos comentá-
+rios revela um contraste marcante entre a produção de conteúdo e a reação da audiência.
+Enquanto os títulos dos vídeos indicam que os tópicos são, em sua maioria, informati-
+vos (campanhas de vacinação, conteúdo técnico, avanços científicos, etc.), os comentá-
+rios apresentam forte polarização política e emoções negativas persistentes. A audiência
+tende a deslocar o debate para disputas ideológicas, teorias conspiratórias, desinforma-
+ção e críticas à obrigatoriedade. Mesmo num cenário pós-pandemia, as dúvidas, medos
+e desconfianças em relação às vacinas continuam persistentes. Isso indica que, embora
+os produtores de conteúdo do YouTube, de forma geral, priorizem informações úteis, a
+recepção do público continua moldada por ideologias e experiências pessoais, indicando
+um desafio na comunicação sobre saúde pública baseada em evidências.
+Esse contraste entre a natureza informativa dos vídeos e a polarização dos comen-
+tários fornece evidência direta do desacoplamento estrutural entre produção de conteúdo e
+recepção da audiência, conforme proposto neste trabalho. É importante destacar que esses
+resultados devem ser interpretados como correlacionais, e não causais. Embora o padrão
+observado seja consistente com a hipótese de que os usuários reinterpretam conteúdos
+informativos a partir de lentes ideológicas e experiências pessoais, não é possível descar-
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+10
+
+Tabela 8. Tópicos gerados pelo BERTopic a partir dos títulos.
+Quant. Rótulo
+Palavras-Chave
+6163
+0_vacinas_vacinação_vacina_co-
+vid
+vacinas, vacinação, vacina, covid, contra covid, saúde, dia, contra, tomar, importân-
+cia
+1958
+1_crianças_vacina_bebê_vacina-
+ção
+crianças, vacina, bebê, vacinação, meses, infantil, escolas, maternidade, vacinas,
+vacina meses
+1617
+2_gripe_contra
+gripe_vacinação
+contra_contra
+gripe, contra gripe, vacinação contra, contra, vacinação, influenza, vacina gripe,
+contra influenza, campanha, vacina
+1596
+3_dengue_contra dengue_contra_-
+vacina dengue
+dengue, contra dengue, contra, vacina dengue, vacina contra, vacina, vacinação
+contra, vacinação, vacinas contra, saúde
+556
+4_hpv_contra hpv_vacina hpv_-
+contra
+hpv, contra hpv, vacina hpv, contra, vacina, vacinação contra, vacina contra, câncer,
+vacinação, hpv vacina
+529
+5_brasil_vacinas_hiv_vacinação
+brasil, vacinas, hiv, vacinação, vacinação brasil, vacina, vacinas brasil, covid, con-
+tra, vacina brasil
+378
+6_poliomielite_contra
+poliomie-
+lite_pólio_vacinação contra
+poliomielite, contra poliomielite, pólio, vacinação contra, contra, contra pólio, va-
+cinação, injetável, campanha, campanha vacinação
+244
+7_bolsonaro_cartão_cartão
+va-
+cina_fraude
+bolsonaro, cartão, cartão vacina, fraude, fraude cartão, vacina bolsonaro, pgr, cartão
+vacinação, cartões, investigação
+241
+8_shorts_vacina shorts_vacina_ví-
+deo
+shorts, vacina shorts, vacina, vídeo, shorts vacina, tomar, tomar vacina, vacinas,
+youtubeshorts, medo
+203
+9_bronquiolite_contra
+bronquio-
+lite_vacina bronquiolite_vírus
+bronquiolite, contra bronquiolite, vacina bronquiolite, vírus, vacina contra, sinci-
+cial, vírus sincicial, sincicial respiratório, respiratório, vacina
+169
+10_câncer_contra
+câncer_vacina
+contra_contra
+câncer, contra câncer, vacina contra, contra, vacina, rússia, próstata, pele, câncer
+pele, câncer próstata
+158
+11_herpes_rotavírus_herpes
+zos-
+ter_zoster
+herpes, rotavírus, herpes zoster, zoster, vacina rotavírus, parte, herpeszóster, enfer-
+magemconcurso, vacina, parte vacina
+148
+12_meningite_contra meningite_-
+acwy_meningocócica
+meningite, contra meningite, acwy, meningocócica, contra, vacina meningocócica,
+vacina, meningo, amplia, vacina meningite
+139
+13_autismo_causam autismo_cau-
+sam_vacinas causam
+autismo, causam autismo, causam, vacinas causam, vacinas autismo, autismo vaci-
+nas, vacinas, paracetamol, autismo vacina, trump
+134
+14_enfermagem_bcg_vacina
+bcg_parte
+enfermagem, bcg, vacina bcg, parte, questões, vacina, parte vacina, concurso, en-
+fermeiraconcurseira, concursoenfermagem
+133
+15_amarela_febre
+amarela_fe-
+bre_contra febre
+amarela, febre amarela, febre, contra febre, vacinação contra, vacinação, vacina
+febre, contra, internacional, certificado
+tar explicações alternativas, como a auto-seleção da audiência, vieses nos mecanismos de
+recomendação da plataforma ou níveis prévios de polarização entre os usuários.
+4.2. Detecção de Posicionamento
+Os resultados com o conjunto completo de comentários mencionando vacina ou imuniza-
+ção estão apresentados na Figura 5. Embora a validação indique concordância moderada
+entre o modelo e os anotadores humanos (Kappa = 0,56), os padrões agregados permane-
+cem informativos. De fato, apesar da concordância moderada, as diferenças observadas
+em nível agregado são suficientemente expressivas para sustentar as conclusões. Mesmo
+considerando possíveis erros de classificação, a diferença entre as opiniões contrárias e
+favoráveis indica a predominância robusta de discursos negativos na audiência.
+A matriz de confusão revela que os principais erros concentram-se na distinção
+entre conteúdos neutros e contrários, com tendência do modelo a classificar casos ambí-
+guos como negativos. Ainda assim, mesmo considerando possíveis superestimações da
+classe contrária, a diferença observada entre as categorias permanece expressiva: cerca de
+59% dos comentários são contrários, frente a 25% neutros e 15% favoráveis. Isso indica
+que o posicionamento contrário não é um efeito marginal, mas um padrão estruturalmente
+dominante no engajamento da audiência.
+4.3. Limitações
+A análise considera apenas conteúdos públicos do YouTube, o que pode gerar viés de so-
+brevivência, pois não é possível coletar materiais efêmeros ou removidos pela plataforma,
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+11
+
+Figura 5. Distribuição do posicionamento dos comentários sobre a vacinação.
+possivelmente sub-representando discursos mais extremos. Ademais, o LLM teve concor-
+dância moderada na detecção de posicionamento, indicando imprecisões. A interpretação
+qualitativa dos tópicos também envolveu análise manual, criando uma certa subjetividade.
+Ainda assim, essas limitações não invalidam os resultados, que se mostram informativos,
+ao mesmo tempo em que indicam oportunidades para estudos futuros mais amplos.
+5. Conclusão
+Este estudo analisa o ecossistema brasileiro de vídeos e comentários sobre vacinação
+no YouTube no período pós-pandêmico, evidenciando um descompasso consistente entre
+produção de conteúdo e recepção da audiência. Enquanto os vídeos apresentam cará-
+ter predominantemente informativo e alinhado a evidências, os comentários revelam um
+discurso mais fragmentado, politizado e marcado por desconfiança.
+Os resultados indicam uma predominância estrutural de posicionamentos contrá-
+rios à vacinação, mesmo na ausência de desinformação explícita nos vídeos. Esse padrão
+sugere que a audiência não apenas consome o conteúdo, mas o reinterpreta à luz de ex-
+periências pessoais, crenças e narrativas ideológicas, em um processo majoritariamente
+orgânico, marcado por relatos pessoais e expressões emocionais. Esse comportamento
+difere de dinâmicas de disseminação coordenada observadas em outras plataformas e
+aponta para a atuação de fatores sociais e cognitivos mais complexos na formação do
+posicionamento da audiência. De forma mais ampla, os resultados sugerem que a expo-
+sição a conteúdos informativos não implica necessariamente concordância, evidenciando
+uma lacuna crítica entre disseminação de informação e persuasão em plataformas digitais.
+Nesse sentido, estratégias de enfrentamento à desinformação devem ir além da modera-
+ção de conteúdo, incorporando abordagens comunicacionais mais eficazes e sensíveis à
+dinâmica interpretativa da audiência.
+Como trabalhos futuros, propõe-se expandir a análise para outros temas de sa-
+úde pública, bem como aprofundar a investigação das dinâmicas causais que conectam
+conteúdo, engajamento e posicionamento da audiência. Adicionalmente, recomenda-se
+explorar abordagens metodológicas que integrem técnicas quantitativas e qualitativas, a
+fim de melhor compreender os processos que influenciam a formação de opiniões.
+Agradecimentos
+CI-IA Saúde/FAPESP, FAPEMIG, UNIMED Belo Horizonte, CNPq e INCT-TILDIAR.
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+12
+
+Referências
+Luiz Arroyo, Antônio Carlos Ramos, Mellina Yamamura, Teresinha Weiller, Juliane Cris-
+pim, Denisse Cartagena-Ramos, Miguel Fuentealba-Torres, Danielle Santos, Pedro Pa-
+lha, and Ricardo Arcêncio. Áreas com queda da cobertura vacinal para BCG, poli-
+omielite e tríplice viral no Brasil (2006-2016): mapas da heterogeneidade regional.
+Cadernos de saúde pública, 36:e00015619, 2020.
+I. J. Borges do Nascimento, A. B. Pizarro, J. M. Almeida, N. Azzopardi-Muscat, M. A.
+Gonçalves, M. Björklund, and D. Novillo-Ortiz. Infodemics and health misinforma-
+tion: a systematic review of reviews. Bulletin of the World Health Organization, 100
+(9):544–561, 2022.
+Eleonora de Magalhães Carvalho, Marcelo Alves do Santos Junior, Luiz Felipe Fernandes
+Neves, Thaiane Moreira de Oliveira, Luisa Massarani, and Marilia Sá Carvalho. Vaci-
+nas e redes sociais: o debate em torno das vacinas no instagram e facebook durante a
+pandemia de covid-19 (2020-2021). Cadernos de Saúde Pública, 38(11):e00054722,
+2022.
+Athus Cavalini, Thamya Donadia, Fabio Malini, and Giovanni Comarela. Detecting mi-
+sinformation on telegram anti-vaccine communities. In Anais do XXXIX Simpósio Bra-
+sileiro de Bancos de Dados, pages 729–735, 2024.
+Edson Fernando D’Almonte, Egberto Lima Siqueira, George de Araújo, et al. Vacinas e
+desinformação: uma análise de conteúdo sobre fake news apuradas por plataformas de
+debunking em redes sociais. Reciis, 17(3), 2023.
+Shreya Ghosh and Prasenjit Mitra. Tweeted fact vs fiction: Identifying vaccine misinfor-
+mation and analyzing dissent. In Proc. of the IEEE/ACM International Conference on
+Advances in Social Networks Analysis and Mining, page 136–143, 2024.
+Adriane Aguiar Gontijo, Ana Luiza Vaz Carvalho, Giovanna Calassa da Silva, Isabela Pi-
+res Esteves, Lara Marques Barreto Meneses, and Luciana Vieira Queiroz Labre. O
+impacto da pandemia da covid-19 na cobertura vacinal infantil brasileira. Research,
+Society and Development, 13(7):e10813746394–e10813746394, 2024.
+Maarten Grootendorst. Bertopic: Neural topic modeling with a class-based tf-idf proce-
+dure, 2022. URL https://arxiv.org/abs/2203.05794.
+Jongin Kim, Byeo Rhee Bak, Aditya Agrawal, Jiaxi Wu, Veronika Wirtz, Traci Hong,
+and Derry Wijaya. COVID-19 vaccine misinformation in middle income countries. In
+Proc.of the Conference on Empirical Methods in Natural Language Processing, pages
+3903–3915, 2023.
+J Richard Landis and Gary G Koch. The measurement of observer agreement for catego-
+rical data. biometrics, pages 159–174, 1977.
+Sharon L Lohr. Sampling: design and analysis. Chapman and Hall/CRC, 2021.
+Larissa Malagoli, Júlia Stancioli, Carlos HG Ferreira, Marisa Vasconcelos, Ana
+Paula Couto da Silva, and Jussara Almeida. Caracterização do debate no twitter so-
+bre a vacinaç¸ão contra a covid-19 no brasil. In Brazilian Workshop on Social Network
+Analysis and Mining (BraSNAM), pages 55–66, 2021.
+Leland McInnes, John Healy, Steve Astels, et al. hdbscan: Hierarchical density based
+clustering. J. Open Source Softw., 2(11):205, 2017.
+Leland McInnes, John Healy, Nathaniel Saul, and Lukas Grossberger. Umap: Uniform
+manifold approximation and projection. The Journal of Open Source Software, 3(29):
+861, 2018.
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+13
+
+Yelena Mejova and Michele Tizzani.
+Vaccine hesitancy on youtube: A competition
+between health and politics. In 2025 10th International Digital Public Health Con-
+ference (DPH), pages 1–8, 2025. doi: 10.1109/DPH66411.2025.11198076.
+Gabriel Oliveira, Beatriz Paiva, Ana Silva, and Mirella Moro. Caracterizando a difusão de
+desinformação sobre a vacina coronavac no brasil. In Anais do XI Brazilian Workshop
+on Social Network Analysis and Mining, pages 204–215, 2022.
+Geovana S. de Oliveira, Ana P. C. Silva, Fabricio Murai, and Carlos H. G. Ferreira. Who
+shapes brazil’s vaccine debate? semi-supervised modeling of stance and polarization
+in youtube’s media ecosystem. In Proc.of the ACM Web Science Conference (WebSci),
+pages 1–12, 2026.
+OpenAI. Gpt-4o mini: advancing cost-efficient intelligence. https://openai.com/
+index/gpt-4o-mini-advancing-cost-efficient-intelligence/,
+July 2024.
+Flavia Pennisi, Cristina Genovese, and Vincenza Gianfredi.
+Lessons from the covid-
+19 pandemic: Promoting vaccination and public health resilience, a narrative review.
+Vaccines, 12(8), 2024.
+Francesco Pierri, Matthew R DeVerna, Kai-Cheng Yang, David Axelrod, John Bryden,
+and Filippo Menczer. One year of covid-19 vaccine misinformation on twitter: Longi-
+tudinal study. J Med Internet Res, 25:e42227, 2023.
+Ana Carolina Lima da Conceição Ramos, Beatriz de Almeida Barreto Pacheco, Jennifer
+Emily Anunciação Sousa, Jessica Dias Petrilli, and Gustavo Nunes de Oliveira Costa.
+Cobertura vacinal e o movimento antivacina: o impacto na saúde pública no brasil.
+Revista Baiana de Saúde Pública, 47(1):210–226, 2023.
+Jônatas H dos Santos, Julio C. S. Reis, Philipe Melo, João FH Olivetti, Thales H Silva,
+Matheus Gontijo Guimaraes, Glaucio de Souza, Marcos A Gonçalves, Fabricio Bene-
+venuto, Filipe BB Zanovello, et al. Whatsapp vaccine discourse (whavax): An expert-
+annotated dataset and benchmark for health misinformation detection. Proc. of the
+International AAAI Conference on Web and Social Media, 2026.
+Jônatas Santos, Julio C. S. Reis, Philipe Melo, João Olivetti, Thales Silva, Matheus Gui-
+maraes, Glaucio Souza, Marco Rodrigues, Marcos Goncalves, Fabricio Benevenuto,
+and Cristiano Lima. Caracterização da (des)informação das narrativas sobre vacinação
+em grupos públicos no whatsapp no brasil. In Proc. of the Brazilian Symposium on
+Multimedia and the Web, pages 121–130, 2025.
+Sarah Schmidt, Brian Thoms, Evren Eryilmaz, and Jason Isaacs. Classifying vaccine
+misinformation in online social media videos using natural language processing and
+machine learning. In Hawaii International Conference on System Sciences, 2024.
+Karishma Sharma, Yizhou Zhang, and Yan Liu. Covid-19 vaccine misinformation cam-
+paigns and social media narratives. Proc. of the International AAAI Conference on Web
+and Social Media, 16(1):920–931, 2022.
+Renato Moraes Silva, Hazem Amamou, Lucca Baptista Silva Ferraz, Fabio Kauê Araujo
+da Silva, and Anderson Raymundo Avila. Fake news detection in portuguese under
+large language model-generated content. Journal of the Brazilian Computer Society,
+31(1):1149–1166, 2025.
+World
+Health
+Organization.
+Call
+for
+action:
+managing
+the
+infodemic.
+https://www.who.int/news/item/
+11-12-2020-call-for-action-managing-the-infodemic,
+2020.
+Online. Acesso em: 10 mar. 2026.
+46º Congresso da Sociedade Brasileira de Computação (CSBC 2026), Gramado/RS
+15º Workshop Brasileiro de Análise de Redes Sociais e Mineração (BraSNAM 2026): Artigos Completos
+14

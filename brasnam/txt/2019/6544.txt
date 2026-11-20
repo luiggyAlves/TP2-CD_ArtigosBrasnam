@@ -1,0 +1,538 @@
+Homofilia e Assimetria na Rede de Coautoria de Proposições
+de Lei do Congresso Brasileiro
+Lucas L. Rolim1, Daniel R. Figueiredo2
+1Universidade Federal do Rio de Janeiro (UFRJ)
+Escola Politécnica (POLI), Departamento de Engenharia Eletrônica (DEL)
+Rio de Janeiro - RJ
+2Universidade Federal do Rio de Janeiro (UFRJ)
+Programa de Engenharia de Sistemas e Computação (PESC)
+Rio de Janeiro - RJ
+lucasrolim@poli.ufrj.br, daniel@cos.ufrj.br
+Resumo. A Câmara dos Deputados é a instância máxima de representatividade
+do povo e uma de suas principais atividades é a proposição e aprovação das
+leis que regem o país. Entretanto, as 513 cadeiras da Câmara são ocupadas por
+deputados de diferentes estados, partidos, etnias e graus de escolaridade, sendo
+necessário articulações e alianças políticas na proposição e aprovação de leis.
+O objetivo deste trabalho é caracterizar a rede de coautoria visando identificar
+homofilia e assimetria de diferentes atributos no processo de proposições de
+leis. Uma metodologia para aferir homofilia da rede e de indivíduos é proposta
+e avaliada, identificando diferentes aspectos relevantes, como a alta assimetria
+de diferentes categorias e a falta de homofilia expressiva entre as minorias.
+Abstract. The Chamber of Deputies is the maximum degree of people represen-
+tativity in Brazil, having as one of its main goals the approval of law and projects
+to develop and manage the country. We have deputies from different regions,
+parties, sex, ethnicity, and education levels occupying the 513 existing chairs
+and creating alliances and negotiations to approve their projects in this hete-
+rogeneous environment. The goal of this work is to describe the coauthorship
+network among these deputies, concentrating in identify and characterize ho-
+mophily and asymmetry patterns. We will propose and evaluate a new metho-
+dology to analyze the homophily in the congress network. Using the proposed
+methodology we will identify important aspects, as a high level of asymmetry
+and a lack of homophily among minorities.
+1. Introdução
+A Câmara dos Deputados é a instância máxima de representatividade do povo no estado
+brasileiro, sendo o principal pilar do Poder Legislativo. A atividade fim desse órgão é,
+através dos seus membros (deputados), elaborar proposições de lei que visem discutir e
+aprimorar áreas econômicas e sociais, bem como fiscalizar o emprego, pelos Poderes da
+União, dos recursos arrecadados da população com o pagamento de tributos.
+
+Toda lei do estado brasileiro necessita passar por votação e aprovação da Câmara
+dos Deputados para se tornar vigente, bem como a maioria dessas são articuladas e desen-
+volvidas pelos membros da própria casa. Para a aprovação, uma proposição de lei precisa
+de apoio dos membros da Câmara, gerando assim a necessidade de articulações e alianças
+políticas dos agentes interessados.
+O Brasil conta atualmente com 513 deputados federais, cada qual com direito a
+suplentes em caso de saída, que se renovam a cada quatro anos por meio de eleições dire-
+tas populares. As cadeiras da Câmara dos Deputados são distribuídas proporcionalmente
+de acordo com a população dos 26 estados membros da república federativa brasileira e o
+distrito federal. Além disso, 35 partidos diferentes ocupam diferentes quantidades de ca-
+deiras na atual legislatura, possuindo ainda diferentes etnias e grau de escolaridade. Como
+tais características se relacionam com o processo de coautoria de proposições de lei? De-
+putados de um estado tendem a escrever projetos com deputados do mesmo estado? Esta
+tendência depende do estado?
+Esta pergunta pode ser atacada através do estudo da rede de coautoria, onde
+vértices são deputados e arestas representam coautoria em proposições de lei. Tendo
+em vista que vértices possuem diferentes atributos, como partido e região, técnicas de
+caracterização de homofilia em redes podem ser utilizadas.
+A homofilia pode ser caracterizada como a maior predisposição dos indivíduos de
+formarem relações baseados na similaridade entre suas características [Madan et al. 2011,
+Newman 2018].
+Por exemplo, indivíduos que frequentaram a mesma universi-
+dade e possuem a mesma nacionalidade têm mais chance de ser amigos no Face-
+book [Seder and Oishi 2009]. Nesse contexto, podemos avaliar o grau em que agentes
+políticos estão suscetíveis a essa influência para cada uma das características coletadas.
+A caracterização da homofilia da rede é portanto o objetivo deste trabalho, que faz
+as seguintes contribuições:
+• Construção de um dataset unificado a partir de diferentes fontes públicas de
+informação com dados de deputados e proposições de leis. Este dataset está dis-
+ponibilizado publicamente em um diretório na nuvem, assim como o software
+utilizado para construção do dataset está disponível no GitHub.
+• Caracterização da rede de coautoria dos deputados na legislatura 55 (entre 2015-
+2018) levando em consideração diferentes atributos (partido, região, etnia, etc), e
+propondo métricas para calcular a homofilia da rede e de vértices.
+• Estudo detalhado da homofilia da rede e de indivíduos de diferentes atributos,
+revelando diversas características do processo de proposição de lei. Em particular,
+a forte assimetria na homofilia indicando que alguns partidos ou estados ou etnias
+possuem muito mais homofilia do que outros. A mesma assimetria foi identificada
+em indivíduos.
+Diversos trabalhos estudam redes formadas por congressistas, tanto do congresso
+brasileiro quanto de outros países (ver seção 2). Entretanto, no contexto brasileiro, não é
+de conhecimento dos autores um estudo da rede de coautoria de proposições de lei e con-
+sequentemente da homofilia e assimetria desta rede, sendo este um importante diferencial
+deste trabalho (mais detalhes na seção 2).
+Uma das questões centrais no estudo e caracterização de homofila é a análise
+
+de minorias, como mulheres e negros no congresso brasileiro. Em particular se estes
+grupos tendem a se apoiar mais entre si do que aos demais parlamentares em média.
+Pesquisas anteriores apontaram que a identificação de um indivíduo com um subgrupo é
+mais forte quando esse subgrupo é uma minoria [Huddy 2004]. Observaremos que este
+fenômeno não ocorre no congresso brasileiro como um todo, mas que pode ocorrer com
+determinados deputados em particular.
+Na seção 2 trabalhos relacionados são brevemente descritos. A seção 3 descreve o
+processo de criação da rede, bem como as premissas adotadas e suas limitações. A seção 4
+apresenta uma caracterização de propriedades elementares desta rede. A seção 5 define
+as métricas de homofilia utilizadas assim como uma avaliação e discussão comparativa
+destes resultados. Por fim, a seção 6 encerra o artigo com uma breve conclusão.
+2. Trabalhos Relacionados
+Tendo em vista sua importância para o sistema político Brasileiro, a Câmara dos Deputa-
+dos é objeto de diversos estudos ao longo dos anos, geralmente conduzidos de forma qua-
+litativa no contexto de Ciências Políticas e Ciências Sociais [Miguel 2003, Nicolau 2002].
+Mais recentemente, com a crescente disponibilidade e quantidade de dados, em parte por
+conta da Lei de Acesso à Informação, diversos estudos quantitativos de larga escala da
+Câmara dos Deputados vem sendo realizados [Baptista et al. 2014, Bursztyn et al. 2016,
+Ferreira et al. 2018, Levorato and Frota 2017, Miguel et al. 2015, Verona et al. 2018].
+Alguns estudos quantitativos recentes da Câmara dos Deputados brasileira cons-
+troem redes onde os deputados são os vértices e analisam a rede em busca de um melhor
+entendimento de características do congresso [Baptista et al. 2014, Bursztyn et al. 2016,
+Ferreira et al. 2018, Levorato and Frota 2017, Verona et al. 2018]. Entretanto, todos es-
+tes trabalhos formam e analisam redes de co-votação, onde o relacionamento entre
+dois deputados (representado por uma aresta) é o mesmo voto em um ou mais proje-
+tos de lei. Uma exceção é a rede de co-doação, onde o relacionamento entre dois de-
+putados é o recebimento de doação para a campanha eleitoral de um mesmo do doa-
+dor [Bursztyn et al. 2016]. Estes trabalhos analisam diferentes aspectos da rede, como a
+formação de comunidades, e a importância ou influência dos deputados.
+Diferente destes, o presente trabalho considera a rede de coautoria em proposições
+de lei, onde o relacionamento entre dois deputados representa a autoria de uma mesma
+proposição de lei. Esta rede é fundamentalmente diferente da rede de co-votação e co-
+doação, sendo uma rede que codifica mais fielmente as relações sociais e profissionais
+entre os deputados. Desta forma, a análise desta rede irá revelar aspectos distintos da
+dinâmica política no congresso brasileiro, contribuindo para um melhor entendimento
+deste complexo sistema.
+No contexto do congresso dos Estados Unidos da América, diversos estudos tra-
+tam da rede de cosponsorship onde um parlamentar declara seu apoio publicamente a
+um projeto de lei proposto por outro parlamentar, mesmo antes do projeto ser subme-
+tido à votação[Kessler and Krehbiel 1996, Fowler 2006]. Estas redes são inerentemente
+direcionadas, pois um deputado declara apoio a um outro (que por sua vez pode declarar
+apoio ao primeiro). Entretanto, redes de cosponsorship não são viáveis de serem cons-
+truídas no contexto brasileiro, tendo em vista o sistema político nacional e as informações
+disponíveis publicamente. Apesar disto, a rede de coautoria considerada no presente tra-
+
+balho certamente está relacionada às redes de cosponsorship, pois a coautoria em uma
+proposição de lei pode ser vista como um apoio mútuo entre dois coautores da proposição.
+3. Criação da rede
+Os dados utilizados neste trabalho foram extraídos da API de Dados Abertos da Câmara
+dos Deputados e do Repositório de dados eleitorais do Tribunal Superior Eleitoral. Ambas
+são iniciativas de dados abertos do governo brasileiro, visando uma maior transparência
+sobre o funcionamento da máquina pública.
+Em particular, foram extraídas informações sobre as proposições de lei criadas ou
+aprovadas em uma determinada legislatura, informações pessoais dos parlamentares dessa
+legislatura, informações oficiais de cada partido e também os cargos ocupados por cada
+um dos membros do congresso no intervalo de tempo definido. Tanto proposições de lei
+tramitadas quanto não tramitadas foram consideradas, com foco nas proposições do tipo
+Projeto de Emenda Constitucional e Projeto de Lei e suas variações. Em particular, foram
+extraídas e avaliadas 12.190 proposições de lei, cada qual com um determinado número
+de coautores. O conjunto de proposições de lei será representado por P e Cp representa o
+conjunto de coautores da proposição de lei p ∈P.
+A figura 1 mostra a distribuição do número de coautores das proposições de lei.
+Vale notar que o número médio de coautores é de 1.95, enquanto os valores mínimo e
+máximo são, respectivamente, de 1 e 37. A distribuição indica que o número de coautores
+em proposições de lei possui cauda pesada, com algumas proposições contendo muito
+mais coautores que a média. A proposição com mais coautores é a PEC139/3391, que
+trata sobre a concessão ou não de anistia ao policial que coordenou a Operação Policial
+Satiagraha.
+Figura 1. Nove proposiç ões (0,04% do total) possuem mais de 20 coautores
+O conjunto de vértices da rede, representado por V, representa os deputados fede-
+rais que possuíram mandato ativo no intervalo escolhido. Desses deputados foram coleta-
+dos os atributos disponíveis na API governamental e que comumente são utilizados para
+análise de redes sociais políticas, como os estudos que serão referenciados ao longo deste
+trabalho. Sendo assim, cada um desses vértices possui os atributos descritos na tabela 1.
+Cada proposição de lei p ∈P dá origem a um clique no qual os vértices corres-
+pondem aos coautores da proposição, ou seja, Cp. Desta forma, a rede é formada por uma
+união de cliques. Além disso, um determinado par de deputados pode ser coautor em mais
+de uma proposição de lei. Esta informação será codificada no peso da aresta, wi,j. Em
+
+Tabela 1. Atributos coletados dos deputados
+Atributo
+Tipo
+Número de categorias
+Nome
+Texto
+-
+Idade
+Inteiro
+-
+Partido
+Categórico
+27
+UF
+Categórico
+28
+Escolaridade
+Categórico
+6
+Etnia
+Categórico
+4
+Sexo
+Categórico
+2
+particular, podemos definir esse peso de aresta da seguinte forma:
+wi,j =
+X
+p∈P
+1(i, j ∈Cp)
+(1)
+onde 1(·) é a função indicadora que retorna 1 se a condição é verdadeira e 0 caso contrário.
+Repare que wi,j = 0 se e somente se i, j ∈V não foram coautores em um mesmo projeto
+de lei.
+O grau do vértice i, definido como di = P
+j∈V 1(wi,j > 0) representa o número
+de coautores do deputado i considerando todos as proposições de lei. Por fim, wi =
+P
+j∈V wi,j denota o peso do vértice i ∈V que representa o número de coautorias do
+deputado i considerando todos as proposições de lei (contando um mesmo coautor mais
+de uma vez).
+É importante ressaltar que outros trabalhos utilizam o conceito de cosponsorship
+para formação da rede de deputados, que neste caso é direcionada e as arestas representam
+o apoio formal que um congressista oferece a outro [Fowler 2006]. Este é o caso do
+congresso dos EUA, por exemplo. Todavia, esse tipo de abordagem é inviável no caso
+brasileiro devido a não discriminação explícita por entre os autores e coautores de uma
+proposição de lei. Assim sendo, todo trabalho foi desenvolvido sem a discriminação entre
+um autor e um coautor de um projeto de lei.
+4. Caracterização da Rede
+O estudo da estrutura da rede se faz importante para entender o contexto geral da interação
+entre deputados e estabelecer um panorama sobre a coautoria de projetos no Brasil. Além
+disso, um estudo inicial destas características permite um primeiro olhar sobre assimetrias
+e disparidades entre os parlamentares brasileiros.
+Um primeiro aspecto interessante é o número de vértices presentes na rede.
+Ao contrário dos 513 vértices esperados, número de deputados federais previstos na
+Constituição, na legislatura 55 houve um total de 633 agentes que participaram do con-
+gresso. Esse maior número ocorre devido a posse de suplentes, causada por casos de
+parlamentares que abriram mão de sua posição para concorrer a outros cargos e também
+de parlamentares que tiveram seu mandato cassado. Essa discrepância mostra que, entre
+os anos de 2015 e 2018, aproximadamente 23% dos agentes envolvidos no desenvolvi-
+mento de proposições de lei não eram representantes eleitos diretamente pelo povo.
+A figura 2 apresenta a distribuição de grau dos vértices, que apresenta uma cauda
+pesada (alguns vértices possuem grau muito maior do que a média). Note que cerca de
+
+Tabela 2. Propriedades da rede de coautoria.
+Característica
+Valor
+Vértices, Arestas
+633, 4985
+Densidade
+2,49%
+Coeficiente de clusterização
+0.39
+Tamanho da maior componente conexa (percentual)
+356 (56%)
+Vértices com grau maior que zero
+360
+Grau (menor, médio, maior)
+0, 15,7, 101
+Peso de aresta (menor, médio, maior)
+1, 1,48, 15
+Figura 2.
+Distribuiç ão empírica
+complementar
+cumulativa
+dos graus da rede.
+Figura 3.
+Distribuiç ão empírica
+complementar cumulativa do
+peso dos vértices da rede.
+50% dos parlamentares tiveram menos de 20 coautores em projetos e destes 43% possuem
+grau zero. O maior grau da rede, de valor 101, pertence ao deputado Alberto Fraga,
+membro do partido DEM e representante do Distrito Federal. Esse parlamentar já ocupou
+os cargos de vice líder dos partidos PMDB, PFL e DEM, o que justifica sua posição de
+destaque. Esta análise ilustra a forte assimetria existente no processo de coautoria de
+proposições de lei desta legislatura.
+A figura 3 apresenta a distribuição do peso dos vértices. Esta distribuição se as-
+semelha à distribuição de grau, contando porém com uma cauda pesada mais acentuada.
+Observando essa métrica podemos notar que apenas 10% dos deputados concentram 50%
+dos pesos da rede. Ainda, entre os 5 vértices com maior peso (Evair de Melo, Vitor Lippi,
+Pedro Uczai, e João Henrique Caldas), todos que se candidataram foram reeleitos para
+mandato na legislatura 56 (2019-2022). Esse resultado permite uma primeira inferência
+sobre a existência de correlação entre a relevância do parlamentar no processo de co-
+autoria e seu desempenho no processo eleitoral, correlação esta que poderá ser melhor
+investigada em trabalhos futuros.
+4.1. Estudo dos atributos da rede
+Com exceção do número de deputados por região, que possui número fixo definido com
+base na população de cada estado da federação, a maior parte dos atributos coletados
+apresentam grande assimetria em suas distribuições.
+Na legislatura 55, dos 35 partidos existentes, apenas 5 (MDB, PT, PP, PSDB e
+DEM) englobavam mais de 50% dos vértices da rede. Levando em consideração o peso
+incidente dos vértices essa concentração fica também evidente, com 41% do peso do grafo
+
+incidindo sobre vértices de apenas três partidos (PT, DEM, PSB). Além disso, é possível
+notar grande polarização entre os partidos DEM (oposição conservadora) e PT (partido
+governista de esquerda) por meio da visualização da rede apresentada na figura 4 (gerada
+pelo openOrd [Martin et al. 2011]).
+Figura 4.
+Rede de coautoria dos deputados com cores indicando partidos
+políticos (PT em vermelho e DEM em laranja).
+Por fim, outras fortes discrepâncias entre a distribuição das características dos
+membros na Câmara e da população brasileira foram encontradas. Apesar de represen-
+tarem 52% do eleitorado brasileiro, apenas 10% dos congressistas são do sexo feminino.
+De forma semelhante, negros e pardos somam aproximadamente 51% da população bra-
+sileira, porém compõem apenas 25% dos deputados atuantes nesta legislatura.
+5. Análise da homofilia
+A homofilia pode ser mensurada a partir de diferentes atributos dos deputados, tais como
+atributos pessoais como etnia, escolaridade e gênero, e atributos externos, tais como par-
+tido político e estado de origem. Não obstante, avaliaremos também a homofilia dos
+diferentes valores desses atributos.
+5.1. Métrica de homofilia
+Para mensurar a homofilia dos atributos da rede será utilizada a métrica de modularidade
+proposta por Newman [Newman 2018]. Esta métrica captura a homofilia utilizando a
+relação entre a fração de arestas com as duas pontas incidindo em vértices que possuem
+uma determinada característica e a fração de arestas com ao menos uma ponta incidindo
+em um vértice com esta mesma característica. Quanto menor for esta diferença, maior
+será a homofilia.
+A métrica originalmente proposta não considera redes com peso e será adaptada
+neste trabalho pra este caso. Além disso, vértices nestes trabalho possuem diferentes atri-
+butos (ex. partido e sexo) que possuem diferentes valores (ex. Rio de Janeiro e Masculino,
+
+respectivamente), e a notação a ser introduzida irá refletir esta dimensão. Seja A o con-
+junto de atributos de cada vértice da rede. Seja a ∈A um destes atributos, e defina Ra o
+conjunto de valores que o atributo a pode assumir. Seja ga(i) o valor do atributo a ∈A
+do vértice i ∈V , e repare que ga(i) ∈Ra.
+Seja a ∈A um atributo e r ∈Ra um de seus valores. Defina as duas seguintes
+funções:
+x(a, r) =
+1
+2W
+X
+i∈V
+X
+j∈V
+wi,j1(ga(i) = r)1(ga(j) = r),
+(2)
+y(a, r) =
+1
+2W
+X
+i∈V
+X
+j∈V
+wi,j1(ga(i) = r),
+(3)
+onde 1(·) é a função indicadora, que vale 1 quando a condição é verdadeira e 0
+caso contrário, e W = P
+ij wi,j a soma dos pesos das arestas da rede. Repare que x(a, r)
+denota a fração de peso das arestas que tem suas duas pontas em vértices com o mesmo
+valor r para o atributo a. Repare ainda que y(a, r) denota a fração de peso das arestas que
+possuem ao menos uma ponta em vértices com o valor r para o atributo a. Desta forma,
+temos que x(a, r) ≤y(a, r).
+Finalmente, a modularidade do atributo a denotada por Qa, é definida como:
+Qa =
+X
+r∈Ra
+(x(a, r) −y(a, r)2)
+(4)
+Esta métrica relaciona o observado empiricamente na rede (valor de x(a, r)) com o valor
+caso as pontas de arestas fossem conectadas ao acaso (valor de y(a, r)2) [Newman 2018].
+5.2. Homofilia na rede
+Conforme exposto pega figura 5, os atributos de partido e região apresentaram uma influ-
+encia significativa na homofilia do processo de coautoria de proposições de lei, enquanto
+características como sexo, etnia e escolaridade se mostrarem praticamente irrelevantes.
+Figura 5. Medida de homofilia das características coletadas
+Esse resultado permite inferir que, no cenário brasileiro, agrupamentos políticos
+ideológicos e regionais são capazes de sobrepor a predisposição apontada pela teoria so-
+cial de minorias de colaborarem de forma mais significativa entre si.
+
+Figura 6.
+Modularidade dos parti-
+dos políticos
+Figura 7. Modularidade das regiões
+5.3. Homofilia condicionada a atributos
+Dado que partido e região foram os atributos mais influentes em relação a homofilia,
+explorou-se a natureza inter grupo desses atributos de modo a descobrir como se compor-
+tam deputados de diferentes regiões e partidos.
+Em relação aos partidos nota-se,conforme a figura 6, que a homofilia está concen-
+trada principalmente em três partidos: DEM, PT e PSB. O destaque para os partidos DEM
+e PT são significativos pois podem ser interpretados como a existência de uma base coesa
+tanto no aspecto governista quanto no aspecto em um dos principais partidos de oposição.
+Em relação ao atributo de região, destaca-se, como pode ser visto na figura 7,a
+homofilia na região Sul do país. Dois de seus três estados (RS e PR) possuem algumas
+das maiores homofilias da rede, além do fato de que a ligações entre seus três estados
+membros apresentam pesos médios de arestas maiores do que a rede de maneira geral.
+5.4. Homofilia individual dos vértices
+Visando o estabelecimento de uma métrica local de homofilia que possa ser atribuída aos
+vértices, definiu-se uma adaptação da fórmula de modularidade de Newman apresentada
+anteriormente. Intuitivamente, esta métrica compara a homofilia entre o vértice e seus
+vizinhos com a homofilia da rede. Desta forma, um vértice pode exibir uma homofilia
+maior ou menor do que a homofilia presente na rede como um todo.
+Considere um atributo a ∈A e um vértice i ∈V . Defina a seguinte função:
+x′(a, i) = 1
+Wi
+X
+j∈V
+wi,j1(ga(i) = ga(j)),
+(5)
+onde Wi = P
+j wi,j é a soma dos pesos das arestas incidente ao vértice i. Repare que
+x′(a, i) denota a fração de peso que o vértice i possui com vizinhos que tem o mesmo
+valor no atributo a.
+A definição acima é comparada com a fração de peso da rede como um todo,
+dando o origem a seguinte definição para homofilia de um vértice:
+Q
+′
+i,a = x′(a, i) −x(a, ga(i))
+(6)
+
+Repare que Q
+′
+i,a é um valor no intervalo [−1, 1] indicando que um vértice pode possuir
+uma homofilia mais forte ou mais fraca que a homofilia da rede no atributo a. Por fim,
+podemos definir a homofilia de um vértice considerando todos os atributos da rede, através
+da seguinte soma:
+Q
+′
+i =
+X
+a∈A
+Q
+′
+i,a
+(7)
+Novamente, repare que Q
+′
+i pode assumir valores positivos ou negativos, indicando se o
+vértice i possui uma homofilia mais ou menos acentuada que a homofilia da rede.
+A figura 8 apresenta a homofilia dos vértices segundo a métrica acima (ordenadas
+da menor para a maior). Nota-se que a grande maioria dos deputados apresenta baixo grau
+de homofilia, seja de forma negativa ou positiva, mas próximas a zero. Em particular, ape-
+nas 142 (22%) apresentam significativa influência das características dos parlamentares
+no processo formação de coautores.
+Figura 8.
+Distribuiç ão da modularidade individual dos vértices (excluindo
+vértices de grau zero)
+Condicionando essa distribuição aos atributos de região e partido, obtermos res-
+pectivamente as figuras 9 e 10. Nota-se que esses dois atributos, que figuram como os
+de maior influência homofílica da rede, possuem distribuições semelhantes e com muito
+menos parlamentares apresentando valores negativos ou insignificantes.
+Figura 9. Distribuiç ão de modulari-
+dade dos deputados condici-
+onada à região
+Figura 10. Distribuiç ão de modula-
+ridade dos deputados condi-
+cionada ao partido
+
+Tabela 3. Deputados com maiores homofilia condicionada a atributos
+-
+1o
+2o
+3o
+Geral
+BENEDITA DA SILVA
+GIUSEPPE VECCI
+DANRLEI HINTERHOLZ
+Escolaridade
+ASSIS MELO (EM comp.)
+HERCULANO PASSOS (EM comp.)
+JO ÃO RODRIGUES (EM comp.)
+Etnia
+BENEDITA DA SILVA (negra)
+IZAQUE SILVA (parda)
+CARLOS ANDRADE (pardo)
+Partido
+JUNIOR MARRECA (PATRI)
+DELEGADO FRANCISCHINI (PATRI)
+JO ÃO MORAES (PCdoB)
+Sexo
+SIMONE MORGADO (F)
+D ÂMINA PEREIRA (F)
+BENEDITA DA SILVA (F)
+Região
+L ÁZARO BOTELHO (TO)
+EZEQUIEL FONSECA (MT)
+CARLOS BEZERRA (MT)
+Os três deputados com menor homofilia partidária (Benedita da Silva, Reginaldo
+Lopes e Carlos Zarattini) pertencem ao PT, um dos partidos com maior homofilia média
+da rede. Dada essa observação, é possível inferir que mesmo em grupos significativa-
+mente coesos existem agentes independentes em suas articulações políticas, que muitas
+vezes levam mais em consideração em sua escolha de coautores a outras de suas carac-
+terísticas (atributos) cuja homofilia é maior.
+Ainda, organizou-se na tabela 3 os três deputados com maior homofilia em cada
+um dos atributos analisados. A parlamentar com maior comportamento homofílico é
+Benedita da Silva, mulher negra que teve como coautoras apenas outras duas mulheres
+também negras (Rosangela Gomes e Tia Eron). Este resultado indica que, apesar de
+não ser válido para a Câmara dos Deputados como um todo, a proposição de Huddy
+[Huddy 2004] sobre maior coesão entre minorias se aplica em casos individuais. Não
+obstante, esse resultado corrobora com a hipótese de que características muito homofílicas
+de agentes individuais (sexo e etnia) são capazes de sobrepujar características que são
+dominantes em influência na rede (partido).
+6. Conclusão e trabalhos futuros
+A proposição e aprovação de leis é provavelmente a tarefa mais importante da Câmara
+dos Deputados. Tendo em vista que as 513 cadeiras do congresso brasileiro são ocupadas
+por membros de 26 diferentes estados e 35 diferentes partidos (atualmente), além dos de-
+putados serem de diferentes etnias e terem diferentes graus de escolaridade, a articulação
+política no processo de proposição e aprovação de leis se torna fundamental.
+Este trabalho explorou a rede de coautoria dos projetos de lei para caracterizar
+a homofilia e assimetria inerente deste processo. Uma metodologia para quantificar a
+homofilia da rede e também do vértice (com relação a um atributo) foi desenvolvida e
+aplicada. A rede, construída a partir da fusão de dados públicos, com vértices represen-
+tando deputados com 5 diferentes atributos e arestas com peso representando coautoria
+entre dois deputados, foi avaliada.
+Dentre os principais resultados está a diferente homofilia entre os atributos da
+rede, com partido e estado exibindo a maior homofilia, e etnia e grau de escolaridade
+praticamente nenhuma homofilia. Outro importante descobrimento foi a alta assimetria na
+homofilia de diferentes valores de atributos. Por exemplo, ao considerar partido político,
+três partidos (de 27) possuem alta homofilia e mais de 20 possuem homofilia desprezível.
+Esta observação vai de encontro a teoria da homofilia das minorias, que diz que minorias
+tendem a possuir homofilia mais alta do que grupos majoritários.
+Diferentes estudos podem ser elaborados como decorrência deste trabalho. Em
+particular, um melhor entendimento da ausência de homofilia entre as minorias, e a
+
+identificação de indivíduos mais influentes por conta de alta homofilia.
+Referências
+Baptista, V., Brito, F., Brasileiro, J., Duarte, A. N., Bezerra, E. P., Almeida, F., Lima,
+P., and Guimaraes, S. (2014). Uma ferramenta para analisar mudanças na coesao en-
+tre parlamentares em votaçoes nominais. In Brazilian Workshop on Social Network
+Analysis and Mining (BraSNAM).
+Bursztyn, V. S., Nunes, M. G., and Figueiredo, D. R. (2016). How congressmen con-
+nect: analyzing voting and donation networks in the brazilian congress. In Brazilian
+Workshop on Social Network Analysis and Mining (BraSNAM).
+Ferreira, C. H. G., de Sousa Matos, B., and Almeira, J. M. (2018). Analyzing dynamic
+ideological communities in congressional voting networks. In International Confe-
+rence on Social Informatics, pages 257–273.
+Fowler, J. H. (2006).
+Connecting the congress: A study of cosponsorship networks.
+Political Analysis, 14(4):456–487.
+Huddy, L. (2004). Contrasting theoretical approaches to intergroup relations. Political
+Psychology, 25(6):947–967.
+Kessler, D. and Krehbiel, K. (1996). Dynamics of cosponsorship. American Political
+Science Review, 90(3):555–566.
+Levorato, M. and Frota, Y. (2017). Brazilian congress structural balance analysis. arXiv
+preprint arXiv:1609.00767.
+Madan, A., Farrahi, K., Gatica-Perez, D., and Pentland, A. S. (2011). Pervasive sensing
+to model political opinions in face-to-face networks. In Inter. Conference on Pervasive
+Computing, pages 214–231.
+Martin, S., Brown, W. M., Klavans, R., and Boyack, K. (2011). Openord: An open-source
+toolbox for large graph layout. SPIE Conference on Visualization and Data Analysis
+(VDA).
+Miguel, L. F. (2003). Capital político e carreira eleitoral: algumas variáveis na eleição
+para o congresso brasileiro. Revista de Sociologia e Política, 20.
+Miguel, L. F., Marques, D., and Machado, C. (2015). Capital familiar e carreira política
+no brasil: gênero, partido e região nas trajetórias para a câmara dos deputados. DADOS
+- Revista de Ciências Sociais, 58(3):721–747.
+Newman, M. (2018). Networks. Oxford.
+Nicolau, J. (2002). Como controlar o representante?: Considerações sobre as eleições
+para a câmara dos deputados no brasil. DADOS - Revista de Ciências Sociais, 45:219–
+236.
+Seder, J. P. and Oishi, S. (2009). Ethnic/racial homogeneity in college students’ facebook
+friendship networks and subjective well-being. Journal of Research in Personality,
+43(3):438 – 443.
+Verona, L., Oliveira, J., da Cunha Hisse, J. V., and Campos, M. L. M. (2018). Metrics for
+network power based on castells’ network theory of power: a case study on brazilian
+elections. Journal of Internet Services and Applications, 9(1):23.

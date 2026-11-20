@@ -1,0 +1,479 @@
+Análise das Publicações de Mídias Alternativas
+Compartilhadas em Páginas Políticas do Facebook
+Sabrina G. Fermano1, Filipe N. Ribeiro1
+1Instituto de Ciências Exatas e Aplicadas - Universidade Federal de Ouro Preto (UFOP)
+Caixa Postal 24 – CEP 35.931-008 – João Monlevade – MG – Brazil
+sabrina.fermano@aluno.ufop.edu.br, filipe.ribeiro@ufop.edu.br
+Abstract. This study aims at analyzing link posts on Facebook pages, focusing
+on alternative media shared between January and October 2022. The rese-
+arch specifically targets pages aligned with left and right political leaning, using
+data collected through the CrowdTangle platform. The methodology encompas-
+ses data collection, pre-processing, and topic modeling employing the Latent
+Dirichlet Allocation (LDA) algorithm. The findings reveal shifts in the most dis-
+cussed topics before the electoral period (January to July 2022) and during it
+(August to October 2022), with an emphasis on the increase in the Elections
+topic during the electoral period.
+Resumo. Este estudo propõe uma análise das publicações de links em páginas
+de mídias alternativas no Facebook, compartilhadas no período de janeiro a
+outubro de 2022, ano das eleições presidenciais brasileiras. O estudo foca em
+páginas de orientação política de esquerda e direita, utilizando dados coletados
+por meio do CrowdTangle. A metodologia envolve coleta, pré-processamento
+e modelagem de tópicos com o algoritmo Latent Dirichlet Allocation (LDA).
+Os resultados revelam mudanças nos temas mais discutidos antes do período
+eleitoral (janeiro a julho de 2022) e durante (agosto a outubro de 2022), com
+destaque para o significativo aumento do tópico Eleições durante o período
+eleitoral.
+1. Introdução
+Em 2022, o Instituto Brasileiro de Geografia e Estatística (IBGE) revelou dados sobre
+o panorama digital no Brasil. Dos 185, 4 milhões de indivíduos com 10 anos ou mais,
+87, 2% utilizaram a Internet, sendo o telefone móvel celular o meio preferido para esse
+acesso, atingindo 98, 9% de utilização. Adicionalmente, o engajamento em redes sociais
+se destacou, com 83, 6% das pessoas conectadas a essas plataformas [IBGE 2023].
+Dentro desse contexto digital, as redes sociais surgem como um terreno fértil
+para o crescimento de mídias alternativas. Essas plataformas não apenas possibilitam
+a disseminação eficiente de informações de diversas categorias a uma ampla audiência,
+mas também se mostram como opções acessíveis [Laurett and Ribeiro 2022].
+Contudo, essa expansão do cenário informativo não está isenta de desafios. Um
+deles é a influência dos algoritmos, os quais, embora exponham o individuo a conteúdo di-
+versificado, também tendem a direcioná-lo para informações que confirmam suas crenças
+e opiniões, aumentando a probabilidade de viés nos conteúdos das mídias alternati-
+vas [Bakshy et al. 2015]. Outro desafio é que pessoas mais receptivas a informações
+
+falsas tendem a compartilhá-las mais [Pennycook and Rand 2020], contribuindo para a
+propagação da desinformação. Esses desafios, somados à dificuldade de monitoramento
+automatizado e eficiente do imenso volume de publicações, representam obstáculos para
+a coexistência pacífica e a compreensão mútua na sociedade contemporânea.
+Em síntese, a interconexão entre o acesso maciço à Internet, a influência das redes
+sociais, o crescimento de mídias alternativas e os desafios associados à disseminação de
+informações enviesadas e desinformação delineiam um panorama complexo e relevante
+para análises críticas no ambiente digital contemporâneo. Nesse contexto, o presente
+estudo combinou técnicas de mineração de dados e processamento de linguagem natural
+para analisar a discussão política conduzida pelas mídias alternativas no Facebook no ano
+eleitoral de 2022. O Facebook foi escolhido como plataforma de análise devido à sua
+vasta base de usuários e à acessibilidade dos dados através da ferramenta CrowdTangle.
+A análise conduzida inclui a caracterização da base de dados coletada, bem como a
+identificação dos tópicos mais discutidos nas postagens do tipo Link por meio da aplicação
+de técnicas Latent Dirichlet Allocation (LDA). Os resultados mostram que houve au-
+mento expressivo na abordagem dos temas político/eleitorais durante o período eleitoral,
+tanto por parte da direita quanto da esquerda. Adicionalmente, notou-se que dentre as
+principais mídias alternativas da direita destaca-se a presença de canais com foco em ou-
+tros segmentos como concursos públicos e religiosos, o que pode facilitar o alcance do
+conteúdo político a público que não busca este tipo de conteúdo diretamente. Ainda como
+contribuição deste trabalho, o código-fonte, os links, páginas e tópicos classificados pelo
+LDA serão disponibilizados para pesquisadores mediante solicitação.
+2. Revisão Teórica
+Ao analisar a interseção entre política, mídia e sociedade na era digital, uma série de
+estudos proporcionam uma compreensão das dinâmicas contemporâneas. A teoria da
+agenda-setting destaca como a mídia influencia a importância atribuída a determina-
+dos tópicos na agenda pública, moldando assim as percepções e prioridades da soci-
+edade [Martins 2012]. Nesse mesmo contexto, [Benkler et al. 2018] examinam como
+mídias moldam a narrativa política e influenciam a opinião pública, abordando padrões de
+manipulação e desinformação e o papel das redes sociais na radicalização e promoção de
+agendas, especialmente durante períodos eleitorais e momentos de polarização política.
+À medida que o cenário midiático se torna mais complexo, a compreensão e
+antecipação de estratégias de manipulação só podem ser alcançadas por meio do de-
+senvolvimento de métodos que examinem os meios de comunicação de forma abran-
+gente [Faris et al. 2017].
+Por isso, [Faris et al. 2017] examinam como diversas fon-
+tes de informação na internet, incluindo as mídias alternativas, foram utilizadas para
+promover agendas políticas específicas, disseminar notícias falsas e polarizar o eleito-
+rado. Eles investigam o impacto dessas atividades na formação de opinião pública e
+na dinâmica do processo eleitoral dos Estados Unidos.
+Dentro do mesmo contexto,
+[Reis and Benevenuto 2022] investigam se existe um conjunto de atributos que pode ser
+útil para a geração de modelos que sejam capazes detectar desinformação, com base em
+um conjunto de dados do período das eleições presidenciais nos Estados Unidos em 2016
+e no Brasil em 2018.
+No âmbito metodológico, a aplicação da modelagem de tópicos LDA revela-se
+
+valiosa em diferentes contextos de pesquisa.
+No estudo sobre a análise de petições
+eletrônicas, [Hagen 2018] destaca a alta interpretabilidade do LDA e sua capacidade de
+identificar tópicos multifacetados. [Kozlowski et al. 2022] utiliza o LDA para examinar as
+dinâmicas do comércio global, expondo padrões distintos de especialização de produtos
+entre países. Já [Pereira et al. 2022] emprega o modelo LDA para analisar os conteúdos
+de links de vídeos do YouTube compartilhados em grupos do Telegram e WhatsApp. A
+análise é organizada pela data de compartilhamento dos links em cada plataforma, permi-
+tindo uma compreensão dos termos relevantes em cada período e se há repetição ao longo
+do tempo. Esse método proporciona uma visão dos termos relevantes em cada período,
+além de verificar a similaridade dos termos no WhatsApp e no Telegram.
+3. Metodologia
+3.1. Coleta
+Para a condução deste estudo, efetuou-se a coleta de postagens entre 01 de janeiro de 2022
+e 30 de outubro de 2022, provenientes de páginas brasileiras classificadas com posição
+política de direita ou esquerda no contexto da pesquisa sobre discurso de ódio em páginas
+do Facebook [Guimarães et al. 2020]. Foram analisadas 78 páginas, sendo 35 identifica-
+das com uma tendência política de direita, enquanto 43 apontavam para a esquerda.
+Os dados foram coletados através da plataforma CrowdTangle1, uma ferramenta
+de análise de dados públicos da Meta que simplifica o monitoramento, análise e relatório
+de eventos relacionados ao conteúdo público nas redes sociais [CrowdTangle 2022]. A
+aplicação apresenta uma funcionalidade de dados históricos que disponibiliza até 300.000
+postagens realizadas em um período pré-selecionado em formato CSV. Ressalta-se que a
+coleta inclui apenas postagens públicas, realizadas por páginas de mídias alternativas no
+Facebook. Todas as análises realizadas foram feitas de forma anonimizada, isto é, não
+foram consideradas informações pessoais ou sensíveis de quaisquer usuários.
+A estrutura de extração disponibilizada pela aplicação oferece diversas
+informações, das quais foram utilizadas os seguintes campos:
+• Type, indicando a categoria da postagem.
+• Post Created Date, empregado para identificar o mês de criação da postagem, pos-
+sibilitando a diferenciação entre o conteúdo veiculado antes e durante o período
+eleitoral.
+• Link, fornecendo a URL postada. Quando a URL é encurtada, a versão original
+é apresentada no campo Final Link. Ambos utilizados para determinar o domínio
+ao qual o link postado pertence.
+• Link Text, contendo o título do link postado, geralmente correspondente ao título
+da página em questão. Seu conteúdo foi empregado na modelagem dos tópicos.
+Essas informações desempenharam um papel importante na análise do conteúdo
+das postagens durante o desenvolvimento deste estudo.
+3.2. Pré-Processamento
+O processo de pré-processamento dos dados envolveu várias etapas para garantir a quali-
+dade e coerência dos tópicos gerados pelo LDA. Inicialmente, foi conduzida uma análise
+1https://www.crowdtangle.com
+
+das fontes de informação, priorizando a relevância e a coesão temática com o escopo do
+estudo. Observou-se que fontes como o Campo Grande News e o Notícias Concursos
+continham grande quantidade de postagens sobre temas muito específicos, como bole-
+tins diários de trânsito local e publicações de editais de concursos com um padrão muito
+bem definido. Decidiu-se então por filtrar tais conteúdos por representarem percentual
+relevante do total de postagens.
+Em seguida, os nomes próprios foram concatenados aos seus sobrenomes, a exem-
+plo de Paulo, que poderia referir-se a Paulo Freire, Paulo Guedes ou Paulo Gustavo. Além
+disso, consideraram-se variações de entidades, como a cidade de São Paulo, mencionada
+também como S. Paulo ou SP. Essas medidas visam facilitar a identificação específica
+dos elementos que compõem cada tópico, contribuindo para reduzir ambiguidades na
+interpretação.
+No contexto dos títulos das publicações, foi realizado um refinamento, de modo
+a identificar e suprimir termos desnecessários, como ”Fotos” e ”Vídeos”, além de ex-
+pressões do tipo ”Veja o vídeo”. Simultaneamente, conduziu-se a remoção de stopwords,
+os quais são termos comuns e pouco informativos. Por fim, assegurou-se a uniformidade
+e coesão nos dados, eliminando caracteres especiais, números e pontuações.
+3.3. Modelagem de Tópicos
+A fim de evidenciar os temas predominantes nos títulos de links compartilhados por
+páginas de orientação política de esquerda e direita no Facebook, recorreu-se ao algo-
+ritmo LDA. Esse algoritmo oferece uma abordagem probabilística para identificar tópicos
+subjacentes em um conjunto de documentos, gerando uma distribuição de palavras-chave
+associadas a cada tópico, juntamente com sua probabilidade de ocorrência [Hagen 2018].
+Contudo, a eficácia do LDA na identificação de assuntos depende da definição
+adequada do número de tópicos para a base de dados. A seleção desse parâmetro é um
+processo importante que impacta diretamente a qualidade do modelo e a interpretabilidade
+dos tópicos gerados [AlSumait et al. 2009]. Para orientar essa decisão, foi utilizada a
+métrica de Coerência CV , uma abordagem quantitativa que avalia a interpretabilidade dos
+tópicos gerados pelo LDA, considerando a força semântica e a coesão das palavras-chave
+em cada tópico, [Röder et al. 2015].
+Para determinar o número ótimo de tópicos, a coerência CV é calculada a par-
+tir de modelos LDA treinados com diferentes números de passos e tópicos. Seguindo
+a recomendação de [Hagen 2018], optou-se por limitar o número de tópicos a 50, uma
+medida preventiva para garantir a viabilidade da análise dos tópicos por especialistas hu-
+manos. A fim de encontrar o melhor valor, variou-se o número de tópicos em incrementos
+de 5 e a cada variação, o modelo LDA era ajustado com números de passos de 10 a 100,
+com incrementados a cada 10. Tal abordagem visou aprimorar a qualidade e a estabilidade
+da geração de tópicos. O resultado desse processo é apresentado no gráfico da Figura 1.
+Uma pontuação mais elevada de Coerência CV indica uma forte associação
+semântica entre as palavras em um tópico, contribuindo para uma interpretação mais clara
+e significativa [Röder et al. 2015]. Analisando a Figura 1, observou-se que o número ideal
+de tópicos para os dados da esquerda é de 50 tópicos, com 10 passos. Para a direita, em-
+bora tenha apresentado estabilidade em relação à coerência, um menor número de tópicos
+resultou em uma mistura de temas, como eleições e política, dificultando a distinção entre
+
+eles. Sendo assim, concluiu-se que o número ideal de tópicos é 35, com 10 passos. As
+pontuações de Coerência CV para esses pontos ótimos foram de 0, 521 para o corpus da
+direita e 0, 493 para o da esquerda.
+Figura 1. Coerência Por Nº De Tópicos
+Após definir o número ótimo de tópicos para o LDA, dividiu-se a base de dados
+de cada posição entre período pré-eleitoral (janeiro a julho de 2022) e eleitoral (agosto a
+outubro de 2022) [TSE 2022], que foi quando passou a ser permitido propaganda eleitoral,
+inclusive via internet. Por fim, foi executado o algoritmo gerando tópicos para cada época.
+3.4. Rotulagem dos Tópicos
+No processo de atribuição de rótulos aos tópicos, utilizou-se uma abordagem de especia-
+listas humanos para associar significado a eles. Essa metodologia envolveu a análise dos
+tópicos gerados pelo LDA, considerando a distribuição de palavras-chave em cada um.
+Nesse processo, o especialista examinou a coesão semântica das palavras para identificar
+o tema principal de cada tópico. Essa rotulagem permitiu agregação dos tópicos em te-
+mas de forma mais ampla. A tabela 1 apresenta as categorias temáticas encontradas e as
+palavras mais relevantes associadas a cada uma.
+Tabela 1. Principais palavras associadas a cada rótulo
+Rótulo
+Palavras
+Benefícios Sociais
+’auxilio’, ’auxilio brasil’, ’beneficio’, ’cadunico’, ’valegas’
+Concurso
+’concurso’, ’edital’
+Conflitos Internacionais
+’guerra’, ’russia’, ’ucrania’
+Consulta à Documentos
+’consulta’, ’cpf’
+Direito Trabalhista
+’abono’, ’abono salarial’, ’aposentadoria’, ’beneficiarios’, ’fgts’,
+’inss’, ’pis’, ’pispasep’, ’salario’
+Economia
+’economia’, ’emprestimo’, ’imposto’, ’inflação’, ’preco’, ’renda’
+Eleições
+’campanha’, ’candidatura’, ’debate’, ’discurso’, ’eleicao’,
+’primeiro turno’, ’segundo turno’, ’urnas’, ’votar’
+Mercado de Trabalho
+’assinada’, ’carteira’, ’emprego’
+Política
+’biden’, ’bolsonaro’, ’camara’, ’congresso’, ’corrupcao’,
+’damares’, ’deputado’, ’ditadura’, ’governo’, ’lula’, ’pdt’, ’pl’,
+’politica’, ’presidente’, ’pt’, ’senado’, ’sergio moro’,’ultradireita’
+Política Internacional
+’chile’, ’cuba’, ’europa’, ’mundo’, ’venezuela’
+
+Tabela 1 continuação
+Rótulo
+Palavras
+Religião
+’cristaos’, ’deus’, ’igreja’, ’jesus’, ’pastor’
+Saúde Pública
+’covid’, ’saude’
+4. Análise dos resultados
+A coleta abrangeu 225.793 postagens, realizadas entre 01 de janeiro de 2022 e 30 de ou-
+tubro de 2022. Dessas, 87.453 pertencem à posição política de direita, enquanto 138.340
+estão relacionadas à posição política de esquerda. Esse período foi selecionado devido às
+eleições presidenciais brasileiras, culminando no dia do segundo turno da votação. É im-
+portante apontar que 10.630 registros da direita foram removidos na etapa de tratamento
+de sites específicos, como mencionado na seção 3.2.
+4.1. Caracterização dos dados coletados
+A Figura 2 apresenta as frequências das postagens por tipo de mídia para as páginas de
+posicionamento político de direita e esquerda. Destaca-se que as postagens classificadas
+como Link constituem 38, 5% do total de publicações nas páginas de direita, enquanto nas
+páginas de esquerda esse valor alcança 68, 2%. Em outro estudo conduzido para o período
+de 2018 a 2021, uma análise semelhante em uma lista comparável de páginas revelou que
+36, 28% das publicações da direita eram links, enquanto a esquerda registrava 67, 63%
+[Laurett and Ribeiro 2022]. Essa consistência ao longo do tempo sugere um padrão de
+comportamento nas páginas, indicando que as postagens do tipo Link podem ser uma
+tendência entre elas.
+Outro fato importante a ser notado é que os dez links mais referenciados são, em
+sua grande maioria, a versão web das páginas de mídias alternativas na rede social. Tal
+fato ocorre tanto na direita quanto na esquerda, podendo ser explicado por fatores como a
+possibilidade de discussão mais aprofundada sobre determinado tópico e a possibilidade
+de monetização pelo acesso à página Web. Nesta segunda hipótese, a página na rede
+social serviria como uma forma de divulgar os links e atrair visualizações das notícias e
+propagandas na página Web, gerando retorno financeiro para a mídia alternativa.
+Figura 2. Frequência Por Categoria De Mídia
+Para uma compreensão mais aprofundada das publicações do tipo Link, dado que
+é a mais utilizada por ambas as posições políticas, identificaram-se os sites aos quais elas
+
+estão vinculadas por meio dos campos Link e Final Link. Essa abordagem possibilita uma
+análise mais detalhada dos domínios preferidos pelas páginas estudadas.
+No contexto da perspectiva política de direita, é evidenciado na Figura 3 que os
+10 sites de notícias mais compartilhadas abarcam 90, 6% das publicações do tipo link,
+contribuindo com 37, 0% do total de publicações. Vale ressaltar a presença dos sites
+Notícias Concursos, responsável por 30, 1% dos links e 11, 5% das postagens, e Campo
+Grande News, que detém 29, 4% dos links e 11, 2% das publicações totais, representando
+quase o triplo do terceiro colocado, Guia-me, que contribui com 10, 4% dos links e 4, 0%
+do total.
+Figura 3. Frequência dos 10 Domínio Principais (Direita)
+Por outro lado, a esquerda concentra 75, 1% das publicações do tipo link nos 10
+domínios principais, representando aproximadamente 48, 6% do total, conforme apresen-
+tado na Figura 4. Dentro desse conjunto, destaca-se o Diário Centro do Mundo, res-
+ponsável por 19, 1% dos links e 13, 0% do total, e a Revista Fórum, com uma participação
+de 15, 6% dos links, correspondendo a 10, 6% do total de publicações.
+Figura 4. Frequência dos 10 Domínio Principais (Esquerda)
+4.2. Análise dos tópicos discutidos
+A análise dos tópicos, abrangendo os períodos pré-eleitoral (janeiro a julho de 2022) e
+eleitoral (agosto a outubro de 2022), oferece informações sobre a dinâmica e evolução
+dos temas discutidos por páginas de diferentes orientações políticas no Facebook.
+No cenário pré-eleitoral, ambas as posições políticas, abordavam uma gama diver-
+sificada de assuntos. Na direita, os três tópicos mais recorrentes foram Direito Trabalhista
+(24, 7%), Notícias Gerais (21, 5%) e Eleições (15, 4%), conforme evidenciado na Figura
+
+5. Já na esquerda (Figura 6), as discussões eram lideradas por Notícias Gerais (42, 1%),
+seguido por Política (20, 7%) e Eleições (19, 0%).
+Durante o período eleitoral, ambas as posições políticas passaram por uma
+reconfiguração, como mostram as Figuras 5 e 6. O tópico Eleições tornou-se predo-
+minante tanto para a direita (28, 1%) quanto para a esquerda (43, 8%). A direita manteve
+a relevância de Direito Trabalhista (22, 0%) e Notícias Gerais (20, 5%), enquanto teste-
+munhou um aumento de 111, 9% no tópico Benefícios Sociais (17.8%). Por sua vez, a
+esquerda apresentou um aumento para Política (26, 2%) e redução para Notícias Gerais
+(25, 5%).
+Figura 5. Frequência Por Tópico (Direita)
+Figura 6. Frequência Por Tópico (Esquerda)
+Apesar de ambos os campos políticos demonstrarem interesse na discussão de
+assuntos relacionados à política nacional desde o início do ano, com 24, 9% dos tópicos
+da direita e 39, 7% da esquerda abordando Eleições e Política, durante o período eleitoral,
+observa-se uma mudança em direção ao debate político eleitoral de ambos os lados. A
+direita teve 32, 7% de seus tópicos vinculados a Eleições e Política, enquanto a esquerda
+saltou para 70, 0% de seus tópicos centrados nessas temáticas.
+
+Ao analisar os tópicos mais abordados, nota-se uma característica peculiar às
+mídias alternativas de direita - a atuação das páginas em contextos não ligados direta-
+mente ao contexto político. Páginas que notadamente atuam em outros setores, como
+notícias regionais (Campo Grande News), religião (Gospel Prime, Gospelmente) e con-
+cursos (Notícias Concursos), acabam por se envolver na discussão política online. Desta
+forma, percebe-se, especialmente no período pré-eleitoral, ampla discussão ao redor de
+temas mais especializados como Direito Trabalhista, Religião e Benefícios Sociais por
+parte das mídias alternativas de direita. Por outro lado, as mídias alternativas da esquerda
+com maior participação nos links têm, em sua maioria, apelo político ideológico mais
+conhecido, tais como Brasil de Fato, Revista Fórum e Diário do Centro do Mundo.
+Comparativamente, os dados revelam que tanto a esquerda quanto a direita de-
+monstram um interesse consistente em temas políticos, especialmente em Eleições e
+Política. Para a direita, a mediana de interações por postagem em Política, sendo a se-
+gunda maior, é de 150, enquanto Eleições, que ocupa a quarta posição, é de 145, apenas
+duas interações a menos que o terceiro colocado, Conflitos Internacionais. Na esquerda,
+Eleições é o tópico com a maior mediana, alcançando 117 interações por postagem, en-
+quanto Política, ocupando o terceiro lugar, registra uma mediana de 94, apenas duas
+interações a menos que o segundo lugar, Notícias Gerais. Essas observações são supor-
+tadas pelos boxplots da Figura 7, que apresenta as medianas das interações por postagem
+nos tópicos para ambos os lados políticos.
+Figura 7. Interaç ões Por Tópico
+4.2.1. Enfoque nos tópicos Eleições e Política
+Durante os 10 meses de 2022 analisados, as menções aos temas de Eleições e Política em
+publicações associadas à direita e à esquerda revelam padrões distintos. A média mensal
+de referências, somando ambos, para a direita é de 27, 2%, com mínimo de 21, 6% em
+fevereiro e máximo de 36, 3% em outubro. Por outro lado, a esquerda apresenta uma
+média mensal de 48, 8%, destacando-se pela volatilidade, variando de 35, 9% em março a
+um pico de 73, 1% em outubro. Essa oscilação é evidenciada pela variabilidade expressa
+nos desvios padrão, registrando 4, 4% para a direita e 14, 9% para a esquerda.
+Ao observar o tópico específico de Eleições, a média mensal de menções pela
+direita é de 19, 2% com desvio padrão de 6, 5%. Os valores oscilam entre o menor registro
+de 13, 1% em fevereiro e o ápice de 32, 1% em outubro. A esquerda, por sua vez, possui
+
+uma média mensal de 26, 5% nas menções a Eleições, com desvio padrão de 12, 1%, indo
+de 16, 8% em março a 45, 6% em outubro.
+Quanto ao tópico Política, a média mensal de menções pela direita é de 8, 0% com
+desvio padrão de 2, 5%, mantendo uma variação mais estável entre os meses, com valores
+oscilando de 4, 3% em outubro a 10, 4% em março. Já a esquerda apresenta uma média
+mensal de 22, 4% nas menções a Política, com um desvio padrão de 3, 1%, indo de 18, 8%
+em janeiro a 27, 5% em outubro.
+Ao avaliar o comportamento da direita e da esquerda ao longo do tempo, percebeu-
+se que, enquanto ambas abordam de maneira consistente o tópico Política, as discussões
+sobre Eleições tiveram mais oscilação, especialmente para a esquerda durante o período
+eleitoral, como demonstra a Figura 8. A variabilidade ressalta como as eleições presiden-
+ciais podem desencadear mudanças nas discussões online, ressaltando a importância que
+tem sido dada por parte das mídias alternativas na discussão política nas redes sociais.
+Figura 8. Evoluç ão Mensal dos Tópicos Eleiç ões e Política em 2022
+4.2.2. Enfoque nos tópicos Eleições e Política analisando por domínio
+Ao comparar os dados da direita e da esquerda em relação ao comportamento das suas
+páginas antes e durante as eleições presidenciais de 2022, destacam-se algumas tendências
+distintas.
+No geral, ambos os espectros políticos aumentaram o engajamento com a
+temática Eleições durante o período eleitoral. No entanto, a média dos valores totais,
+composta por Eleições e Política, mostra uma diferença entre os dois grupos.
+Na direita, antes das eleições, a média dos valores totais, excluindo os valores
+zerados, foi de 38, 4%, enquanto durante, essa média subiu para 43, 2%. Dentre os si-
+tes analisados, destacam-se os três com maior variação absoluta: Campo Grande News
+(16, 19%), Gospel Prime (14, 8%) e Partido Brasil Oficial (14, 53%). Observa-se que os
+sites Imprensa Brasil e O Brasil Acordou não tiveram seus links compartilhados pelas
+
+páginas abordadas no período eleitoral. A Figura 9 apresenta os valores encontrados.
+Por outro lado, na esquerda, a média dos valores totais antes das eleições foi de
+39, 1%, e durante, essa média aumentou para 70, 3%. Entre os sites abordados, os três com
+maior variação absoluta foram: Vermelho (34, 5%), Diálogos do Sul (34, 1%) e Esquerda
+Diário (33, 0%), como ilustrado na Figura 10.
+Figura 9. Frequência Tópico Eleiç ões e Política Por Domínio (Direita)
+Figura 10. Frequência Tópico Eleiç ões e Política Por Domínio (Direita)
+É interessante observar que, enquanto a esquerda apresentou uma resposta ho-
+mogênea e consistente entre os sites, a direita demonstrou uma maior variabilidade em
+como cada domínio abordou assuntos relacionados a política nacional. Nota-se também
+que, ao passo que a esquerda aumentou tanto o tópico Eleições quanto Política, a direita
+aparenta ter migrado de Política para Eleições.
+Em resumo, ambos os espectros políticos aumentaram seu envolvimento com
+Eleições durante as eleições presidenciais de 2022, com a esquerda demonstrando um
+
+aumento mais expressivo em termos relativos, enquanto a direita exibiu uma resposta
+mais variada e moderada em comparação.
+5. Conclusão
+Nesta pesquisa, busca-se uma compreensão das estratégias de compartilhamento de links
+por páginas de mídias alternativas de direita e esquerda no Facebook, durante o período
+das eleições brasileiras de 2022.
+A análise dos resultados revelou detalhes sobre os
+padrões de comportamento dessas páginas, suas preferências de mídia e a evolução dos
+tópicos discutidos com a aproximação das eleições.
+Na caracterização dos dados coletados, destacou-se uma distinção entre as páginas
+de direita e esquerda em relação aos tipos de mídia compartilhados. A prevalência de
+links, particularmente em páginas de esquerda, sugere uma estratégia consistente e um
+interesse mais acentuado na disseminação de informações por meio dessa modalidade.
+Essa observação é reforçada pela análise dos domínios mais frequentemente compartilha-
+dos, que mostrou que as páginas de mídias alternativas tendem a compartilhar páginas
+Web homônimas, aparentemente, sob mesma administração. Tal ação permitiria discutir
+os assuntos publicados mais profundamente, além de permitir monetização por meio da
+visualização de anúncios em suas páginas.
+A análise dos tópicos publicados proporcionou uma visão mais detalhada dos as-
+suntos discutidos por ambas as orientações políticas. Antes das eleições, as páginas de
+direita abordaram grande variedade de tópicos, enquanto as de esquerda já evidenciavam
+um foco maior em Notícias gerais e Eleições. No entanto, durante o período eleitoral,
+ambas as orientações dedicaram mais espaço para o tema Eleições, que figurou dentre os
+tópicos que atraíram maior engajamento da audiência. Percebeu-se também que boa parte
+dentre as principais mídias alternativas de direita não têm como foco o debate político
+ideológico, mas outros assuntos como temas religiosos, concursos e notícias regionais.
+Tal situação ocasionaria, em teoria, uma vantagem em relação às mídias alternativas de
+esquerda, permitindo à direita alcançar um público que não busca o conteúdo político
+diretamente, mas acaba consumindo.
+Ao analisar por domínio, notam-se padrões distintos. As páginas de direita, em-
+bora tenham aumentado o engajamento no âmbito da política nacional durante o período
+eleitoral, exibiram uma resposta mais variada entre os diferentes sites. Em contraste, as
+páginas de esquerda demonstraram uma resposta coesa, indicando uma estratégia mais
+uniforme em abordar temas políticos durante as eleições.
+Em síntese, este estudo integrou técnicas de mineração de dados e análise de
+tópicos a uma visão detalhada da comunicação política por parte das mídias alternativas
+nas redes sociais no ano eleitoral de 2022. As descobertas evidenciam as peculiaridades
+deste tipo de comunicação e permitem aumentar a compreensão quanto à importância e
+influência das mídias alternativas no debate político. Dentre as possibilidades de pes-
+quisa futuras, destaca-se a análise de outros tipos de postagens que ocorreram em menor
+quantidade, como fotos e vídeos e o estudo mais aprofundando quanto ao alcance das
+publicações de direita em público que não busca conteúdo político.
+
+Referências
+AlSumait, L., Barbará, D., Gentle, J., and Domeniconi, C. (2009). Topic significance
+ranking of lda generative models. In Buntine, W., Grobelnik, M., Mladenić, D., and
+Shawe-Taylor, J., editors, Machine Learning and Knowledge Discovery in Databases,
+pages 67–82, Berlin, Heidelberg. Springer Berlin Heidelberg.
+Bakshy, E., Messing, S., and Adamic, L. (2015). Political science. exposure to ideologi-
+cally diverse news and opinion on facebook. Science (New York, N.Y.), 348.
+Benkler, Y., Faris, R., and Roberts, H. (2018). Network Propaganda: Manipulation,
+Disinformation, and Radicalization in American Politics. Oxford University Press.
+CrowdTangle, T. (2022). CrowdTangle. Facebook, Facebook, Menlo Park, California,
+United States.
+Faris, R., Roberts, H., Etling, B., Bourassa, N., Zuckerman, E., and Benkler, Y. (2017).
+Partisanship, propaganda, and disinformation: Online media and the 2016 us presiden-
+tial election. Berkman Klein Center Research Publication, 6.
+Guimarães, S. S., Reis, J. C. S., Lima, L., Ribeiro, F. N., Vasconcelos, M., An, J., Kwak,
+H., and Benevenuto, F. (2020). Identifying and characterizing alternative news media
+on facebook.
+In 2020 IEEEACM International Conference on Advances in Social
+Networks Analysis and Mining (ASONAM), pages 448–452.
+Hagen, L. (2018). Content analysis of epetitions with topic modeling: How to train and
+evaluate lda models? Information Processing & Management, 54(6):1292–1307.
+IBGE (2023).
+Acesso à internet e à televisão e posse de telefone móvel celu-
+lar para uso pessoal 2022 / IBGE, coordenação de pesquisas por amostra de do-
+micílios. https://biblioteca.ibge.gov.br/visualizacao/livros/liv102040 informativo.pdf,
+Rio de Janeiro.
+Kozlowski, D., Semeshenko, V., and Molinari, A. (2022).
+Latent dirichlet allocation
+models for world trade analysis. PLOS ONE, Edited by Dante R. Chialvo, issue 2, p.
+e0245393, 16.
+Laurett, N. and Ribeiro, F. (2022). Caracterização das publicações e relações entre mídias
+alternativas polarizadas no facebook. In Anais do XI Brazilian Workshop on Social
+Network Analysis and Mining, pages 133–144, Porto Alegre, RS, Brasil. SBC.
+Martins, A. (2012). A hipótese da agenda-setting e a teoria do newsmaking no Blog do
+Noblat, pages 271–287.
+Pennycook, G. and Rand, D. G. (2020). Who falls for fake news? the roles of bullshit
+receptivity, overclaiming, familiarity, and analytic thinking. Journal of Personality,
+88(2):185–200.
+Pereira, É., Melo, P., Júnior, M., Mafra, V., Reis, J., and Benevenuto, F. (2022). Analyzing
+youtube videos shared on whatsapp and telegram political public groups. In Anais do
+XXVIII Simpósio Brasileiro de Sistemas Multimídia e Web, pages 29–38, Porto Alegre,
+RS, Brasil. SBC.
+Reis, J. and Benevenuto, F. (2022). Detecção automática de desinformação em diferentes
+cenários: Eleiçõoes nos estados unidos e no brasil. In Anais do XI Brazilian Workshop
+on Social Network Analysis and Mining, pages 1–12, Porto Alegre, RS, Brasil. SBC.
+
+Röder, M., Both, A., and Hinneburg, A. (2015). Exploring the space of topic coherence
+measures. In Proceedings of the Eighth ACM International Conference on Web Search
+and Data Mining, WSDM 15, page 399–408, New York, NY, USA. Association for
+Computing Machinery.
+TSE
+(2022).
+Confira
+as
+principais
+datas
+do
+calendário
+eleitoral
+de
+2022.
+https://www.tse.jus.br/comunicacao/noticias/2022/Janeiro/confira-as-principais-
+datas-do-calendario-eleitoral-de-2022. Acessado em 20 de Jun de 2023.

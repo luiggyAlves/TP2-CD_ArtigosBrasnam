@@ -1,0 +1,771 @@
+Uma análise das seleções da copa utilizando uma rede de
+transferências de jogadores entre países
+Lucas G. S. Félix1 , Carlos M. Barbosa1 , Iago A. Carvalho2,
+Vinícius da F. Vieira1 , Carolina Ribeiro Xavier1
+1Departamento de Ciência da Computação - Universidade Federal de São João del-Rei
+Av. Visconde do Rio Preto S/N - Colônia do Bengo
+2Departamento de Ciência da Computação - Universidade Federal de Minas Gerais
+{lucasgsfelix, cmagnobarbosa}@gmail.com, iagoac@dcc.ufmg.br
+{carolinaxavier, vinicius}@ufsj.edu.br
+Abstract. Football is the most popular sport in the world. The growth in the
+number of transactions of purchase and sale, marketing, sponsorships, sale of
+tickets, TV contracts, among other forms of monetization of football makes the
+flow of values increasingly higher. The majority of works related to this sport
+is associated with sociological analysis. This work proposes a study focused
+on the transactions occurred among the football teams classified to the World
+Cup 2018 using complex networks techniques for an analysis of the transfer of
+players among these countries.
+Resumo. O futebol é hoje o esporte mais popular do mundo. O crescimento no
+número de transações de compra e venda, marketing, patrocínios, venda de in-
+gressos, contratos de TV, entre outras formas de monetização do futebol faz com
+que o fluxo de valores seja cada vez maior. Grande parte dos trabalhos relacio-
+nados a esse esporte são associados a análises sociológicas. Neste trabalho, é
+proposto um estudo focado nas transações feitas entre as seleções classificadas
+para a Copa do Mundo 2018 utilizando técnicas de redes complexas para uma
+análise da transferência de jogadores entre esses países.
+1. Introdução
+O
+futebol
+é
+hoje
+o
+esporte
+mais
+popular
+do
+mundo
+[Liebig et al. 2012,
+Palacios-Huerta 2004].
+Devido a sua grande popularidade, gera um enorme fluxo
+financeiro. Somente na Europa, o futebol movimentou aproximadamente 25 bilhões de
+euros na temporada 2016/2017 [Deloitte 2016].
+Um time de futebol possui diversas formas de compensação financeira inclusive:
+vendas de camisas, patrocinadores, cotas pagas por canais de TV, além de uma grande
+movimentação de valores através de transações de jogadores. Um clube pode comprar
+um jogador permanentemente ou então adquirir seus direitos temporariamente, através
+de empréstimo. Ambos modelos de transação envolvem uma compensação financeira
+[Liu XF 2016].
+A Copa do Mundo FIFA é um evento esportivo que ocorre de 4 em 4 anos. Criado
+em 1928, teve sua primeira edição realizada em 1930 e, desde então, foram realizadas 20
+edições. A vigésima primeira edição da copa do mundo será realizada na Rússia em 2018.
+
+O objetivo deste trabalho é estudar as propriedades da rede de transferências de
+jogadores de futebol entre os países participantes da Copa do Mundo de 2018 a fim de
+extrair informações para entender a dinâmica dessas transferências. Para isso, além das
+características básicas da rede, serão utilizados algoritmos de ranking e de detecção de
+comunidades em redes complexas.
+Existem diversos estudos que abordam o futebol como tema principal, entretanto,
+apesar da importância e do tamanho do mercado de transferências de jogadores, exis-
+tem poucos estudos sobre o mesmo, sendo que grande parte aborda somente o lado so-
+ciológico das transferências de jogadores, usando o futebol para ilustrar o movimento in-
+ternacional de forças de trabalho [Maguire 1994, Maguire and Pearton 2000, Poli 2010,
+Roderick 2013].
+No trabalho [Poli 2010], o autor mostra a globalização através das transações fei-
+tas no mercado do futebol. Nos trabalhos [Maguire and Pearton 2000, Maguire 1994],
+são feitas análises do impacto da migração no esporte, sendo o primeiro mais focado no
+desenvolvimento de jogadores europeus e o segundo na análise do fluxo de mão de obra
+não apenas no futebol, mas em todos esportes.
+Em [Roderick 2013], os autores analisam o movimento de jogadores de futebol
+dentro de um mercado interno, entretanto, este é um trabalho qualitativo, onde não houve
+uma coleta de dados em quantidade, apenas uma entrevista feita com cerca de 49 jo-
+gadores. O trabalho de [Palacios-Huerta 2004] estuda o futebol através de análises es-
+tatísticas comportamentais temporais, investigando apenas ligas inglesas e dando uma
+visão econômica ao esporte. No artigo [Frick ], é analisado o mercado de transferências
+de atletas na Europa dando um foco mais empírico ao assunto, avaliando aspectos não
+considerados em nossas análises como salário de jogadores e tempo de carreira de joga-
+dores.
+Um trabalho anterior que modelou uma rede de transferências de jogadores e a
+estudou foi [Liu XF 2016], apontando algumas propriedades da rede construída com o
+objetivo principal de analisar o sucesso de um time através de suas transferências.
+2. Coleta e modelagem da rede
+Para obtenção da rede de transferências, foi utilizado como base o transfermarkt[tra ].
+O transfermarkt é uma página na internet que possui uma grande base de dados, com
+diversas informações relacionadas ao futebol, como: estatísticas de resultados, tabelas
+de campeonatos e o principal objeto de estudo deste trabalho, os dados relacionados a
+transferências de jogadores. Para a coleta de dados, foram consideradas as transferências
+entre 1990 e 2017. Os dados relativos a anos anteriores ao ano de 1990 se mostraram
+pouco relevantes para o estudo, já que, além de estarem em pouca quantidade, os valores
+das transações se mostraram irrisórios quando comparado a valores dos anos seguintes.
+Após a obtenção das páginas no formato html, foi montado um parser responsável
+por fazer um pré-processamento das páginas e permitir a estruturação dos dados para
+extração das informações. Após formatação padrão, foi montado um banco de dados para
+facilitar eventuais consultas, que poderia auxiliar também em diversas análises, principal-
+mente para modelagem de diversas redes de interesse para análises específicas.
+As redes foram modeladas da seguinte forma: cada país foi considerado um
+
+vértice, e caso um país tenha realizado uma transferência para o outro país, uma aresta
+direcionada do país vendedor para o país comprador será adicionada, considerando como
+o peso das arestas a quantidade de transações feitas entre os países, levando em conta a
+direção.
+3. Análise da rede
+3.1. Propriedades da Rede de Transferências
+A base de dados coletada possui transferências dos anos de 1990 a 2017, que totalizam
+aproximadamente 27 mil transferências nas quais estão 135 vértices, representando os
+países presentes na base e 597 arestas representando a conexão entre esses países quando
+houve transferência de jogadores entre eles. Contudo, como o estudo abrange apenas os
+países presentes na Copa do Mundo FIFA 2018, a rede foi reduzida para 32 vértices e 430
+arestas, abrangendo um total de 13797 transações, o que representa um pouco mais 50%
+do total de transferências da base, mostrando que os poucos países participantes da copa,
+representam grande parte das transações mundiais.
+Conforme mostram os dados da Tabela 3.1, a densidade da rede é 0,40, o diâmetro
+é 4 e o coeficiente de clusterização é 0,70, o que mostra que há uma grande movimentação
+de jogadores entre os países participantes da copa, e que essas transações, geralmente são
+recíprocas, já que a reciprocidade da rede é maior do que 70%.
+Verifica-se que a rede é disassortativa, o que significa que os países que negociam
+com muitos países tendem a negociar com países que negociam com poucos países, apon-
+tando para um desbalanceamento entre os investimentos dos países em seus campeonatos
+internos com jogadores estrangeiros.
+Propriedade
+Valor
+Densidade
+0.40
+Diâmetro
+4
+Coeficiente de clusterização
+0.70
+Reciprocidade
+0.71
+Assortatividade grau
+-0.22
+Grau máximo
+46
+Força máxima de saída
+521
+Força máxima de entrada
+1034
+Tabela 1. Propriedades da rede de países da Copa
+O grau máximo da rede é 46, valor que está associado a dois países muito impor-
+tantes no futebol mundial: França e Alemanha. Esse valor indica que esses países são os
+que possuem o maior número de parceiros para compra e venda de jogadores. A força
+máxima de saída é 521, referindo-se ao total de vendas internacionais na rede de um país,
+o Brasil. Ou seja, o Brasil é o país que mais forneceu jogadores para os clubes dos países
+que estão na Copa. Por outro lado, o país que mais comprou jogadores de outros países
+foi a Inglaterra, que possui a força máxima de entrada da rede, 1034 arestas. As Figuras 1
+e 2 mostram as distribuições de grau de entrada e de saída da rede. Essas curvas mostram
+que a rede possui muitos vértices de grau alto, logo, é possível perceber que os países da
+copa são, de fato, bastante representativos no cenário do futebol mundial.
+
+Figura 1. Distribuiç ão de grau
+de entrada
+Figura 2. Distribuiç ão de grau
+de saída
+3.2. Análise de centralidade
+Aplicando alguns algoritmos de centralidade de vértices, pode-se identificar os princi-
+pais vértices da rede. Para isso foram consideradas três diferentes medidas de centrali-
+dade: Closeness [Freeman 1978], Betweenness [Newman and Girvan 2004] e PageRank
+[Page et al. 1999].
+A centralidade de Closeness calcula o menor caminho entre um vértice e todos
+outros vértices do grafo, assim o vértice mais central é o que é mais próximo, em média,
+de todos os outros vértices.
+A centralidade de Betweenness também é baseado em caminhos mínimos, con-
+tudo, este medida leva em consideração o número de caminhos mínimos que passam por
+um vértice. O vértice que é utilizado mais vezes como passagem nos caminhos mínimos
+será o vértice mais bem ordenado segundo esta medida.
+Para aplicar medidas de Closeness e Betweenness, foi preciso inverter os valo-
+res dos pesos das arestas pois, como essas medidas utilizam como base os caminhos
+mínimos, a importância de um país, ligada ao número de transferências que ele faz,
+é mais apropriadamente representando os pesos de maneira inversa do original. Desta
+forma, para a aplicação dessas medidas, o peso das arestas foi calculado da seguinte
+forma: PesoAresta = P 1/(QuantidadeTransacoesb
+a).
+A medida de PageRank, por outro lado, considera que um vértice é importante se
+ele é apontado por outros vértices importantes. O PageRank leva em conta o número e a
+qualidade das ligações de um vértice para determinar o quão importante ele é, portanto o
+peso da aresta foi a quantidade de transações.
+Após o cálculo das medidas de centralidade para a rede, foram obtidos três listas
+ordenadas distintas, das quais a Tabela 2 apresenta as 10 primeiras posições.
+Como é possível observar a partir da Tabela 2, há uma grande consistência en-
+tre as medidades de centralidade consideradas e os rankings obtidos apresentam poucas
+variações. Cinco países aparecem entre as 10 primeiras posições nas três listas, e estão
+
+Posição
+Closeness
+Betweenness
+PageRank
+1
+Inglaterra
+Inglaterra
+Inglaterra
+2
+Alemanha
+Espanha
+Alemanha
+3
+Espanha
+Alemanha
+Espanha
+4
+França
+Brasil
+Rússia
+5
+Suíça
+França
+França
+6
+Rússia
+Argentina
+Brasil
+7
+Bélgica
+Portugal
+Bélgica
+8
+Argentina
+Costa Rica
+Portugal
+9
+Brasil
+Dinamarca
+Polônia
+10
+Dinamarca
+Egito
+México
+Tabela 2. Top-10 países ordenados por cada uma das medidas de centralidade.
+em negrito na Tabela 2, assim como na Tabela 3. As maiores surpresas ocorreram na
+lista ordenada pela medida Betweenness, mostrando Egito e Costa Rica, que são grandes
+parceiros da Inglaterra.
+A Tabela 3 mostra a quantidade de transações realizadas pelos 10 países que mais
+realizaram transações internacionais dentro da rede. Percebe-se que todos países presen-
+tes nesta tabela também estão presentes em pelo menos um dos rankings apresentados
+pela Tabela 2, desta forma podemos considerar que a importância dos países na rede está
+diretamente ligada ao número de transações internacionais realizadas.
+Posição
+País
+# de transações
+1
+Inglaterra
+1384
+2
+Alemanha
+1230
+3
+Espanha
+1096
+4
+França
+925
+5
+Brasil
+719
+6
+Portugal
+691
+7
+Argentina
+513
+8
+Rússia
+453
+9
+Bélgica
+416
+10
+Suíça
+337
+Tabela 3. Quantidade de transaç ões por país
+3.3. Análise de comunidades
+Uma investigação sobre a estrutura de comunidades na rede de transferências foi reali-
+zado com o objetivo de identificar grupos coesos de países dentro da rede e, para isso,
+utilizou-se alguns dos algoritmos para detecção de comunidades mais adotados na litera-
+tura. Apesar de se tratar de um mercado abrangente, onde qualquer país pode realizar o
+intercâmbio de jogadores com qualquer outro país, alguns “padrões de consumo”podem
+ser observados, como o fato de grandes países procurarem talentos estrangeiros para seus
+times locais em um mesmo grupo de países com mais frequência.
+Os métodos para detecção de comunidades considerados neste trabalho
+foram:
+Multilevel [Blondel et al. 2008],
+Eigenvector [Newman 2006] e Fastgre-
+
+edy
+[Clauset et al. 2004],
+todos
+eles
+baseados
+na
+otimização
+da
+modularidade
+[Newman and Girvan 2004], a medida mais utilizada na literatura para avaliação da qua-
+lidade da partição de uma rede. A Tabela 4 mostra os resultados encontrados por cada um
+dos métodos, em termos do valor de modularidade e do número de comunidades.
+Algoritmo
+Modularidade
+# de comunidades
+Eigenvector
+0.53
+8
+Fastgreedy
+0.14
+7
+Multilevel
+0.54
+6
+Tabela 4. Comparaç ão entre algoritmos de comunidade
+Considerando que os métodos para identificação de comunidades visam otimizar
+a modularidade como uma medida a ser maximizada, a análise da Tabela 4 permite iden-
+tificar que o método multilevel oferece uma partição de melhor modularidade entre os
+métodos analisados e, por isso, essa partição foi escolhida para as análises seguintes.
+Como apresentado na Tabela 4, o método multilevel identificou 7 comunidades,
+descritas na Tabela 5.
+Comunidade
+Países
+1
+Rússia, Polônia, Sérvia e Panamá
+2
+Egito, Tunísia, Arábia Saudita, Nigéria e Marrocos
+3
+Irã, Bélgica, Croácia, Dinamarca, Costa Rica, Suécia e Austrália
+4
+Brasil, México, Espanha, Portugal, Argentina, Japão
+Coreia do Sul, Uruguai,Colômbia e Peru
+5
+Alemanha e Suíça
+6
+Inglaterra e Islândia
+7
+França e Senegal
+Tabela 5. Comunidades formadas
+A Figura3 apresenta uma representação gráfica da rede de transferências com as
+comunidades identificadas através de cores.
+A comunidade 1, formada por Rússia (país anfitrião dessa copa do mundo),
+Polônia, Sérvia e Panamá, possui apenas um entre os países com maior número de trans-
+ferências registradas na base (Tabela 3), sendo este a Rússia, com 882 transações. Polônia
+e Sérvia possuem 428 e 308 transferências respectivamente. Já o Panamá, possui apenas
+duas transações registradas com outros países participantes da copa, sendo uma com a
+Polônia, o que ajuda a explicar o porquê da presença do Panamá neste grupo.
+Para auxiliar na análise dos dados e ilustrar o montante movimentado por um país,
+foi considerada a balança comercial do mesmo. Essa balança mostra o quanto um país
+ganhou ou perdeu com a compra e venda de atletas. Para o cálculo da balança comercial
+foi considerada a soma de todas vendas subtraída da soma de compras. Os países com
+balança comercial negativa podem ser considerados como mercado consumidor de atle-
+tas. Já os países com balança comercial positiva podem ser considerados países fazenda,
+que são países que se caracterizam pela venda de jogadores e são frequentemente procu-
+rados para a compra de jogadores jovens que se destacaram em campeonatos nacionais,
+
+Figura 3. Rede de transferências de jogadores de futebol entre países da copa
+do mundo dividida em comunidades
+País
+Vendas
+Compras
+Balança
+# de transferências
+Rússia
+Inglaterra,Alemanha,Espanha
+Brasil,Portugal,Sérvia
+-757416000 e
+882
+Polônia
+Alemanha,Rússia,Inglaterra
+Sérvia,Alemanha,Croácia
+163645000 e
+428
+Sérvia
+Rússia,Alemanha,Espanha
+Brasil,Rússia,Portugal
+466825000 e
+308
+Panamá
+Espanha,Polônia
+-
+790000 e
+2
+Tabela 6. Dados sobre os países presentes na comunidade 1
+regionais e às vezes até nos campeonatos juniores. O cálculo da balança comercial é da
+forma: BalancaComercial = P V endas −P Compras.
+A Tabela 6 analisa os países presentes na comunidade 1, apresentando os países
+que mais compram de cada país de referência, os países que mais vendem para aquele
+país, a balança comercial e a quantidade de transferências realizadas por aquele país.
+A análise dos países com os quais os integrantes da comunidade 1 realizam trans-
+ferências com maior frequência, permite observar o motivo da ligação entre os mesmos.
+De acordo com a balança comercial do país, é possível ver qual sua posição com relação
+aos outros países, se é um país consumidor ou um país fornecedor de atletas.
+É possível perceber que, nessa comunidade, todos os países estão conectados pe-
+los seus compradores e fornecedores, sendo a Rússia o principal país da comunidade,
+por possuir a maior quantidade de transações e estar entre os principais parceiros comer-
+ciais de cada um dos países, com exceção do Panamá. Desta forma observa-se que a
+movimentação financeira dos três primeiros países é consideravelmente grande, sendo a
+Rússia, o único país presente na comunidade com a balança comercial negativa, um país
+consumidor, que possui clubes ricos que buscam atletas em outros países, enquanto os ou-
+tros países Polônia e Sérvia são países produtores de talentos por possuírem uma balança
+comercial positiva.
+A comunidade 2 é formada por Egito, Tunísia, Arábia Saudita, Nigéria e Marro-
+cos, sendo que apenas a Arábia Saudita não pertence ao continente africano. Nesta comu-
+
+nidade, como pode-se observar na Tabela 7, os países não possuem uma grande quanti-
+dade de transferências e nenhum dos países presentes nessa comunidade se equipara, em
+número de transações realizadas, com grandes países da Europa e América. Além disso,
+assim como na comunidade 1, a maioria dos países possui a balança comercial positiva.
+Provavelmente esses países trocam frequentemente de jogadores entre si devido a pro-
+ximidade geográfica deles, e essas transações foram suficientes para considerá-los como
+integrantes de uma comunidade.
+País
+Vendas
+Compras
+Balança
+# de transferências
+Tunísia
+França,Arábia Saudita,Suíça
+Nigéria,França,Marrocos
+39491000 e
+190
+Egito
+Arábia Saudita,Inglaterra,Suíça
+Tunísia,Portugal,Inglaterra
+48775000 e
+164
+Arábia Saudita
+Brasil,Suíça,Rússia
+Brasil,Egito,Tunísia
+-166437000 e
+123
+Nigéria
+Tunísia,França,Alemanha
+Egito
+22035000 e
+35
+Marrocos
+França,Tunísia,Arábia Saudita
+Egito,França,Tunísia
+27789000e
+68
+Tabela 7. Dados sobre os países presentes na comunidade 2
+A comunidade 3, formada por Irã, Bélgica, Croácia, Dinamarca, Costa Rica,
+Suécia e Austrália é a comunidade com maior diversidade de continentes, tendo países
+pertencentes a Europa, América, Ásia e Oceania. Essa comunidade é caracterizada por
+possuir somente países com uma balança comercial totalmente positiva, como pode ser
+observado de maneira detalhada pela Tabela 8.
+País
+Vendas
+Compras
+Balança
+# de transferências
+Irã
+Alemanha,Rússia,Inglaterra
+Brasil,Rússia,Espanha
+7607000e
+41
+Bélgica
+Inglaterra,Alemanha,França
+França,Alemanha,Croácia
+500960000e
+627
+Croácia
+Alemanha,Bélgica,Rússia
+Alemanha,Bélgica,Brasil
+406378000e
+286
+Dinamarca
+Alemanha,Inglaterra,Suécia
+Alemanha,Suécia,Inglaterra
+247644000e
+354
+Costa Rica
+México,Bélgica,Inglaterra
+Brasil
+13645000e
+13
+Suécia
+Inglaterra,Alemanha,Dinamarca
+Dinamarca,Inglaterra,Alemanha
+260493000e
+188
+Austrália
+Inglaterra,Alemanha,Japão
+Costa Rica
+23305000e
+37
+Tabela 8. Dados sobre os países presentes na comunidade 3
+A Tabela 8 mostra que os países europeus possuem uma quantidade maior de
+transações e, consequentemente, um maior valor na balança comercial. Estes países fun-
+cionam como um trampolim para futura venda de jogadores para outros países europeus,
+envolvendo times de maior prestígio.
+Das poucas transações presentes na Oceania a maioria são transações de venda. O
+continente possui 62 transações de venda e 7 transações de compra registradas, fazendo
+desse continente o que possui menor quantidade de transações nesta comunidade.
+Na Tabela 9, a distribuição de transações por continente é apresentada.
+Continente
+# compras
+# vendas
+# internas
+Asia
+834
+281
+539
+América
+435
+1853
+1296
+Africa
+60
+388
+384
+Europa
+2222
+966
+21057
+Oceania
+7
+62
+4
+Tabela 9. Quantidade de transaç ões de cada continente
+A comunidade 4 é a maior comunidade presente na rede, com um total de 10
+países. Essa comunidade é caracterizada pela presença de países de diversos continentes
+
+Continente
+Valor médio vendas
+Asia
+1.535.288 e
+América
+2.894.209 e
+Africa
+604.533 e
+Europa
+2.202.635 e
+Oceania
+415.322 e
+Tabela 11. Valor médio pago em transaç ões por continente
+como Brasil, México, Argentina, Uruguai, Colômbia e Peru, representando a América,
+Japão e Coreia do Sul representando Ásia e, ainda, Espanha e Portugal representando a
+Europa.
+A Tabela 10 apresenta os dados dos países presentes na comunidade 4. Nesta co-
+munidade, está presente uma maior quantidade de países vencedores de copas do mundo,
+sendo eles Brasil, Argentina, Espanha e Uruguai.
+País
+Vendas
+Compras
+Balança comercial
+# de transferências
+Espanha
+Inglaterra,Alemanha,Portugal
+Argentina,Inglaterra,Portugal
+-906437000 e
+1704
+Portugal
+Espanha,Inglaterra,França
+Brasil,Espanha,Argentina
+1468658000 e
+871
+Brasil
+Alemanha,Portugal,Espanha
+Argentina,Portugal,Espanha
+2257058000e
+1133
+Argentina
+Espanha,México,Brasil
+Espanha,Uruguai,México
+1491868000e
+794
+México
+Argentina,Brasil,Espanha
+Argentina,Brasil,Colômbia
+-72455000e
+298
+Japão
+Alemanha,Brasil,Inglaterra
+Brasil,Alemanha,Coreia do Sul
+42627000e
+144
+Uruguai
+Espanha,Argentina,Portugal
+Brasil,Argentina,Espanha
+328424000e
+122
+Colômbia
+Argentina,Brasil,México
+México,Argentina,Brasil
+188658000e
+89
+Peru
+Alemanha,México,Portugal
+Argentina
+22703000 e
+27
+Coreia do Sul
+Alemanha,Japão,Inglaterra
+Brasil,Sérvia,Croácia
+58499000e
+73
+Tabela 10. Dados sobre os países presentes na comunidade 4
+Assim como na comunidade 1, apenas uma pequena parte da comunidade possui
+uma balança comercial negativa, sendo estes Espanha e México.
+Como esta comunidade possui um número bem grande países, optou-se por ana-
+lisar a mesma por continente. Primeiramente, analisando os países da América, que são
+maioria nessa comunidade, observa-se que o Brasil possui o maior número de transações
+e o Peru o menor número de transações. Através dessa comunidade é possível visualizar
+um padrão que é compartilhado pela maioria dos países da América do Sul e América
+Central que é a balança comercial positiva, demonstrando a falta de poder de compra
+dos clubes pertencentes a esses países para trazer atletas de outros continentes ou mesmo
+manter atletas de origem nacional de qualidade dentro do próprio país.
+A América hoje possui a maior média de venda de jogadores entre todos os con-
+tinentes, como podemos ver na Tabela 11, sendo que considerando apenas transações
+externas de compra e venda, cerca de 81% das transações deste continente são transações
+de venda. Desta forma a Tabela 11 corrobora que este é um mercado produtor de talentos
+para clubes de outros países com poder aquisitivo maior.
+Analisando os países asiáticos presentes na comunidade, tendo Japão e Coreia do
+Sul como representantes nesta comunidade, observa-se que ambos possuem uma balança
+comercial positiva, o que não representa o padrão de consumo asiático como um todo,
+pois a maioria das movimentações de compra superam as de venda. Esse padrão é ala-
+vancado pela China, que lidera como país com maior transações gerais dentro da Ásia
+movimentando grandes quantidade financeiras com grandes contratações de jogadores
+
+estrangeiros [the ]. A China, entretanto, mesmo sendo um país com fluxo considerável
+no mercado de transação de atletas não está presente entre os países classificados para
+copa de 2018, o que aponta que não são apenas investimentos em jogadores estrangei-
+ros para fortalecimento das competições nacionais que influenciam no desempenho da
+seleção para classificação e participação em uma copa do mundo.
+Os países do continente europeu nesta comunidade são Espanha e Portugal. Neste
+grupo fica claro o domínio de alguns países pertencentes a esse continente no mercado de
+transações. Cada um dos países presentes nesta comunidade funciona como um agente
+diferente na rede estudada e no mercado como um todo. A Espanha é um país comprador
+de talentos para fortalecimento do campeonato nacional, de forma que os clubes perten-
+centes a esses países adquirem tais atletas sem pensar em uma eventual venda do jogador.
+Portanto, a Espanha possui uma balança negativa, abrigando alguns dos clubes mais ricos
+do mundo [ric ], que dispõem de montantes significativos para manter os atletas dentro de
+seu domínio e sempre comprar novos reforços para manutenção dos clubes.
+Já Portugal tem servido como vitrine para os atletas, que passam pelos clubes por-
+tugueses para ter maior visibilidade no mercado europeu ao atuar neste país, servindo
+como um mercado impulsionador de atleta, aumentando atributos e o valores dos joga-
+dores. Geralmente, times portugueses compram jogadores com o objetivo da venda por
+um preço maior que o comprado, obtendo assim um lucro na venda do jogador fazendo,
+assim, que Portugal possua uma balança comercial positiva.
+Hoje a Europa é o centro do futebol mundial, onde há as principais ligas, com
+os melhores jogadores do mundo [fif ]. Grande parte dos países europeus com balança
+comercial positiva funcionam como país trampolim para uma posterior venda desses jo-
+gadores. Entretanto, isso não ocorre com todos os países, já que com a consolidação de
+campeonatos mais fortes devido a compra de jogadores de maior habilidade faz com que
+o nível dessas competições aumente, fazendo com que haja uma evolução dos jogadores e
+dos preços de venda do atleta. Para uma melhor visualização disso, foi analisada a média
+de compra e venda nesses países.
+País
+Vendas
+Compras
+Rússia
+1.681.381 e
+1.830.670 e
+Polônia
+693.962 e
+268.694 e
+Sérvia
+972.090 e
+408.254 e
+Espanha
+3.128.515 e
+2.907.998 e
+Portugal
+2.089.052 e
+1.975.059 e
+Bélgica
+1.738.789 e
+1.022.196 e
+Croácia
+1.090.413 e
+646.089 e
+Dinamarca
+1.503.512 e
+943.660 e
+Suécia
+1.124.419 e
+418.479 e
+Alemanha
+1.529.849 e
+1407114 e
+Suíça
+1.337.964 e
+908.760 e
+Inglaterra
+2.886.619 e
+3.013.590 e
+França
+2.098.838 e
+2.145.160 e
+Islândia
+278.750 e
+0 e
+Tabela 12. Tabela mostra o valor médio pago em transaç ões por continente
+
+Pode-se ver na Tabela 12 a média de compra e vendas dos países pertencentes
+a Europa que estão presentes na copa do mundo 2018. De forma parcial pode-se ver
+países que compram jogadores por uma média mais baixa e vende a um preço mais alto.
+Se associarmos essa informação a dados de balança comercial e aos países ao qual esse
+país se associa para fazer compras, podemos definir se esse é um país consumidor ou
+fornecedor.
+4. Conclusão
+Este trabalho apresentou a análise de uma rede de transferências de jogadores de futebol
+entre países participantes da copa do mundo. Foram utilizadas técnicas de redes comple-
+xas como ranking por algumas medidas de centralidade e detecção de comunidades.
+Observou-se que esses países são bastante representativos no futebol, abrangendo
+50% das transferências mundiais as quais são bastante frequentes entre a maioria dos
+países da rede. Pode-se perceber alguns destaques de papéis de alguns países empregam
+no futebol mundial, por exemplo, se comparamos o Brasil, um país fazenda com a In-
+glaterra, um país de ligas ricas, pode-se ver dois países bastante diferentes em termos
+humanos e econômicos. A Inglaterra possui o 16o IDH do mundo, uma expectativa de
+vida de 80, 8 anos e seus cidadãos estudam em média por 16, 3 anos. Enquanto o Brasil é
+o 79o de acordo com o IDH, tem expectativa de vida de 74, 7 e seus cidadãos estudam em
+média 15, 2. A Inglaterra importa mais matéria prima e exporta produtos industrializados
+e medicamentos, enquanto o Brasil exporta matéria prima e produtos agrícola e importa
+produtos industrializados. No Brasil o futebol ainda é uma grande esperança de muitos
+jovens para mudança de realidade de vida.
+As listas top-10 geradas pelas diferentes medidas de centralidade mostraram que
+os países de ligas ricas são os países mais centrais da rede para qualquer medida de centra-
+lidade observada, apesar de países fazenda e países que tem tradição de comprar jogadores
+para valorização e futura venda e lucro também são encontrados nas listas.
+Considerando a estrutura de comunidades, observa-se que os maiores parceiros
+comerciais estão unidos nos mesmos grupos. No entanto, os países mais centrais estão
+separados em comunidades isoladas com um parceiro eventual, possivelmente devido ao
+fato de estes países menores possuírem poucas transações com os demais países da rede.
+Como trabalhos futuros, pretende-se realizar análises de comunidades com
+métodos que consigam identificar comunidades com sobreposição, pois acredita-se que
+este tipo de abordagem pode trazer mais informações interessantes. Pretende-se ainda
+utilizar uma rede com o montante financeiro como peso das arestas para comparação de
+resultados, além de analisar as redes separadas pelos anos que antecederam a copa e con-
+frontar os resultados com o desempenho das seleções naquele período.
+Agradecimentos
+Os autores agradecem às agências de fomento: Capes, CNPq e FAPEMIG.
+Referências
+fifa-11. http://www.fifa.com/the-best-fifa-football-awards/fifa-fifpro-world11/index.html.
+Accessed: 2017-12-04.
+
+Richest clubs. http://uk.businessinsider.com/the-20-richest-football-clubs-in-the-world-
+2017-1. Accessed: 2018-01-13.
+The Guardian.
+www.theguardian.com/football/these-football-times/2017/jan/05/china-
+chinese-super-league-oscar-carlos-tevezWhy Chinese clubs are breaking transfer re-
+cords – and why players are wise to go. Accessed: 2017-11-20.
+Transfermarkt. transfermarkt.com/statistik/transferrekorde. Accessed: 2017-11-17.
+Blondel, V. D., Guillaume, J.-L., Lambiotte, R., and Lefebvre, E. (2008). Fast unfol-
+ding of communities in large networks. Journal of Statistical Mechanics: Theory and
+Experiment, 2008(10):P10008.
+Clauset, A., Newman, M. E. J., and Moore, C. (2004). Finding community structure in
+very large networks. Phys. Rev. E, 70:066111.
+Deloitte (June 2016). Annual review of football finance.
+Freeman, L. C. (1978). Centrality in social networks conceptual clarification. Social
+Networks, page 215.
+Frick, B. The football players’ labor market: Empirical evidence from the major european
+leagues. Scottish Journal of Political Economy, 54(3):422–446.
+Liebig, J., Rhein, A. V., Kastner, C., Apel, S., Dorre, J., and Lengauer, C. (2012). Large-
+scale variability-aware type checking and dataflow analysis.
+Liu XF, Liu Y-L, L. X.-H. W. Q.-X. W. T.-X. (2016). The anatomy of the global football
+player transfer network: Club functionalities versus network properties. PLoS ONE,
+11(6).
+Maguire, J. (1994). Preliminary observations on globalisation and the migration of sport
+labour. The Sociological Review, 42(3):452–480.
+Maguire, J. and Pearton, R. (2000). The impact of elite labour migration on the iden-
+tification, selection and development of european soccer players. Journal of Sports
+Sciences, 18(9):759–769. PMID: 11043901.
+Newman, M. E. J. (2006). Finding community structure in networks using the eigenvec-
+tors of matrices. Phys. Rev. E, 74:036104.
+Newman, M. E. J. and Girvan, M. (2004). Finding and evaluating community structure in
+networks. Phys. Rev. E, 69:026113.
+Page, L., Brin, S., Motwani, R., and Winograd, T. (1999). The pagerank citation ranking:
+Bringing order to the web. Technical Report 1999-66, Stanford InfoLab. Previous
+number = SIDL-WP-1999-0120.
+Palacios-Huerta, I. (2004). Structural changes during a century of the world’s most popu-
+lar sport. Statistical Methods and Applications, 13(2):241–258.
+Poli, R. (2010). Understanding globalization through football: The new international
+division of labour, migratory channels and transnational trade circuits. International
+Review for the Sociology of Sport, 45(4):491–506.
+Roderick, M. (2013). Domestic moves: An exploration of intra-national labour mobility
+in the working lives of professional footballers. International Review for the Sociology
+of Sport, 48(4):387–404.

@@ -1,0 +1,575 @@
+Análise da ontologia dos assuntos jurídicos e suas respectivas
+legislações através de Redes Complexas
+Rilder S. Pires1, Erneson A. Oliveira1,2,3, Vitor F. Almeida2,
+João A. Monteiro Neto4,Vasco Furtado1,2
+1Laboratório de Ciência de Dados e Inteligência Artificial, Universidade de Fortaleza
+Fortaleza, Ceará, 60811-905, Brasil
+2Programa de Pós Graduação em Informática Aplicada, Universidade de Fortaleza
+Fortaleza, Ceará, 60811-905, Brasil
+3Mestrado Profissional em Ciências da Cidade, Universidade de Fortaleza
+Fortaleza, Ceará, 60811-905, Brasil
+4Centro de Ciências Jurídicas, Universidade de Fortaleza
+Fortaleza, Ceará, 60811-905, Brasil
+{rilder,erneson,joaoneto,vasco}@unifor.br,almeida.f.vitor@gmail.com
+Abstract. Several efforts have been made with the aim of mitigating the effects
+of the increasing inherent complexity of Brazilian Judicial System. In this con-
+text, we present an approach based on Complex Networks that relates legal sub-
+jects from the Unified Procedural Table of the first level of the Federal Justice
+from the National Council of Justice. Based on Graph Theory concepts, we iden-
+tify groups of subjects and build a bipartite network of legal subjects and legal
+provisions. When analyzing the one-mode projection of the bipartite network in
+the subset of legal subjects, we found a strong tendency for subjects in the same
+group to share legal provisions with each other, which results in a group assor-
+tativity coefficient r ≈0.62. Despite this, we verified that specific groups of
+legal subjects share a particular set of legal provisions among them. This result
+can contribute to the understanding of the existing relationships among legal
+subjects and to the creation and improvement of Artificial Intelligence models
+that would support the day to day operation of the Brazilian judicial system.
+Resumo. Diversos esforços vem ocorrendo com o intuito de mitigar os efei-
+tos da crescente complexidade inerente da Justiça brasileira. Nesse contexto,
+apresentamos uma abordagem baseada em Redes Complexas que relaciona as-
+suntos jurídicos da Tabela Processual Unificada do primeiro grau da Justiça
+Federal do Conselho Nacional de Justiça. A partir de conceitos da Teoria de
+Grafos, identificamos grupos de assuntos e construímos uma rede bipartida de
+assuntos jurídicos e dispositivos legais. Ao analisarmos a projeção de um modo
+da rede bipartida no subconjunto dos assuntos jurídicos, verificamos uma forte
+tendência de assuntos do mesmo grupo compartilharem dispositivos legais entre
+si, o que resulta em um coeficiente de assortatividade de grupo r ≈0.62. Ape-
+sar disso, verificamos a presença de compartilhamento de dispositivos legais
+entre grupos específicos de assuntos jurídicos. Esse resultado, pode contribuir
+para a compreensão das relações existentes entre os assuntos jurídicos, bem
+
+como para a criação e aprimoramento de modelos de Inteligência Artificial que
+auxiliem em tarefas práticas do sistema judiciário brasileiro.
+1. Introdução
+Nas últimas décadas, o setor judiciário vem realizando diversos esforços na ampliação
+do uso de tecnologias [Susskind and Susskind 2015, Ruhl et al. 2017], melhoria de pro-
+cessos de gestão [Henderson 2014, Ruhl et al. 2017] e metodologias de “design thinking”
+[Haapio and Hagan 2016, Ruhl et al. 2017] e “legal design” [Law by design]. Uma das
+iniciativas mais importantes realizada pelo Conselho Nacional de Justiça (CNJ) con-
+siste na definição de ontologias-padrões de assuntos jurídicos para as diferentes esferas
+do sistema judiciário brasileiro através de uma Tabela Processual Unificada (TPU). A
+construção dessas ontologias têm sido feita de forma colaborativa e gradativa refletindo
+a dinâmica da evolução legislativa, visto que os assuntos jurídicos estão relacionados às
+leis que definem os temas abordados nas demandas judiciais. Esse processo de construção
+não é trivial e a complexidade de uma TPU é crescente, o que dificulta a interpretação e
+uso pelos operadores do direito em suas tarefas cotidianas.
+Um
+exemplo
+de
+tarefa
+que
+pode
+ser
+impactada
+dentro
+do
+domínio
+jurídico
+é
+a
+classificação
+de
+demandas
+processadas
+pelo
+Poder
+Ju-
+diciário [Morais and Ambrósio 2008].
+A divisão dessas demandas em “classes” e
+“assuntos” permite aos órgãos responsáveis pelo processamento identificar e aplicar
+de forma correta as regras processuais que definem quem dentro da estrutura do Poder
+Judiciário é competente para atuar naqueles casos e também quais regras processuais
+devem ser observadas. O desrespeito a essas regras, especialmente no que tange a sua
+incorreta aplicação, pode gerar prejuízos significativos para a administração da Justiça,
+como também para o jurisdicionado, uma vez que a aplicação errada de regras de
+processamento ou o julgamento por órgão incompetente podem levar a anulação de todo
+o processo.
+Conhecer as relações entre as classes, os assuntos e os dispositivos legais a
+eles relacionados bem como desenvolver formatos “datificados” dessas relações podem
+contribuir não somente para uma melhor compreensão jurídica dessas conexões, mas
+também para apoiar o desenvolvimento de mecanismos inteligentes aplicados a gestão
+desses processos.
+O desenvolvimento e utilização de redes complexas pode forne-
+cer valor prático para formuladores de políticas, educadores jurídicos e advogados em
+exercício, uma vez que muitas tarefas jurídicas diárias podem ser aprimoradas através
+de uma melhor compreensão das relações e dos sistemas jurídicos representados pe-
+las informações obtidas [Ruhl et al. 2017].
+Nesse contexto, estudos baseados em re-
+des complexas têm sido desenvolvidos evidenciando o potencial da aplicação de re-
+des no domínio jurídico [Fowler et al. 2007, Zhang and Koppaka 2007, Whalen 2016,
+Carmichael et al. 2017, Koniaris et al. 2018, Pires et al. 2021].
+Nesse artigo, utilizamos a linguagem de programação Python e conceitos de Re-
+des Complexas e Teoria de Grafos para modelar a ontologia de assuntos jurídicos e seus
+respectivos dispositivos legais representados na TPU do CNJ. Na Seção 2, introduzimos a
+TPU e descrevemos o tratamento que foi feito para higienizar e padronizar as colunas de
+interesse. Em seguida, na Seção 3, definimos, de forma precisa, a rede bipartida proposta.
+A partir disso, aplicamos técnicas e métricas de redes complexas capazes de evidenciar
+
+características inerentes aos assuntos jurídicos. Esses achados estão apresentados e dis-
+cutidos na Seção 4. Finalmente, na Seção 5, destacamos as principais contribuições e
+apresentamos as perspectivas desse estudo para trabalhos futuros.
+2. Conjunto de Dados
+O conjunto de dados abordado neste trabalho consiste na tabela de Assuntos Jurídicos do
+Primeiro Grau da Justiça Federal [CNJ] disponibilizadas por meio do Sistema de Gestão
+de TPUs do CNJ. Nessa tabela, existem 8 campos e 2239 registros distintos onde cada
+registro corresponde a um único Assunto Jurídico. Dentre os campos, destacamos os
+campos: “Código”, “Cód. Pai” e “Dispositivo legal”, que serão utilizados nas análises a
+seguir, além do campo “Assuntos processuais do 1º Grau da Justiça Federal” que contém
+a descrição do assunto.
+Dos 2239 registros, 1723 registros possuem o campo “Dispositivo legal” não-nulo.
+Ao analisarmos esses registros, verificamos que em alguns casos havia referência a mais
+de um dispositivo, normalmente separados por “,”, “;” ou “e”. Verificamos também que
+nas referências ao dispositivo legal haviam palavras que eram escritas de diversas for-
+mas ( e.g., “Decreto”, “Dec.” e “D”), além de abreviações, como por exemplo “CC”,
+“CP” e “CF”, fazendo referência à “Lei 10.406/2002 (Código Civil)”, ao “Decreto-Lei
+2.848/1940 (Código Penal)” e à “Constituição Federal”, respectivamente. De modo a
+minimizar os impactos desses pontos em nossas análises, realizamos substituições e tra-
+tamentos através de expressões regulares nesse campo com o propósito de padronizar
+as referências aos dispositivos legais. Após essa etapa, verificamos a existência de 720
+dispositivos legais distintos.
+Por último, analisamos o campo “Cód. Pai” da tabela. Observamos que nesse
+campo se encontravam códigos que relacionam assuntos específicos com assuntos mais
+genéricos. Por exemplo, o assunto “10441 - Acidente de Trânsito” tem como pai o assunto
+“10439 - Indenização por Dano Material”, que tem como pai “10431 - Responsabilidade
+Civil” e que, por fim, tem como pai o assunto “899 - DIREITO CIVIL”. Verificamos,
+ainda, a existência de 18 assuntos, como o “899 - DIREITO CIVIL”, onde o campo “Cód.
+Pai” encontra-se vazio. Esses assuntos podem ser compreendidos como os assuntos mais
+genéricos da tabela. Na tabela 1 mostramos esses assuntos e seus respectivos códigos.
+3. Modelo
+Utilizamos conceitos de Redes Complexas e Teoria de Grafos [Newman 2018] a fim de
+representar as relações existentes no conjunto de dados apresentado na seção anterior.
+Observamos que existem relações de duas naturezas distintas nesse dado. A primeira,
+corresponde a uma relação de associação entre Assuntos Jurídicos e Dispositivos Legais
+e a segunda corresponde a uma relação de inclusão entre os Assuntos Jurídicos e seus
+respectivos Assuntos Pais.
+Para a relação de associação, utilizamos uma representação na forma de uma Rede
+Bipartida [Newman 2018]. Esse tipo de rede possui dois conjuntos de vértices, onde cada
+conjunto está relacionado a um tipo de vértice. Na Figura 1a, mostramos, um subgrafo
+da Rede Bipartida de Assuntos Jurídicos e Dispositivos Legais, onde os círculos azuis
+representam os vértices do tipo “assunto jurídico”, os círculos laranjas representam os
+
+Tabela 1. Assuntos jurídicos onde o campo “Cód. Pai” encontra-se vazio.
+Código
+Assunto Jurídico
+14
+DIREITO TRIBUT ÁRIO
+195
+DIREITO PREVIDENCI ÁRIO
+287
+DIREITO PENAL
+899
+DIREITO CIVIL
+1146
+DIREITO MARÍTIMO
+1156
+DIREITO DO CONSUMIDOR
+1209
+DIREITO PROCESSUAL PENAL
+6191
+DIREITO INTERNACIONAL
+8826
+DIREITO PROCESSUAL CIVIL E DO TRABALHO
+9633
+DIREITO DA CRIANÇ A E DO ADOLESCENTE
+9985
+DIREITO ADMINISTRATIVO E OUTRAS MATÉRIAS DE DI-
+REITO P ÚBLICO
+10110
+DIREITO AMBIENTAL
+12467
+QUEST ÕES DE ALTA COMPLEXIDADE, GRANDE IMPACTO E
+REPERCUSS ÃO
+12480
+DIREITO DA SA ÚDE
+12734
+DIREITO ASSISTENCIAL
+12775
+DIREITO À EDUCAÇ ÃO
+vértices do tipo “dispositivo legal” e as arestas cinzas representam a relação de associação
+entre os dois tipos de vértices.
+Redes bipartidas possuem como principal característica o fato de não existirem
+arestas entre vértices do mesmo tipo, o que naturalmente ocorre no conjunto de dados
+estudado. Em Teoria de Grafos, um tipo de operação importante que pode ser feita em
+um grafo bipartido é a projeção de um modo [Newman 2018]. Na Figura 1b, mostra-
+mos a projeção do subgrafo da rede bipartida no subconjunto dos assuntos jurídicos. É
+importante notar que, nessa representação, o grafo obtido é ponderado e o peso de suas
+arestas corresponde ao número de dispositivos compartilhados entre os assuntos. Para a
+relação de inclusão, utilizamos uma representação na forma de um grafo simples, onde os
+vértices representam Assuntos Jurídicos, que são conectados aos seus respectivos Assun-
+tos Pais. Como cada Assunto Jurídico só possui um único Assunto Pai, o grafo gerado por
+esse processo não possui ciclos. Além disso, conforme foi dito na seção anterior, existem
+18 assuntos sem Assunto Pai o que resulta na divisão do grafo em vários componentes.
+Grafos que possuem essas duas propriedades são classificados como Grafos Florestas.
+4. Resultados
+Com o intuito de compreender as relações existentes entre os Assuntos Jurídicos, reali-
+zamos algumas análises nas redes descritas na seção anterior. Inicialmente, estudamos
+a rede que representa as relações existentes entre os Assuntos Jurídicos e seus respecti-
+vos Assuntos Pais. Para esse caso, obtemos uma rede com 2241 vértices e 2223 arestas.
+Conforme foi comentado anteriormente, a estrutura subjacente dessa rede corresponde a
+um grafo do tipo floresta que possui 18 árvores (componentes conectados e sem ciclos).
+Na Figura 2a, mostramos o número de vértices de cada árvore de assuntos, ordenados
+
+de forma decrescente. Cada árvore possui um único vértice sem pai (vértice raiz) e foi
+rotulada com o mesmo rótulo desse vértice. Na Figura 2b, mostramos uma representação
+gráfica da Floresta de Assuntos Jurídicos. Aqui, destacamos os vértices das sete maiores
+árvores da Floresta de Assuntos. Conforme podemos observar, as árvores de assuntos são
+agrupamentos naturais que emergem do conjunto de dados e serão úteis para compreen-
+dermos propriedades de outras relações existentes entre os Assuntos Jurídicos.
+Estudamos também a rede que representa as relações existentes entre os Assuntos
+Jurídicos do ponto de vista do compartilhamento de dispositivos legais. Conforme vimos
+anteriormente, a representação mostrada na Figura 1a nos permite ter alguns “insights”
+sobre as relações existentes entre assuntos jurídicos e dispositivos legais. Contudo, é
+na projeção mostrada na Figura 1b que obtemos um grafo com vértices apenas do tipo
+assunto jurídico e com arestas que representam o compartilhamento de dispositivos legais
+Lei 10.406/2002
+(Código Civil)
+Lei 13.105/2015
+(Código de Proc. Civil)
+9098 - Cabimento
+6207 - Mercosul 
+10503 - Erro Médico
+10504 - Acidente de Trânsito
+10433 - Indenização por
+ Dano Moral
+Lei 4.737/1965
+(Código Eleitoral)
+Lei 9.099/1995
+Decreto-Lei 5.452/1943
+(Consolidação das leis do Trabalho)
+Decreto-Lei 3.689/1941
+(Código de Proc. Penal)
+Decreto-Lei 1.002/1969
+(Código de Proc. Penal Militar)
+Constituição
+Federal
+9098 - Cabimento
+6207 - Mercosul 
+10503 - Erro Médico
+10504 - Acidente
+de Trânsito
+10433 - Indenização por
+ Dano Moral
+2
+2
+2
+2
+1
+1
+1
+1
+1
+1
+(a) Rede Bipartida
+(b) Projeção de um modo
+Figura 1.
+(a) Subgrafo da Rede Bipartida de Assuntos Jurídicos e Dispositi-
+vos Legais e em (b) sua projeç ão de um modo no conjunto dos Assuntos
+Jurídicos
+
+287-Direito Penal
+899 - Direito Civil
+195- Direito Previdenciário
+8826 - Direito Proc. Civil e do Trabalho
+14 - Direito Tributário
+12775 - Direito à Educação
+9985 - Direito Administrativo e outras matérias de Direito Público
+9985
+287
+14
+8826
+899
+195
+12775
+1156
+1209
+12480
+1146
+6191
+10110
+9633
+12467
+10672
+12734
+14967
+0
+100
+200
+300
+400
+500
+600
+700
+Número de Vértices
+(a)
+9985
+287
+14
+8826
+899
+12775
+(b)
+Figura 2. (a) Número de vértices de cada árvore de assuntos ordenados de forma
+decrescente. (b) Representaç ão gráfica da Floresta de Assuntos Jurídicos.
+entre esses assuntos. Dessa forma, realizamos o procedimento mostrado na Figura 1 para
+todo o conjunto de dados e obtemos uma rede bipartida com 1723 vértices do tipo assunto
+jurídico, 720 vértices do tipo dispositivo legal e 2535 arestas.
+Posteriormente, realizamos a operação de projeção e verificamos que alguns as-
+suntos da rede bipartida estavam associados aos dispositivos legais que não possuem ou-
+tro assunto relacionado a eles. Na construção da projeção, desconsideramos os vértices
+associados aos assuntos onde isso ocorre, o que resultou numa rede com 1542 vértices
+e 107333 arestas.
+Observamos que a rede projetada apresenta diversos componen-
+tes conectados, onde o maior possui 1243 vértices, o que corresponde a ≈81% dos
+vértices da rede. Na Figura 3, mostramos o subgrafo gerado pelo maior componente
+conexo da Rede Projetada de Assuntos Jurídicos através do algoritmo de visualização
+de Fruchterman-Reingold [Fruchterman and Reingold 1991]. Esse subgrafo possui 1243
+vértices e 105813 arestas. Aqui, destacamos também os vértices das sete maiores árvores
+da Floresta de Assuntos, mostradas na Figura 2. Os assuntos pertencentes a essas árvores
+correspondem a um percentual superior a 90% dos Assuntos jurídicos presentes no com-
+ponente principal da Rede Projetada de Assuntos Jurídicos.
+287-Direito Penal
+899 - Direito Civil
+195- Direito
+ Previdenciário
+8826 - Direito Proc. Civil
+ e do Trabalho
+14 - Direito Tributário
+12775 - Direito à Educação
+9985 - Direito Administrativo
+ e outras matérias
+ de Direito Público
+Figura 3. Subgrafo gerado pelo maior componente conectado da Rede Projetada
+de Assuntos Jurídicos
+
+A Figura 3 mostra os relacionamentos entre os assuntos jurídicos do maior com-
+ponente conectado. Aparentemente, existe uma associação direta entre os dispositivos
+legais compartilhados entre dois assuntos e a Árvore de assuntos jurídicos a qual eles
+pertencem. Além disso, calculamos também algumas métricas básicas para caracterizar a
+rede encontrada (Tabela 2).
+Tabela 2. Caracterizaç ão básica do maior componente conectado da Rede Proje-
+tada de Assuntos Jurídicos. Aqui, n é o número de vértices, m é o número
+de arestas, ρ é a densidade, ⟨ℓ⟩é o comprimento do caminho mais curto
+médio, D é o diâmetro, R é o raio e ⟨C⟩é o coeficiente de agrupamento
+médio.
+Métrica
+Valor
+n
+1243
+m
+105813
+ρ
+≈0.137
+⟨ℓ⟩
+≈2.695
+D
+7
+R
+4
+⟨C⟩
+≈0.946
+Nossa hipótese é que esses relacionamentos entre os assuntos jurídicos podem
+ser quantificados através da métrica de Assortatividade [Newman 2003, Newman 2018].
+Nesse contexto, o coeficiente de assortatividade de grupo é definido como:
+r =
+P
+i eii −
+P
+i aibi
+1 −P
+i aibi
+=
+X
+i
+ri,
+(1)
+onde ri = (eii −aibi)/(1 −P
+i aibi) é o coeficiente de assortatividade do grupo i e eij é a
+fração de arestas do grupo i para o grupo j. Aqui, P
+ij eij = 1, P
+j eij = ai e P
+i eij = bj.
+Para a rede projetada de assuntos jurídicos, obtemos um valor de r = 0.616. Esse valor
+para o coeficiente de assortatividade de grupo é considerado alto, indicando que a rede
+em questão é considerada homofílica, i.e., vértices de um grupo tendem a se ligar com
+outros vértices daquele mesmo grupo [Newman 2003, Newman 2018].
+A Tabela 3 mostra os assuntos jurídicos e o ri, coeficiente de assortatividade do
+grupo i, ordenados pela fração ri/ P
+i ri. Percebemos que o assunto “287 - Direto Penal” é
+o assunto que contribui mais para o coeficiente de assortatidade r, mais de 3× em relação
+ao segundo, assunto “9985 - Direito Administrativo e outras matérias de Direito Público”,
+e mais de 4× em relação ao terceiro, assunto “8826 - Direito Proc. Civil e do Trabalho”.
+Finalmente, analisamos também a matriz de mistura eij dos grupos da rede proje-
+tada de assuntos jurídicos, como mostra a Figura 4. Observamos que a fração de arestas
+dos vértices com assunto “287 - Direto Penal” para vértices do mesmo grupo é a maior
+da matriz (eii ∼0.390), corroborando com o resultado mostrado na Tabela 3. Entretanto,
+uma análise mais detalhada dessa matriz nos revela que também existem alguns valores
+que são relativamente altos (eij > 0.010) fora da diagonal principal. Por exemplo, os
+vértices com assunto “287 - Direto Penal” tendem a não se relacionar com nenhum outro
+grupo, exceto com os vértices do grupo “1209 - Direito Processual Penal”, onde a fração
+eij ∼0.012. Esse mesmo comportamento é visto entre os vértices dos seguintes grupos:
+
+Tabela 3. Assuntos jurídicos e coeficiente de assortatividade do grupo i, ri, or-
+denados pela fraç ão ri/ P
+i ri. Os traços representam valores < 0.001.
+Assuntos Jurídicos
+ri
+ri/
+P
+i ri
+287
+0.296
+0.480
+9985
+0.090
+0.145
+8826
+0.069
+0.113
+195
+0.053
+0.087
+14
+0.039
+0.064
+899
+0.038
+0.061
+12775
+0.021
+0.034
+1156
+0.009
+0.014
+1209
+0.001
+0.002
+6191
+-
+0.001
+10672
+-
+-
+12734
+-
+-
+10110
+-
+-
+14967
+-
+-
+assunto “9985 - Direito Administrativo e outras matérias de Direito Público”, assunto “14
+- Direito Tributário” e assunto “12775 - Direto à Educação”. Esse resultado explica o fato
+desses vértices serem mais espalhados na Figura 3, apesar de que cada um desses grupos
+ter um núcleo bem definido.
+5. Conclusão
+Neste trabalho, analisamos dados sobre assuntos jurídicos da TPU do primeiro grau da
+Justiça Federal por meio de um formalismo de redes complexas. Verificamos que os as-
+suntos jurídicos estão relacionados entre si através da estrutura de um Grafo Floresta com
+18 árvores, onde cada árvore é um grupo de vértices associado a um assunto raiz. Além
+disso, verificamos a existência de relações entre assuntos jurídicos e dispositivos legais
+que permite a criação de uma rede bipartida cuja projeção de um modo no subconjunto
+dos assuntos jurídicos revelou um outro tipo de relação bem mais complexa entre eles.
+Observamos que o grafo gerado pela projeção no subconjuntos dos assuntos
+jurídicos possui um componente conectando ≈81% dos vértices da rede e, consequen-
+temente, relacionando assuntos em grupos distintos. Apesar desses grupos possuírem
+conexões entre si, encontramos uma assortatividade de grupo elevada (r ∼0.62) para o
+grafo subjacente. Isso revela uma forte tendência de assuntos pertencentes à mesma árvore
+se associarem aos mesmos dispositivos legais. Essa tendência foi explorada através da
+observação individual dos termos que compõem o r onde foram encontradas contribuições
+positivas para todos os grupos, com destaque para o grupo relacionado ao “287 - Direito
+Penal” com uma contribuição de ≈50% para o r do componente conectado.
+De modo a compreendermos melhor as relações existentes entre os grupos de as-
+suntos jurídicos, analisamos a matriz de mistura dos grupos da rede projetada de assuntos
+jurídicos. A partir dessa matriz, verificamos que além da forte tendência de assuntos per-
+tencentes ao “Direito Penal” em se associarem aos mesmos dispositivos legais, também
+há uma notável tendência no compartilhamento de dispositivos legais, especialmente, en-
+
+Figura 4.
+Matriz de mistura eij dos grupos da rede projetada de assuntos
+jurídicos. As linhas e colunas de eij estão ordenadas pela fraç ão ri/ P
+i ri
+de cada grupo i. Além disso, os círculos realçam os valores eij > 0.01.
+tre os assuntos jurídicos pertencentes aos grupos “9985 - Direito Administrativo e outras
+matérias de Direito Público”, “14 - Direito Tributário” e “12775 - Direto à Educação”.
+Essas relações de compartilhamento de dispositivos legais observadas entre alguns
+assuntos, e.g. “14 - Direito Tributário” e “9985 - Direito Administrativo e outras matérias
+de Direito Público”, apontam para a existência de zonas de sobreposição entre eles, o
+que pode gerar uma incorreta classificação da ação judicial e ocasionar prejuízos para o
+adequado e tempestivo processamento da demanda.
+Outra observação importante revelada pela rede construída, evidenciada na Fi-
+gura 3, é a representação das áreas de afinidades compartilhadas pelos diferentes assuntos
+jurídicos. Essa relação pode ser observada tanto pelo posicionamento espacial dos gru-
+pos como pela distância entre eles e revela tanto o relativo isolamento de assuntos muito
+específicos como o “287 - Direito Penal”, bem como a fragmentariedade de assuntos mul-
+tidisciplinares como “9985 - Direito Administrativo e outras matérias de Direito Público”
+e “14 - Direito Tributário”. Acreditamos ainda que esses resultados podem contribuir para
+compreensão das relações existentes entre os assuntos jurídicos bem como para a criação
+e aprimoramento de modelos teóricos e computacionais que auxiliem em tarefas como:
+classificação de processos em assuntos jurídicos, identificação de erros em citações legais
+de processos e recomendação de citações legais em processos judiciais.
+A percepção visual dessas relações pode ajudar significativamente no estudo das
+conexões legais entre esses assuntos, bem como na observação, sob o prisma temporal,
+da evolução do sistema legal brasileiro. Vale ressaltar que a rede revela importantes ca-
+racterísticas do sistema legal brasileiro especialmente no que toca as relações internas,
+
+externas e setoriais dos ramos do Direito representados. A possibilidade de visualizar de
+forma multidimensional as conexões que compõe a rede permite observar o denso aglu-
+tinamento característico do Direito Penal que tende a se relacionar mais proximamente
+entre suas próprias comunidades de legislações, procurando produzir suas definições le-
+gais e suas regras de aplicação dentro de uma racionalidade muito peculiar estruturada
+ao redor da chamada “legalidade penal”. Isso porque o Direito Penal é um sistema muito
+fechado que se orienta por conceitos, princípios e regras muito próprias que apenas excep-
+cionalmente se comunicam ou influenciam outros ramos do Direito. Em contrapartida, a
+representação dos nós do ramo Direito Tributário demonstra a alta fragmentariedade e o
+elevando nível de conexão desse ramo com outras áreas do Direito, uma vez que o Direito
+Tributário, por regular a atividade de cobrança de tributos (impostos, taxas e contribuições
+de melhoria) precisa necessariamente se espalhar pelas mais variadas áreas de produção
+normativa para apropriar-se dos conceitos e instrumentos jurídicos necessários a regular
+a tributação, inclusive negociando em alguns momentos com o Direito Penal, quando por
+exemplo esse precisa definir os chamados crimes contra a ordem tributária.
+Finalmente, como perspectiva de trabalhos futuros, gostaríamos de aplicar a meto-
+dologia proposta diretamente em documentos oficiais, e.g., em dados de petições iniciais
+com assuntos rotulados. Tal avaliação poderia ser utilizada para confrontar a imparciali-
+dade das análises e métricas vindas de um grande volume de dados com a subjetividade
+inerente das TPUs.
+6. Agradecimentos
+Agradecemos ao CNPq, CAPES, FUNCAP e a Fundação Edson Queiroz pelo apoio fi-
+nanceiro.
+Referências
+Carmichael, I., Wudel, J., Kim, M., and Jushchuk, J. (2017). Examining the evolution of
+legal precedent through citation network analysis. NCL Rev., 96:227.
+CNJ. Sistema de gestão de tabelas processuais unificadas: Assuntos - Última versão
+(excel) - versão: 23/03/2022. Disponível em: https://www.cnj.jus.br/sgt/
+versoes.php?tipo_tabela=A
+Fowler, J. H., Johnson, T. R., Spriggs, J. F., Jeon, S., and Wahlbeck, P. J. (2007). Network
+analysis and the law: Measuring the legal importance of precedents at the us supreme
+court. Political Analysis, 15(3):324–346.
+Fruchterman, T. M. and Reingold, E. M. (1991). Graph drawing by force-directed place-
+ment. Software: Practice and experience, 21(11):1129–1164.
+Haapio, H. and Hagan, M. (2016). Design patterns for contracts. In Networks. Procee-
+dings of the 19th international legal informatics symposium IRIS, pages 381–388.
+Henderson, W. D. (2014). From big law to lean law. International Review of Law and
+Economics, 38:5–16.
+Koniaris, M., Anagnostopoulos, I., and Vassiliou, Y. (2018). Network analysis in the
+legal domain: A complex model for european union legal sources. Journal of Complex
+Networks, 6(2):243–268.
+
+Hagan, M. Law by design. Disponível em: https://lawbydesign.co/
+Morais, E. A. M. and Ambrósio, A. P. L. (2008). Automatic domain classification of
+jurisprudence documents. In Proceedings of the 2008 Euro American Conference on
+Telematics and Information Systems, pages 1–6.
+Newman, M. (2018). Networks. Oxford university press.
+Newman, M. E. (2003). Mixing patterns in networks. Physical review E, 67(2):026126.
+Pires, R. S., Oliveira, E. A., Fernandes, C. G., Neto, J. A. M., and Furtado, V. (2021).
+Mapping landmark cases in the us legal system.
+Ruhl, J., Katz, D. M., and Bommarito, M. J. (2017). Harnessing legal complexity. Science,
+355(6332):1377–1378.
+Susskind, R. E. and Susskind, D. (2015). The future of the professions: How technology
+will transform the work of human experts. Oxford University Press, USA.
+Whalen, R. (2016). Legal networks: The promises and challenges of legal network analy-
+sis. Mich. St. L. Rev., page 539.
+Zhang, P. and Koppaka, L. (2007). Semantics-based legal citation network. In Proce-
+edings of the 11th international conference on Artificial intelligence and law, pages
+123–130.

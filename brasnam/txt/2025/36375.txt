@@ -1,0 +1,531 @@
+Institutional Hierarchy and Asymmetry in Brazilian
+Computer Science Faculty Hiring Network
+Augusto Ferreira Guilarducci1, Icaro Luiz Lage Vasconcelos1,
+Eduardo Jose da Silva Luz1, Vander Luis de Souza Freitas1
+1Department of Computing, Federal University of Ouro Preto (UFOP)
+35.400-000 – Ouro Preto – MG – Brazil
+augusto.guilarducci@aluno.ufop.edu.br
+Abstract. Scientific academia is often shaped by invisible hierarchies that in-
+fluence career trajectories and institutional prestige. This study examines the
+prestige and faculty migration of professors affiliated with Brazilian Gradu-
+ate Programs in Computer Science from 60 institutions. We identify the rela-
+tionship between the institution’s prestige, hiring patterns, and scientific pro-
+ductivity metrics, tracking the migration of 1084 Professors using data from
+the 2022 CAPES Graduate Programs evaluation report, Lattes curriculum, and
+OpenAlex profiles. Our analysis reveals an extreme asymmetry: 90% of profes-
+sors originate from just 20% of institutions, with only 2.31% professors being
+hired by more prestigious institutions than their doctorate ones.
+1. Introduction
+The Science of Science (SciSci) is a transdisciplinary approach to investigate the struc-
+ture of science, applying quantitative and computational methods to study the mecha-
+nisms underlying scientific discovery, collaboration and impact [Fortunato et al. 2018].
+Recent advances in the field leverage the availability of bibliographic data in dif-
+ferent large-scale databases,
+namely OpenAlex [Priem et al. 2022], Web of Sci-
+ence,
+and Scopus,
+with investigations ranging from the discovery of hierar-
+chical structures in academia [Wapman et al. 2022] to the mobility of scientists
+[FitzGerald et al. 2023, Murray et al. 2023, Sugimoto et al. 2017] and predictions of pro-
+ductivity [Acuna et al. 2012, Dong et al. 2016, Sinatra et al. 2016].
+One aspect of scientific ecosystems is the mobility of researchers, especially the
+transition from doctoral training to faculty positions. In [FitzGerald et al. 2023], this tran-
+sition is examined within the mathematics community, where the authors build a network
+from mathematicians and their Ph.D. supervisors. The network nodes are math depart-
+ments, and weighted directed links connect the department where researchers obtained
+their Ph.D. to where they became faculty. The analysis reveals that the graduate faculty
+transition rate is decaying over time, showing that it is becoming harder for Ph.D. hold-
+ers to become faculty, even for historically well-placed departments. The main factors
+influencing this transition are gender, the hiring year, and the number of students advised
+by the Ph.D. advisor. Recently, [Wapman et al. 2022] investigated the career mobility of
+tenured or tenured faculty employed in the years 2011–2020 at 368 PhD-granting univer-
+sities in the US, annotating their doctoral and faculty institutions. They built networks
+whose nodes are institutions, and directed links go from the institution where the profes-
+sor got their doctorate to where they were hired as faculty. They found that 80% of all
+
+domestically trained faculty were trained in just 20.4% universities. In addition, people
+are usually hired in lower-rank institutions compared to where they got a Ph.D.
+While these studies provide insights into the US academic landscape, the dynam-
+ics of faculty hiring and prestige in other national contexts remain relatively unexplored.
+In Brazil, the Coordination for the Improvement of Higher Education Personnel (CAPES)
+plays a central role in evaluating graduate programs [Capes 2024]. CAPES conducts qua-
+drennial evaluations, assigning scores from 1 to 7 based on various criteria, including
+scholarly output, student enrollment, and successful thesis defenses. Scores of 1 and 2
+indicate programs unfit to operate, 3 allows for Master’s programs, 4 to 7 permit PhD
+programs, and 6 and 7 denote programs of excellence. This structured evaluation system
+provides a unique opportunity to examine the interplay between institutional prestige,
+hiring patterns, and research productivity.
+This paper investigates the prestige hierarchies and asymmetries within the Brazil-
+ian Graduate Programs in Computer Science (BRGPCS) hiring network. We construct a
+directed hiring network encompassing n = 1, 084 professors across 60 BRGPCS institu-
+tions, drawing data from three primary sources: the 2022 CAPES evaluation report, Lattes
+curriculum (the Brazilian national researcher database), and OpenAlex profiles. Notably,
+OpenAlex [Priem et al. 2022], a fully open catalog of the global research system, en-
+compassing millions of entities (authors, works, institutions, topics) interconnected by
+billions of relationships, and its well-documented API, facilitates in-depth exploration of
+our research questions, supplementing the structured data from CAPES and Lattes.
+Our study is motivated by three research questions. The first (RQ1) is how un-
+equal is the distribution of faculty production and hiring within the BRGPCS network?
+Can we identify systemic patterns of inequality and self-reinforcement among elite insti-
+tutions? The second (RQ2) asks if a significant prestige hierarchy does exist within the
+BRGPCS network, and how does its steepness compare to established patterns (such as in
+US academia)? And the third (RQ3) ask how strongly does institutional prestige, as deter-
+mined by network analysis, correlate with established scientific productivity indicators,
+such as CAPES scores and bibliometric measures?
+To address these questions, we employ a combination of quantitative methods,
+including the calculation of Gini coefficients of inequality, hierarchical violation rates,
+and the application of the SpringRank algorithm [Bacco et al. 2018] for network analysis,
+inspired by [Wapman et al. 2022] and [Clauset et al. 2015], to properly rank institutions
+based on their hires and production of scientists.
+The contributions of this work are a comprehensive analysis of the BRGPCS fac-
+ulty hiring network, quantifying the extent of inequality in faculty production and hiring.
+By evaluating the existence and characteristics of a prestige hierarchy within the Brazil-
+ian context, we offer a comparative perspective to studies focused on the US system. We
+also investigate the relationship between network-derived prestige and traditional mea-
+sures of scientific productivity, shedding light on the potential for prestige to influence
+evaluation metrics. Finally, we demonstrate the utility of combining data from diverse
+sources (CAPES, Lattes, and OpenAlex) for studying the dynamics of national academic
+systems, highlighting how this can impact scientific development in countries outside the
+usual US-Europe axis.
+
+Our analysis reveals a highly unequal distribution of faculty production within the
+BRGPCS, with a striking 90% of professors originating from just 20% of the institutions,
+reflected in a Gini coefficient of G = 0.81. This pronounced asymmetry persists even after
+accounting for institutional age and the number of graduate programs (G = 0.74 −0.79).
+Furthermore, we find evidence of a steep prestige hierarchy, where upward mobility is
+exceptionally limited: only 2.31% of hires represent movement to a more prestigious
+institution than the professor’s doctoral origin, a rate significantly lower than the 5-23%
+observed in US-based studies [Wapman et al. 2022, Clauset et al. 2015].
+2. Data and Methodology
+This study investigates faculty production inequality and prestige hierarchies within BRG-
+PCS. We frame this investigation as a network analysis problem, where institutions are
+represented as nodes and faculty hiring patterns are represented as directed, weighted
+edges. Our analysis is based on a comprehensive dataset constructed from three primary
+sources: the 2022 CAPES Evaluation Report, Lattes curricula, and OpenAlex. We detail
+the data collection, processing, and analysis methods below.
+2.1. Data Collection
+We collected the faculty record of 1,511 professors hired as faculty in at least one Brazil-
+ian Graduate Program in Computer Science in 2022. To be eligible to participate in the
+study, one must have at least a doctorate degree in order to qualify as a supervisor. The
+list of professors comes from the 2022 CAPES Evaluation Report of Brazilian Graduate
+Programs available at Sucupira1, serving as the primary source for the identification of
+affiliated professors. The list of professors was then cross-referenced with their Lattes
+curriculum2, extracting each professor’s doctorate and current faculty institution. Only
+professors from graduate programs with CAPES score between 3 and 7 are included,
+ensuring alignment with nationally recognized quality standards. The starting year and
+the CAPES score for each Brazilian Graduate Program in Computer Science were also
+recorded in the CAPES Evaluation Report. In instances where institutions maintained
+multiple Graduate Programs in Computer Science, the oldest program was assumed as
+the reference year, and a mean CAPES score was calculated, weighted by the number of
+professors within each graduate program.
+Using the list of institutions and professors compiled from the CAPES and Lattes
+databases, we also retrieved from OpenAlex the academic profiles of professors through
+its public API3. The extracted data included the institution’s full name and acronym and
+the list of works published by the institution’s faculty affiliated with Computer Science
+GPs. This list of works was used to calculate scientific productivity metrics, such as the
+number of papers, the h index and the i10 index, treating the sampled faculty as a group
+for calculations. To maintain data quality, only journal articles and conference papers pub-
+lished up to 2022 were included, excluding works categorized as paratexts or retracted.
+We also annotated, for each sampled institution, the number of professors trained outside
+Brazil to calculate international hiring rates, but internationally trained professors were
+removed from the mobility network. Although the initial data included 1,511 professors,
+1Available at: https://sucupira.capes.gov.br/sucupira/. Accessed on 15/05/2025.
+2Available at: https://lattes.cnpq.br/. Accessed on 12/05/2025.
+3Available at: https://docs.openalex.org/. Accessed on 12/05/2025.
+
+only 1,084 (72%) remained in the final sample, as eligibility required earning a doctorate
+from and holding a faculty position at a Brazilian institution, keeping the focus on domes-
+tic training. The final dataset consists of n = 1, 084 professors affiliated with Brazilian
+Graduate Programs in Computer Science from 60 institutions.
+2.2. Network Construction and Analysis
+A graph G(V, E) contains N = |V | vertices (nodes) and L = |E| edges (links), usually
+represented by an adjacency matrix Aij, with Aij = 1 when nodes i and j are connected
+and Aij = 0 otherwise [Barabási and Pósfai 2016]. For digraphs (directed graphs), the
+source and target nodes have distinct roles, and link directions matter. One might quantify
+the number of links, known as node degree, that arrive kin
+i
+and leave kout
+i
+node i, as
+follows:
+kin
+i =
+N
+X
+j=1
+Aij,
+kout
+i
+=
+N
+X
+j=1
+Aji.
+(1)
+Node strength is a more general concept that considers the total weight incident to
+a node:
+f in
+i
+=
+N
+X
+j=1
+Wij,
+f out
+i
+=
+N
+X
+j=1
+Wji.
+(2)
+The matrix Wij contains any real-valued number of the weight between pairs of
+nodes in contrast to unweighted networks. We show later a network whose nodes repre-
+sent institutions, and its weighted connections are numbers of professors that obtained a
+Ph.D. in i and later became a faculty in j. The entries are integer numbers but could be
+real-valued if one were interested in rates instead.
+To investigate the hiring patterns of professors in the Brazilian Graduate Programs
+in Computer Science, we built a directed graph describing the hiring network. Institutions
+were modeled as nodes and directed edges were drawn from a faculty member’s doctoral
+institution to their employing institution, weighted by the number of individuals moving
+between the two. So, given two institutions i and j, if w professors earned their Ph.D.
+from i and were later hired as faculty at j, we create the edge i →j, with weight w.
+In the case of a professor being hired by their doctorate institution, we consider this as a
+self-hire, linking the institution to itself as i →i. The resulting network consisted of 60
+nodes (institutions) and 318 edges (hiring relationship).
+Likewise, the prestige hierarchy in BRGPCSs was explored by calculating the
+number of professors hired that violated the prestige hierarchy. A faculty hired by a
+more prestigious institution than their doctorate institution describes upward mobility
+in prestige, or a violation of prestige, contradicting the expected prestige flow saw in
+[Wapman et al. 2022, Clauset et al. 2015]. In a perfectly hierarchical network, no insti-
+tution would hire a professor from a lower-ranking institution. From this perspective, an
+institution is regarded as more prestigious if its trained professors secure faculty posi-
+tions at other prestigious institutions. To obtain a network that closely approximates a
+
+perfectly aligned hierarchy of prestige, we applied the SpringRank algorithm as done by
+[Wapman et al. 2022], assigning ranks to each institution.
+2.3. SpringRank Algorithm for Prestige Ranking
+SpringRank is a network ranking algorithm that simulates a physical spring system, de-
+signed to infer hierarchical structures from directed edge patterns [Bacco et al. 2018].
+Each node i is embedded with a rank si connected by springs (edges) exerting a force
+proportional to the deviation from its resting length. The algorithm assumes that edges
+inherently encode status differences: a directed edge i →j implies that node i has a
+higher prestige than node j. A directed edge i →j has its associated energy defined as:
+Hij = 1
+2(si −sj −1)2,
+(3)
+where si and sj represent the ranks of nodes i and j, respectively. Equation (3) can be
+minimized when si −sj = 1. The optimal ranking s∗of the nodes can be given by
+minimizing the total energy of the system, described by:
+H(s) = 1
+2
+X
+i,j
+Aij(si −sj −1)2,
+(4)
+where Aij denotes the weight of the directed edge i →j. Setting the gradient ∇H(s) to
+zero, we can obtain the optimal rank s∗by solving the linear system:
+[Dout + Din −(A + AT)]s∗= [Dout −Din]1,
+(5)
+where Dout and Din are diagonal matrices of out-degrees and in-degrees, respectively,
+and 1 is a vector of ones.
+The algorithm then fixes the rank of one of the nodes and solves the remaining
+equation using a sparse iterative solver. This characteristic allows SpringRank to solve
+Equation (5) almost in linear time, with O(L) with L as the number of nonzero edges in A,
+making it applicable to large-scale networks with millions of nodes [Bacco et al. 2018].
+Finally, we obtain the real value ranking s∗of the network by solving Equation (5). The
+implementation of the SpringRank algorithm we use is described by [Bacco et al. 2018]
+and can be accessed at: https://github.com/LarremoreLab/SpringRank.
+With node rankings that approximate a perfectly aligned hierarchy of prestige,
+we calculate the number of violations of the prestige hierarchy, as previously described.
+To evaluate whether the observed violations in our network are lower than expected by
+chance, randomized networks were created using a null model based on the configuration
+model. Specifically, it randomly rewires the edges, preserving the nodes’ in and out de-
+grees, thus generating randomized versions of the original network. This process ensures
+that the global connectivity structure remains unchanged, but that any hierarchical con-
+straints present in the original network are disrupted. We generated n = 10, 000 networks
+in total, annotating the fraction of hierarchical violations for each randomized network
+and comparing the distribution with the fraction of violations in the original network.
+All data and source code used in this study are publicly available and can be
+accessed at: https://github.com/augustofgui/prestige-hierarchy.
+
+3. Results and Discussion
+This section presents and discusses the results of our analysis, focusing on two primary
+aspects: faculty production inequality and the prestige hierarchy within Brazilian Gradu-
+ate Programs in Computer Science (BRGPCS). We connect these findings to the research
+questions outlined in the Introduction.
+3.1. Faculty Production Inequality
+Our first research question (RQ1) concerned the extent of inequality in faculty production
+within the BRGPCS network. The Brazilian Graduate Programs in Computer Science ex-
+hibit a high level of inequality in faculty production. An overwhelming 90% of professors
+were trained in just 20% of the institutions (12 units). This concentration is significantly
+higher than what is observed in US academia as a whole, where 20.4% of institutions
+account for 80% of all trained professors [Wapman et al. 2022]. Furthermore, this in-
+equality is significantly higher than what is observed in the US domains of Computer
+Science, History, and Business, where 25% of the institutions were responsible for train-
+ing between 71% and 86% of faculty members [Clauset et al. 2015]. Our results show
+a greater concentration, with fewer institutions producing a larger share of professors,
+highlighting a high degree of inequality in faculty production in the Brazilian Computer
+Science academic field.
+To quantify the observed inequality, we calculated the Gini coefficient, a standard
+measure of statistical dispersion. The Gini coefficient ranges from 0 to 1, where G = 0
+indicates a perfect equality where all institutions produce the same number of faculty,
+and G = 1 represents a maximum inequality where all faculty are trained in a single
+institution. Our analysis yielded a G = 0.81, indicating a highly unequal distribution
+of faculty production, as shown in Figure 1. In comparison, in the US. academia as a
+whole, the Gini coefficient for faculty production has been found to be around G = 0.75
+as reported by [Wapman et al. 2022].
+Older institutions would have more time to develop their research infrastructure
+and attract faculty, which could partially explain the concentration of faculty production.
+To assess whether the inequality in faculty production could be attributed to the age of
+an institution, we tested the influence of the institution’s age on faculty production by
+normalizing their faculty production rates by the corresponding institution age. We found
+G = 0.74 after normalizing for age, indicating that a significant component of inequality
+in faculty production still remains, even with a reduction in the magnitude of the inequal-
+ity. Additionally, since some institutions contain multiple Graduate Programs, we also
+analyzed the influence of the number of Graduate Programs on the production inequality,
+resulting in G = 0.79. However, the lack of a significant influence from institution age
+or the number of Graduate Programs suggests that the observed inequality is likely driven
+by other social factors.
+The domination of the hiring network by few institutions is also observed in fac-
+ulty hiring, self-hiring, and international hiring rates. The highest producing institution
+also tends to hire more faculty (Pearson ρ = 0.75, p < 10−5). Moreover, these institu-
+tions show a tendency to train a high degree of their own faculty (Spearman ρ = 0.86,
+p < 10−5) and to hire professors trained outside of Brazil (Spearman ρ = 0.73, p < 10−5).
+
+0%
+20%
+40%
+60%
+80%
+100%
+Fraction of Institutions
+0%
+20%
+40%
+60%
+80%
+100%
+Fraction of Faculty Produced
+Lorenz Curve for Faculty Production
+Lorenz Curve
+Perfect Equality
+Figure 1.
+Lorenz curve, in blue, of the fraction of the cumulative sum of the
+faculty produced by institutions ordered from lower to higher Spring Rank.
+The line of equality, in red, indicates perfect equality in faculty production.
+The further the Lorenz curve is from the line of equality, the greater the
+inequality observed.
+This underscores the rigidity and self-reinforcing cycle in which top-tier institutions dom-
+inate faculty production and hiring of the BRGPCSs network.
+3.2. Prestige Hierarchy
+Our second research question (RQ2) focused on the existence and steepness of a prestige
+hierarchy within the BRGPCS hiring network. To investigate such a hierarchy of pres-
+tige in the BRGPCSs hiring network, the SpringRank algorithm was applied to assign
+a rank to each institution in the network, as discussed in Section 2.3. Figure 2 presents
+the BRGPCS hiring network with mobility of professors trained in one institution and
+hired as faculty in another, considering the BRGPCS from 60 institutions. The institu-
+tions are sorted by their prestige, as in their corresponding SpringRank value, starting
+from PUC-RIO and going clockwise to the smallest values, and grouped by the major
+regions in Brazil by color. It suggests that the more prestigious institutions in each major
+region seem to function as the primary source of Professors for other institutions in their
+respective regions.
+In this context, we observed the fraction of professors who were hired by an in-
+stitution more prestigious than their doctorate institution, qualifying this mobility, from
+lower to higher prestige, as a violation of prestige hierarchy. Only 2.31% of the profes-
+sors violated the hierarchy, being hired by more prestigious institutions, demonstrating
+the very steep hierarchical structure of the BRGPCSs hiring network. In comparison,
+
+PUC-RIO
+UNICAMP
+UFRJ
+UFRGS
+UFPE
+USP
+UFMG
+PUC/RS
+UFSC
+UTFPR
+UFF
+UFCG
+UFRN
+UFC
+UFES
+IME
+UFPR
+PUC/PR
+UNIRIO
+UFAM
+UFPB-JP
+UFSCAR
+UFBA
+UFPA
+UFJF
+UNISINOS
+UNB
+UFPEL
+UFABC
+UFU
+UFRPE
+UFMS
+UPE
+UNIFEI
+UFSM
+UNESP-SJRP
+UEL
+FURG
+UECE
+UNIVALI
+UFV
+UFSJ
+UFMA
+UNIFESP
+PUC/MG
+UFOP
+UNIFOR
+UDESC
+CEFET/RJ
+UFG
+UFLA
+UFAL
+UEM
+FUFPI
+FUFSE
+UFAC
+UNIOESTE
+UEFS
+UNIFACS
+IFCE
+Figure 2.
+Chord diagram of the BRGPCSs faculty hiring network, ordered by
+SpringRank rankings, going clockwise starting from PUC-RIO. The color
+indicates institutions grouped by major regions. The arrows describe the
+flow of professor trained in an institution that were hired as faculty by the
+pointed institution.
+US academia shows that 5 to 23% professors violated the prestige hierarchy within all
+domains and fields sampled [Wapman et al. 2022], 13% in the domain of Mathematics
+and Computing[Wapman et al. 2022], and 9 to 14% in the fields of Computer Science,
+History, and Business [Clauset et al. 2015].
+Figure 3 shows that the fraction of prestige violations in the original network is
+much lower than the null model distribution, lying in the extreme left tail of the null
+distribution (p < 10−5). This indicates that the steep hierarchy of prestige, with low rates
+of upward mobility, is structurally inherent in the system.
+Moreover, 25.18% of the professors were self-hired, as in the fraction of profes-
+sors hired as faculty by their own doctoral institutions. More prestigious universities have
+
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+0.16
+Fraction of Upwards Violations
+0
+200
+400
+600
+800
+1000
+Frequency
+Original Network
+Rewired Networks
+Figure 3. Fraction of prestige violations in the original network (red) and the null
+model distributions for the fraction of prestige violations (blue).
+a small tendency to hire more of their own students (Pearson ρ = 0.60, p < 10−5) and to
+hire more talent outside of Brazil (Pearson ρ = 0.73, p < 10−5). These tendencies further
+consolidate the hierarchy prestige in the BRGPCSs network by limiting upward mobility
+for domestically trained academics.
+Finally, our third research question (RQ3) explored the correlation between
+network-derived prestige (SpringRank) and established scientific productivity indicators.
+The rankings derived from the SpringRank algorithm seemed to approximate the hierar-
+chy of scientific productivity. The top ranked institutions usually had a higher weighted
+CAPES score (Pearson ρ = 0.78, p < 10−5), higher h index (Pearson ρ = 0.75,
+p < 10−5), i10 index (Pearson ρ = 0.71, p < 10−3) and greater number of articles
+published by the faculty of an institution (Pearson ρ = 0.72, p < 10−5). This relationship
+suggests that productivity metrics and CAPES scores may not only reflect program quality
+but also signal the existence of a hierarchical structure to scientific impact and output. Al-
+though this study focuses on hiring patterns, future research could analyze co-authorship
+and collaboration networks between these institutions, revealing if prestige hierarchies
+and inequality in scientific impact manifest in collaborative practices of BRGPCSs.
+4. Conclusions
+This study investigated the asymmetry and prestige hierarchy within Brazilian Grad-
+uate Programs in Computer Science (BRGPCS), focusing on faculty hiring patterns
+and evaluating how these phenomena compare with the US academia observed by
+[Wapman et al. 2022] and [Clauset et al. 2015]. By analyzing data from n = 1, 084 BRG-
+PCS professors in 60 institutions, we constructed a directed hiring network and applied
+the SpringRank algorithm to rank institutions, quantifying institutional prestige hierarchy
+and dynamics of inequality within the network.
+Our findings revealed an inequality in faculty production, with 90% of professors
+
+trained by only 20% of institutions, with a Gini coefficient of G = 0.81 indicating an
+extreme inequality. This asymmetry is present in the data even after normalizing for in-
+stitutional age or accounting for the number of graduate programs (G = 0.74 −0.79).
+Furthermore, the hiring network showed a steep prestige hierarchy, with only 2.31% of
+the hires representing upward mobility, significantly lower than the rates observed in US
+academia (5-23%) [Wapman et al. 2022, Clauset et al. 2015]. This steep hierarchy, val-
+idated through comparison with null models (p < 10−5), emphasizes institutional self-
+reinforcement, as more prestigious programs dominate faculty production, preferentially
+hire their own graduates (25.18% self-hires), and attract more international talent, strongly
+correlating with higher scientific productivity metrics, such as h index, i10 index, and
+CAPES scores.
+4.1. Limitations
+Although our study offers insight into the structure and inequality of the BRGPCS hiring
+network, it contains limitations. We captured only a cross-sectional snapshot based on the
+2022 CAPES evaluation and publications up to that year, overlooking temporal dynamics
+that may influence hiring patterns. We included only doctoral-holding professors due to
+the nature of our dataset, which contains only professors affiliated with Graduate Pro-
+grams. This design choice excludes those with master’s degrees and potentially omits
+early-career faculty whose hiring dynamics might differ. [FitzGerald et al. 2023] and
+[Wapman et al. 2022] also consider doctoral-holding researchers, since the graph edges
+connect departments or institutions where the researchers obtained their Ph.D. to where
+they became faculty. We also focused on Computer Science programs, limiting general-
+ization to other academic fields as hiring pattern can vary widely across disciplines.
+4.2. Future Works
+In future work, longitudinal hiring networks could be studied by compiling data from
+multiple CAPES evaluations from different years to track changes in faculty production
+concentration, prestige hierarchies, and mobility patterns over time. Furthermore, to de-
+termine whether the extreme inequality and steep prestige gradients observed in CS are
+widespread in Brazilian academia or discipline-specific, one could encompass all CAPES-
+accredited graduate programs in Brazil.
+Acknowledgements
+The authors would like to thank the Fundação de Amparo à Pesquisa do Estado de Minas
+Gerais (FAPEMIG), the Coordenação de Aperfeiçoamento de Pessoal de Nível Superior
+(CAPES) and the Universidade Federal de Ouro Preto (PROPPI/UFOP) for supporting
+the development of this study.
+References
+Acuna, D. E., Allesina, S., and Kording, K. P. (2012). Predicting scientific success. Na-
+ture, 489(7415):201–202.
+Bacco, C. D., Larremore, D. B., and Moore, C. (2018). A physical model for efficient
+ranking in networks. Science Advances, 4(7):eaar8260.
+Barabási, A.-L. and Pósfai, M. (2016). Network Science. Cambridge University Press,
+Cambridge.
+
+Capes (2024). Plataforma sucupira. Available at: https://sucupira-v2.capes.
+gov.br/sucupira4/. Accessed on 26/05/2024.
+Clauset, A., Arbesman, S., and Larremore, D. B. (2015). Systematic inequality and hier-
+archy in faculty hiring networks. Science Advances, 1(1):e1400005.
+Dong, Y., Johnson, R. A., and Chawla, N. V. (2016). Can scientific impact be predicted?
+IEEE Transactions on Big Data, 2(1):18–30.
+FitzGerald, C., Huang, Y., Leisman, K. P., and Topaz, C. M. (2023). Temporal dynamics
+of faculty hiring in mathematics. Humanities and Social Sciences Communications,
+10(1):247.
+Fortunato, S., Bergstrom, C. T., Börner, K., Evans, J. A., Helbing, D., Milojević, S.,
+Petersen, A. M., Radicchi, F., Sinatra, R., Uzzi, B., Vespignani, A., Waltman, L., Wang,
+D., and Barabási, A.-L. (2018). Science of science. Science, 359(6379):eaao0185.
+Murray, D., Yoon, J., Kojaku, S., Costas, R., Jung, W.-S., Milojević, S., and Ahn,
+Y.-Y. (2023).
+Unsupervised embedding of trajectories captures the latent struc-
+ture of scientific migration.
+Proceedings of the National Academy of Sciences,
+120(52):e2305414120.
+Priem, J., Piwowar, H. A., and Orr, R. (2022). Openalex: A fully-open index of scholarly
+works, authors, venues, institutions, and concepts. arXiv preprint arXiv:2205.01833.
+Sinatra, R., Wang, D., Deville, P., Song, C., and Barabási, A.-L. (2016). Quantifying the
+evolution of individual scientific impact. Science, 354(6312):aaf5239.
+Sugimoto, C. R., Robinson-Garcia, N., Murray, D., Yegros-Yegros, A., Costas, R., and
+Larivière, V. (2017). Scientists have most impact when they’re free to move. Nature,
+550:29–31.
+Wapman, K. H., Zhang, S., Clauset, A., and Larremore, D. B. (2022). Quantifying hier-
+archy and dynamics in us faculty hiring and retention. Nature, 610(7930):120–127.

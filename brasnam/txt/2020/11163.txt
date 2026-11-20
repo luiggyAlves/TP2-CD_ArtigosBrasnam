@@ -1,0 +1,519 @@
+Métodos baseados em léxico para 
+extração de aspectos de opiniões em português 
+Raul Wagner Martins Costa e Thiago Alexandre Salgueiro Pardo 
+Núcleo Interinstitucional de Linguística Computacional (NILC) 
+Instituto de Ciências Matemáticas e de Computação, Universidade de São Paulo (USP) 
+São Carlos/SP, Brasil 
+raul.wagner@live.com, taspardo@icmc.usp.br
+Abstract. In the sentiment analysis area, the task of aspect extraction usually 
+consists of identifying the opinion aspects in user-generated reviews of 
+products that users have acquired. It is a basic task for several others, from 
+polarity classification to opinion summarization. In this article, we study some 
+methods for extraction of aspects from opinions written in Portuguese. In 
+particular, we focus on lexical-based methods, aiming at assessing their 
+potentialities and limitations. 
+Resumo. Na área de análise de sentimentos, a tarefa de extração de aspectos 
+consiste usualmente em identificar os aspectos de opinião em revisões 
+produzidas por usuários sobre produtos que adquiriram. É uma tarefa de base 
+para diversas outras, desde classificação de polaridade à produção de 
+sumários de opinião. Neste artigo, estudamos alguns métodos para extração 
+de aspectos em opiniões escritas em português. Em especial, focamos em 
+métodos baseados em léxico, buscando avaliar suas potencialidades e 
+limitações. 
+1. Introdução 
+A web possibilitou compilar uma quantidade grande de opiniões de pessoas sobre 
+diversos tópicos, desde política e saúde até serviços e produtos fornecidos por empresas 
+e, além disso, extrair informações relevantes para análise e apoio à decisão em seus mais 
+variados níveis (governamental, empresarial, comercial ou mesmo pessoal), visto que 
+muitas das opiniões que temos possuem grande influência nas de outras pessoas, devido 
+à natureza social dos humanos. 
+ 
+Estudar essas opiniões é a principal motivação da área conhecida por análise de 
+sentimentos. Nessa área, objetiva-se extrair informações de revisões escritas por 
+milhares de pessoas na web, principalmente. Formalmente, segundo Liu (2012), análise 
+de sentimentos é a área de estudo que analisa as opiniões e sentimentos de pessoas com 
+relação a entidades como produtos, serviços, organizações, indivíduos, tópicos e seus 
+respectivos atributos/aspectos. 
+ 
+Como o conceito de opinião é bem amplo, no geral se estudam as opiniões que 
+trazem consigo algum sentimento em relação a uma entidade específica. Produtos 
+eletrônicos são objetos frequentes das pesquisas na área, dados os interesses de
+
+fabricantes e seus clientes. Na Figuras 1 e 2, é possível ver exemplos reais (com erros, 
+inclusive) de revisões sobre um produto comprado online. 
+ 
+É um produto considerável, bom e indico para comprar fácil de usar .recebi antes do prazo a 
+empresa está de parabéns. 
+Figura 1. Exemplo de revisão sobre uma impressora 
+ 
+é um bom produto, porém algumas fahlas são encontradas na tela. O que gostei: o produtoo é 
+bem legal. Possui alkgumas teclas de atalho interessantes. O que não gostei: os toques são 
+mto ruins e os menus mto complicados. 
+Figura 2. Exemplo de revisão sobre um smartphone 
+ 
+Nos exemplos, nota-se que, apesar dos usuários terem opiniões positivas em relação aos 
+produtos, eles fazem algumas críticas em relação a algumas características específicas. 
+Isso nos motiva a analisar não só a opinião geral sobre os produtos, mas a opinião sobre 
+as suas características de maneira individual. Para isso, é necessário identificar e extrair 
+essas características, usualmente chamadas de “aspectos” ou “atributos” (Liu, 2012). 
+Como exemplo, um conjunto de aspectos de um smartphone pode incluir “tela”, “peso”, 
+“velocidade”, “usabilidade”, “design” e “bateria”, dentre outros. Alguns aspectos são 
+citados explicitamente nas revisões, enquanto outros apenas implicitamente. Por 
+exemplo, ao usar o termo “fácil de usar” no primeiro exemplo, o usuário refere-se ao 
+aspecto implícito “usabilidade”. Também é interessante ver que nem todos os aspectos 
+referem-se à entidade sendo avaliada. Na primeira revisão, por exemplo, a “velocidade 
+de entrega” se refere à transportadora, e não ao produto em si. Pode-se perceber, 
+portanto, que há vários desafios relacionados à identificação automática dos aspectos. 
+Somam-se a isso as características do registro linguístico das opiniões da web, que se 
+caracteriza como o chamado “internetês”, onde se vê o uso de gírias, simplificações e 
+emojis, além da ocorrência de diversos erros ortográficos e gramaticais. 
+ 
+O passo de identificação e extração de aspectos é a base para tarefas e aplicações 
+seguintes mais sofisticadas, desde detecção da polaridade atribuída a cada aspecto até a 
+sumarização das opiniões sobre uma entidade de interesse (veja, por exemplo, os 
+trabalhos de Liu et al., 2005, López Condori e Pardo, 2017, e Silva e Pardo, 2019). 
+ 
+Iniciativas relativamente recentes na área têm estudado as questões relacionadas 
+à ocorrência dos aspectos e métodos computacionais para sua extração a partir de 
+opiniões escritas em língua portuguesa, visando aplicações mais sofisticadas de análise 
+de sentimentos. Há abordagens com base em aprendizado de máquina (veja, por 
+exemplo, Balage Filho, 2017), levantamento de padrões morfossintáticos e sintáticos 
+(Balage Filho, 2017; Catharin e Feltrim, 2018), estudos linguísticos para agrupamento e 
+organização ontológica dos aspectos (Vargas e Pardo, 2018a, 2018b, 2020) e uso de 
+teorias discursivas na tarefa de extração de aspectos (Oliveira e Feltrim, 2015; Catharin 
+e Feltrim, 2018). Neste trabalho, em particular, nosso interesse reside em métodos de 
+extração de aspectos com base em conhecimento lexical, explorando uma frente até 
+então não testada para o português e buscando delimitar suas potencialidades e 
+limitações.
+
+Em uma primeira linha, baseada em conhecimento especializado, fazemos uso 
+de ontologias de aspectos para identificar aspectos explícitos e implícitos. Em seguida, 
+avaliamos um método genérico e simples de detecção de aspectos, que seleciona os 
+substantivos de uma opinião como candidatos a aspecto. Aprofundando a investigação, 
+usamos um método distribucional para enriquecer o processo, utilizando os conhecidos 
+modelos de word embeddings (Mikolov et al., 2013). Essas abordagens foram 
+escolhidas por apresentarem olhares distintos para a tarefa, mas que são bastante usados 
+na literatura. Os métodos e suas variações são avaliados, demonstrando suas vantagens e 
+limitações. 
+ 
+A seguir, na Seção 2, apresentamos os principais conceitos e trabalhos 
+relacionados. Na Seção 3, detalhamos nossos métodos para extração de aspectos. A 
+avaliação dos métodos é relatada na Seção 4. As considerações finais são feitas na Seção 
+5. 
+2. Trabalhos relacionados 
+Um dos trabalhos pioneiros de análise de sentimentos em nível de aspecto foi feito por 
+Hu e Liu (2004) para a língua inglesa. Os autores extraíram os aspectos através de duas 
+estratégias. Primeiramente, foram extraídos os substantivos mais frequentes como sendo 
+os aspectos. A segunda estratégia trata as sentenças que possuem palavras de 
+sentimento, mas nenhuma palavra que indica um aspecto: neste caso, considera-se o 
+substantivo mais próximo como aspecto. Com esses métodos, foram extraídos os 
+aspectos no domínio de eletrônicos. O trabalho deles mostrou a eficácia das técnicas 
+testadas, apesar de possuir algumas limitações, como não identificar aspectos implícitos. 
+ 
+Muitos trabalhos fizeram uso de técnicas de aprendizado de máquina na tarefa. 
+Por exemplo, o estudo de Toh e Su (2015) se focou nos domínios de opiniões sobre 
+laptops e restaurantes. Para extração dos aspectos, foi usada a técnica de aprendizado de 
+máquina Conditional Random Fields (CRF). Para qualificação dos aspectos, foi usado 
+um classificador binário para cada possível categoria encontrada, por exemplo, “preço”, 
+“atendimento”, etc. Por fim, as duas técnicas foram agregadas para executar a tarefa 
+completa. Os autores descobriram que o desempenho foi afetado pela pequena 
+quantidade de vezes que muitos aspectos foram comentados pelos usuários. Liu et al. 
+(2015) usaram CRF e redes neurais recorrentes para extração dos aspectos. O córpus 
+usado foi o mesmo usado por Toh e Su (2015). Conclui-se que as redes neurais superam 
+a performance de CRF. Galliat et al. (2018) foram além e empregaram word 
+embeddings, usando o modelo word2vec de Mikolov et al. (2013), visando identificar 
+aspectos de revisões sobre finanças em uma taxonomia manualmente construída. Os 
+autores observaram bons resultados para a extração de aspectos explícitos, mas 
+limitações para aspectos implícitos. 
+ 
+Especificamente para o português, apresentamos sucintamente alguns dos 
+principais trabalhos conhecidos que serviram de base para o relatado aqui. É interessante 
+notar que alguns deles seguem linhas apresentadas nos trabalhos citados anteriormente 
+para o inglês. Há abordagens mais tradicionais, que fazem uso de aprendizado de 
+máquina, e mais sofisticadas, que utilizam teorias discursivas.
+
+Balage Filho (2017) testou diferentes métodos de extração de aspectos. Foram 
+testadas a extração de termos frequentes, a extração pela análise de relação sintática (ou 
+seja, uso de templates sintáticos em que aspectos e seus modificadores são 
+frequentemente encontrados) e técnicas de aprendizado de máquina. Esse estudo 
+concluiu que conhecimento sintático e semântico tem um impacto significante na 
+performance da extração. Além disso, mostrou que, em um córpus de resenha de livros, 
+os resultados da extração de termos frequentes são um baseline difícil de superar. 
+ 
+Oliveira e Feltrim (2015) avaliaram o potencial da conhecida teoria discursiva de 
+Centralização (Grosz et al., 1995) para prever a ocorrência de aspectos em comentários 
+de notícias jornalísticas. Segundo a teoria da Centralização, é possível identificar 
+“centros” de atenção mais salientes nas sentenças de acordo com suas funções sintáticas. 
+Os autores utilizaram esses centros como representantes dos aspectos, mostrando que a 
+extração de aspectos com base na teoria discursiva supera baselines mais simples 
+baseados em classificação morfossintática e sintática. Dando continuidade ao trabalho 
+anterior, Catharin e Feltrim (2018) compararam a teoria da Centralização com o uso de 
+padrões morfossintáticos que caracterizam aspectos e de heurísticas sobre comentários 
+de notícias e também resenhas de livros. Seus resultados foram bastante variados, 
+mostrando que o desempenho em comentários de notícias tende a ser melhor. 
+ 
+Em uma abordagem relacionada, Vargas e Pardo (2018a, 2018b) realizaram um 
+estudo manual sobre opiniões de três domínios diferentes - livros, câmeras digitais e 
+smartphones - para propor uma organização ontológica de seus aspectos, produzindo 
+“ontologias de aspectos”, identificando tanto aspectos explícitos quanto implícitos 
+(nesses casos, os chamados termos pista dos aspectos implícitos são registrados). Em 
+um passo posterior, os autores propuseram um novo método para agrupamento de 
+aspectos similares (por exemplo, “preço”, “custo” e “valor”), utilizando, como base, 
+relações lexicais e semânticas de naturezas variadas, como sinonímia, causalidade, 
+construções deverbais, estrangeirismos e correferências, dentre outras. Seus resultados 
+superaram abordagens tradicionais baseadas em menos conhecimento linguístico e 
+resultados mais recentes com word embeddings, mostrando a eficácia da combinação de 
+conhecimentos linguísticos. Vargas e Pardo (2020) vão além e propõem regras que 
+também consideram a ocorrência de verbos psicológicos para a correta identificação de 
+aspectos. 
+ 
+A seguir, apresentamos os métodos que exploramos neste artigo. 
+3. Métodos 
+Formalmente, os métodos investigados neste trabalho buscam, a partir de uma opinião 
+fornecida, gerar uma lista de aspectos identificados, incluindo aspectos explícitos e 
+implícitos. As opiniões processadas são revisões que usuários de sites de comércio 
+eletrônico submetem, avaliando produtos que adquiriram, como as exibidas nas Figuras 
+1 e 2. 
+ 
+Como citado anteriormente, este trabalho foca seus estudos em métodos de 
+extração de aspectos com base em léxico, visando avaliar suas potencialidades e 
+limitações. O processo geral é simples: se um termo na revisão sendo analisada constar 
+no recurso léxico em uso, esse termo é extraído como um aspecto. Em geral, esse tipo
+
+de método demanda a disponibilidade de recursos lexicais e, portanto, costuma ser 
+considerado caro. Recentemente, para o português, houve avanços na criação de 
+recursos desse tipo (incluindo grandes córpus e ontologias), o que viabiliza tal 
+investigação. 
+ 
+O primeiro método investigado realiza a extração de aspectos usando ontologias, 
+que é um método já clássico na literatura. Ontologias são organizações conceituais sobre 
+tipos de objetos e suas propriedades e relações em um domínio de conhecimento 
+específico, como definido por Chandrasekaran et al. (1999). Neste trabalho, foram 
+utilizadas as ontologias de aspectos criadas por Vargas e Pardo (2018a). Um exemplo de 
+representação gráfica de uma parte dessas ontologias (para o domínio de smartphones) 
+pode ser visto na Figura 3. Todas as palavras das ontologias (ignorando-se as relações 
+entre elas) são utilizadas na busca por termos na revisão a ser processada. No caso de 
+aspectos implícitos, usam-se os termos pista que também constam nas ontologias. 
+ 
+Figura 3. Exemplo de parte de ontologia de aspectos para smartphones (Vargas e Pardo, 
+2018a). 
+ 
+Na literatura, métodos com base em ontologias costumam atingir alta precisão, dada a 
+qualidade dos dados ontológicos, que normalmente passam por curadoria humana. 
+Entretanto, são métodos altamente especializados por dependerem de uma estrutura 
+ontológica específica para um domínio de interesse. 
+ 
+Um segundo método avaliado, mais genérico e simples do que o anterior, usa um 
+léxico criado com os substantivos extraídos do grande córpus de revisões de produtos 
+eletrônicos de Hartmann et al. (2014), em uma espécie de “treinamento”, para aprender 
+os termos que podem se referir aos aspectos. Após serem extraídos desse córpus, os 
+substantivos foram filtrados por sua frequência relativa, ou seja, de todos os 
+substantivos recuperados, apenas os 3% mais frequentes foram selecionados (na linha 
+do que foi feito por Balage Filho, 2017, por exemplo). Esse valor foi visto como o 
+melhor em testes empíricos que realizamos. Dessa forma, evita-se a inclusão de dados 
+espúrios no processo, já que muitos substantivos não se referem a aspectos. Para extrair 
+os substantivos, entretanto, ressalta-se que foi necessário usar o normalizador Enelvo
+
+(Bertaglia e Nunes, 2016) para corrigir os textos do córpus (dado que as revisões 
+apresentam textos que não seguem necessariamente a norma culta da língua) e etiquetar 
+morfossintaticamente cada sentença do córpus para posterior seleção dos substantivos. 
+ 
+Como se sabe, usar etiquetas morfossintáticas para guiar a extração de aspectos é 
+um processo mais genérico e independente de domínio (em relação às ontologias), 
+devendo obter uma cobertura maior de aspectos, mas sendo menos preciso, já que há 
+muitos substantivos que não são aspectos. Ao restringir aos substantivos mais 
+frequentes que ocorrem em um córpus de revisões de produtos, o processo fica mais 
+informado. Entretanto, mesmo assim, tal abordagem não garante a identificação de 
+aspectos implícitos, pois, diferentemente do que ocorre nas ontologias, os eventuais 
+termos pista (mesmo que sejam substantivos frequentes no córpus) não estão associados 
+aos aspectos que indicam. 
+ 
+Uma das principais limitações de se usar léxicos baseados em ontologias ou com 
+substantivos extraídos de um córpus é a cobertura não exaustiva desses recursos, 
+característica inerente a eles. Eles são incapazes de lidar, por exemplo, com palavras 
+sinônimas não previstas. Como ilustração, um smartphone pode ser referenciado em 
+uma revisão como “celular” ou “telefone”; se esses termos não estiverem presentes nas 
+ontologias ou não tiverem sido usados com uma frequência mínima nos textos que 
+deram origem ao léxico de substantivos, eles não serão reconhecidos posteriormente. 
+Naturalmente, é inviável listar de maneira manual todas as possibilidades. Isso nos 
+motivou a usar as word embeddings (como definidas por Mikolov et al., 2013) para 
+enriquecer a listagem de aspectos a serem buscados nas revisões de interesse. As word 
+embeddings são representações vetoriais de palavras em um espaço multidimensional, 
+de forma que, se o treinamento for satisfatório, com um córpus suficientemente grande, 
+palavras com sentido próximos ou relacionados tendem a se aglomerar no espaço 
+vetorial. 
+ 
+Neste trabalho, treinamos um modelo de word embeddings com base no grande 
+córpus de produtos eletrônicos de Hartmann et al. (2014) (que conta com 85.910 
+revisões de produtos variados, totalizando 4.097.905 palavras) usando o modelo skip-
+gram do word2vec (Mikolov et al., 2013) com 600 dimensões1. Em seguida, 
+enriquecemos os recursos lexicais dos métodos anteriores com as palavras mais 
+próximas ainda não consideradas, ou seja, para cada palavra das ontologias e do léxico 
+de substantivo extraído do córpus, adicionamos nos recursos lexicais as 3 palavras cujos 
+vetores na modelagem do word2vec fossem mais próximos. A proximidade dos vetores 
+foi medida pela tradicional medida do cosseno para similaridade lexical (conforme 
+definem Jurafsky e Martin, 2008). Dessa forma, por exemplo, para a palavra “preço”, 
+pode-se recuperar da modelagem do word2vec as palavras “valor”, “custo” e “produto”, 
+que seriam as 3 mais próximas a ela no espaço vetorial treinado. Elas seriam incluídas 
+no recurso lexical se não estivessem presentes, aumentando assim a cobertura dos 
+recursos e, consequentemente, dos métodos. 
+ 
+Métodos baseados em word embeddings mostram-se bastante interessantes pelo 
+conhecimento semântico adquirido automaticamente, mas, claramente, podem cometer 
+ 
+1 Dentre vários modelos e dimensões testadas, essa foi a configuração de melhor desempenho. Portanto, 
+relatamos somente os resultados desta configuração de treinamento neste artigo.
+
+erros, pois proximidade vetorial não é garantia de relação lexical relevante. Por 
+exemplo, no caso citado acima, o termo “produto” não seria um aspecto relacionado a 
+“preço”. Na tarefa de extração de aspectos, esse tipo de associação errônea pode gerar 
+problemas. 
+ 
+A Tabela 1 sintetiza o número de aspectos em cada recurso lexical criado neste 
+trabalho. Pode-se notar que o uso das word embeddings aumentou em 47% e em 135% 
+os recursos criados com as ontologias e os substantivos mais frequentes, 
+respectivamente. 
+ 
+Tabela 1. Número de aspectos nos recursos lexicais criados 
+ 
+Ontologias 
+Ontologias + 
+Word Embed. 
+Substantivos 
+Substantivos + 
+Word Embed. 
+Número de aspectos 
+294 
+432 
+320 
+752 
+ 
+A seguir, relatamos a avaliação dos métodos. 
+4. Avaliação 
+Foram realizados testes em um córpus anotado manualmente, composto por 105 
+revisões de produtos eletrônicos, em particular, câmeras digitais e smartphones, 
+totalizando 1.980 palavras. Esse córpus é um compilado de revisões do córpus de 
+Hartmann et al. (2014), já citado, com seus aspectos e polaridades manualmente 
+identificados. Um exemplo de revisão que foi anotada é dado na Figura 4. 
+ 
+É possível observar como a anotação dos aspectos foi feita. Primeiramente, a 
+revisão foi segmentada em orações; depois, o principal aspecto da sentença foi 
+identificado. Por exemplo, na oração “contudo a memoria ram poderia ser 3gb”, 
+“ARMAZENAMENTO” indica o grupo ao qual o aspecto extraído pertence e “memória 
+ram” é o aspecto desejado. Pode-se ver também que, nesse caso, o aspecto foi avaliado 
+negativamente (indicado pelo sinal ‘-’ associado ao aspecto).
+
+"otimo atendeu minhas expectativas. Estou muito satisfeito com o desempenho, contudo a 
+memoria ram poderia ser 3g." 
+ 
+[ 
+ [ 
+ "otimo atendeu minhas expectativas.", 
+ "PRODUTO", 
+ "produto", 
+ "+" 
+ ], 
+ [ 
+ "Estou muito satisfeito com o desempenho,", 
+ "DESEMPENHO", 
+ "desempenho", 
+ "+" 
+ ], 
+ [ 
+ "contudo a memoria ram poderia ser 3gb.", 
+ "ARMAZENAMENTO", 
+ "memoria ram", 
+ "-" 
+ ] 
+] 
+Figura 4. Exemplo de revisão anotada no córpus de teste 
+ 
+Para análise dos resultados dos métodos, foram escolhidas as métricas tradicionais de 
+precisão, cobertura e medida-f, bastante comuns na área de análise de sentimentos. 
+Precisão indica quantos aspectos extraídos estavam corretos em relação a todos os 
+extraídos; cobertura indica quantos aspectos extraídos estavam corretos em relação a 
+todos que deveriam ser extraídos (conforme anotação manual). A medida-f é a média 
+harmônica de precisão e cobertura. 
+ 
+Para se ter uma visão mais detalhada sobre os métodos que estão sendo 
+avaliados, foram propostos dois testes distintos, um pessimista e um otimista. A 
+avaliação pessimista considera que um aspecto foi corretamente identificado se e 
+somente se o aspecto extraído for exatamente igual ao aspecto anotado manualmente. 
+Por exemplo, se o aspecto extraído for “custo” e o anotado manualmente no córpus de 
+teste for “custo/benefício”, considera-se que o aspecto não foi extraído corretamente. Já 
+a avaliação otimista considera o exemplo anterior como um acerto, dado que “custo” 
+está presente no termo “custo/benefício”. 
+ 
+As médias dos resultados de cada método são exibidas na Tabela 2, sendo que os 
+melhores resultados são mostrados em negrito.
+
+Tabela 2. Precisão, cobertura e medida-f obtidas pelos métodos 
+ 
+ 
+Medidas 
+Métodos 
+Ontologias 
+Ontologias + 
+Word Embed. 
+Substantivos 
+Substantivos + 
+Word Embed. 
+Precisão otimista 
+0,530 
+0,346 
+0,150 
+0,115 
+Precisão pessimista 
+0,522 
+0,343 
+0,150 
+0,113 
+Cobertura otimista 
+0,448 
+0,433 
+0,401 
+0,458 
+Cobertura pessimista 
+0,414 
+0,399 
+0,360 
+0,405 
+Medida-f otimista 
+0,485 
+0,384 
+0,218 
+0,183 
+Medida-f pessimista 
+0,461 
+0,368 
+0,211 
+0,176 
+ 
+Inicialmente, é interessante notar que, como esperado e discutido na seção anterior, o 
+método com base em ontologia obtém precisão maior do que cobertura, enquanto o com 
+base em substantivos tem comportamento oposto. As word embeddings aumentaram a 
+cobertura do método com base em substantivos, mas não tiveram o mesmo efeito no 
+método com base em ontologias. 
+ 
+No geral, vê-se que, em termos de medida-f, o método baseado em ontologias 
+teve um desempenho melhor, tanto em sua versão pessimista como na otimista. Esse 
+resultado pode ser explicado pelo alto refinamento das ontologias produzidas por 
+Vargas e Pardo (2018a) e que foram utilizadas aqui. Logicamente, pode-se esperar que a 
+qualidade do método baseado em ontologia é diretamente influenciada pela qualidade da 
+ontologia utilizada. Mais do que isso, depende da existência da ontologia apropriada 
+para o domínio que analisam. Vargas e Pardo disponibilizaram ontologias apenas para 
+os domínios de câmeras digitais, smartphones e livros, mas o portal de ontologias 
+OntoLP2 provê outras que podem sustentar o uso do método com base em ontologias. 
+ 
+A análise dos erros cometidos pelos métodos evidenciou três problemas 
+principais que afetam seus resultados. Por um lado, a vagueza nas revisões afetou o 
+desempenho dos métodos. No córpus de teste, não é raro encontrar revisões como as 
+mostradas na Figura 4, em que não há citação ao aspecto. Por outro lado, há aspectos 
+muito específicos que não constavam nas ontologias ou no léxico de substantivos, e 
+sequer foram aprendidos com a modelagem das word embeddings, como foi o caso dos 
+aspectos “gestos” e “leitor de digitais”. Além disso, a detecção de aspectos implícitos 
+ainda é desafiadora. Apesar de as ontologias conterem os termos pista, a variedade de 
+formas de referenciar os aspectos é muito grande. 
+ 
+“Bom. Quase nao utilizei ainda.” 
+ 
+“otimo. Excelente.” 
+ 
+“Excelente. Excelente.” 
+Figura 4. Exemplos de revisões vagas 
+ 
+ 
+2 http://ontolp.inf.pucrs.br/
+
+A seguir, apresentamos algumas considerações finais. 
+5. Considerações finais 
+Investigamos, neste artigo, métodos baseados em conhecimento lexical para a 
+identificação e extração de aspectos. Os resultados foram promissores e o uso de 
+ontologias se mostrou uma melhor opção em relação aos outros métodos avaliados. 
+Entretanto, ainda há questões de pesquisa relevantes a responder em trabalhos futuros, 
+que incluem a eficácia dos métodos em domínios variados (que, como a literatura já 
+mostrou, é um grande problema na área) e como identificar com maior acurácia os 
+aspectos implícitos. Futuramente, também se pretende investigar os modelos mais 
+recentes de word embeddings contextuais, como o BERT3 (Devlin et al., 2019), que, 
+acredita-se, pode trazer impactos mais positivos. 
+ 
+Mais detalhes sobre este trabalho (incluindo os dados e os softwares produzidos) 
+e iniciativas relacionadas podem ser encontrados no site do projeto OPINANDO 
+(https://sites.google.com/icmc.usp.br/opinando/). 
+Agradecimentos 
+Agradecemos à Pró-Reitoria de Pesquisa da Universidade de São Paulo pelo apoio a 
+este projeto (PRP #668). 
+Referências 
+Balage Filho, P.P. (2017). Aspect Extraction in Sentiment Analysis for Portuguese. Tese 
+de Doutorado. Instituto de Ciências Matemáticas e de Computação, Universidade de 
+São Paulo. São Carlos-SP, October, 77p. 
+Bertaglia, T.F.C. and Nunes, M.G.V. (2016). Exploring Word Embeddings for 
+Unsupervised Textual User-Generated Content Normalization. In the Proceedings of 
+the 2nd Workshop on Noisy User-generated Text (WNUT), pp. 112-120. 
+Catharin, L.G. and Feltrim, V.D. (2018). Finding Opinion Targets in News Comments 
+and Book Reviews. In the Proceedings of the 13th International Conference on 
+Computational Processing of the Portuguese Language (PROPOR) (LNAI 11122), 
+pp. 375-384. 
+Chandrasekaran, B.; Josephson, J.; Benjamins, V. R. (1999). What Are Ontologies, and 
+Why Do We Need Them? IEEE Intelligent Systems and their Applications, Vol. 14, 
+N. 1, pp. 20-26. 
+Devlin, J.; Chang, M.W.; Lee, K.; Toutanova, K. (2019). BERT: Pre-training of Deep 
+Bidirectional Transformers for Language Understanding. In the Proceedings of the 
+Annual Conference of the North American Chapter of the Association for 
+Computational Linguistics: Human Language Technologies (NAACL-HLT), pp. 
+4171-4186. 
+ 
+3 Já treinado e disponibilizado para a língua portuguesa (Souza et al., 2020), como se pode ver em 
+https://github.com/neuralmind-ai/portuguese-bert
+
+Gaillat, T.; Stearns, B.; Sridhar, G; McDermott, R.; Zarrouk, M. (2018). Implicit and 
+Explicit Aspect Extraction in Financial Microblogs. In the Proceedings of the 1st 
+Workshop on Economics and Natural Language Processing, pp. 55–61. 
+Grosz, B.J.; Joshi, A.K.; Weinstein, S. (1995). Centering: A Framework for Modeling 
+the Local Coherence of Discourse. Computational Linguistics, Vol. 21, N. 2, pp. 204-
+225. 
+Hu, M. and Liu, B. (2004). Mining and summarizing customer reviews. In the 
+Proceedings of the tenth ACM SIGKDD International Conference on Knowledge 
+Discovery and Data Mining (KDD), pp. 168-177. 
+Hartmann, N.S.; Avanço, L.V.; Balage Filho, P.P.; Duran, M.S.; Nunes, M.G.V.; Pardo, 
+T.A.S.; Aluísio, S.M. (2014). A Large Corpus of Product Reviews in Portuguese: 
+Tackling Out-Of-Vocabulary Words. In the Proceedings of the 9th Language 
+Resources and Evaluation Conference (LREC), pp. 3865-3871. 
+Jurafsky, D. and Martin, J.H. (2008). Speech and Language Processing. An Introduction 
+to Natural Language Processing, Computational Linguistics, and Speech 
+Recognition. Prentice Hall. 
+Liu, B. (2012). Sentiment Analysis and Opinion Mining. Morgan & Claypool 
+Publishers. 
+Liu, B; Hu, M.; Cheng, J. (2005). Opinion Observer: Analyzing and Comparing 
+Opinions on the Web. In the Proceedings of the 14th International Conference on 
+World Wide Web, pp. 342-351. 
+Liu, P.; Joty, S.; Meng, H. (2015). Fine-grained Opinion Mining with Recurrent Neural 
+Networks and Word Embeddings. In the Proceedings of the Conference on Empirical 
+Methods in Natural Language Processing (EMNLP), pp. 1433–1443. 
+López Condori, R.E. and Pardo, T.A.S. (2017). Opinion Summarization Methods: 
+Comparing and Extending Extractive and Abstractive Approaches. Expert Systems 
+with Applications (ESWA), Vol. 78, pp. 124-134. 
+Mikolov, T.; Corrado, G.; Chen, K.; Dean, J. (2013). Efficient Estimation of Word 
+Representations in Vector Space. ArXiv: 1301.3781. 
+Oliveira, F.W.C. and Feltrim, V.D. (2015). Extração de Alvos em Comentários de 
+Notícias em Português baseada na Teoria da Centralização. In the Proceedings of 
+Symposium in Information and Human Language Technology (STIL), pp. 63-67. 
+Silva, R.R. e Pardo, T.A.S. (2019). Córpus 4P: um córpus anotado de opiniões em 
+português sobre produtos eletrônicos para fins de sumarização contrastiva de opinião. 
+In Anais da 6a Jornada de Descrição do Português (JDP), pp. 330-338. 
+Souza, F.; Nogueira, R.; Lotufo, R. (2020). Portuguese Named Entity Recognition using 
+BERT-CRF. arXiv:1909.10649v2 
+Toh, Z. and Su, J. (2015). NLANGP: Supervised Machine Learning System for Aspect 
+Category Classification and Opinion Target Extraction. In the Proceedings of the 9th 
+International Workshop on Semantic Evaluation (SemEval), pp. 496–501.
+
+Vargas, F.A. and Pardo, T,A.S. (2018a). Hierarchical clustering of aspects for opinion 
+mining: a corpus study. In M.J.B. Finatto, R.R. Rebechi, S. Sarmento and A.E.P. 
+Bocorny (eds.), Linguística de Corpus: Perspectivas, pp. 69-91. Porto Alegre: 
+Instituto de Letras da UFRGS. 580p. 
+Vargas, F.A. and Pardo, T.A.S. (2018b). Aspect clustering methods for sentiment 
+analysis. In the Proceedings of the 13th International Conference on the 
+Computational Processing of Portuguese (PROPOR) (LNAI 11122), pp. 365-374. 
+Vargas, F.A. and Pardo, T.A.S. (2020). Linguistic Rules for Fine-Grained Opinion 
+Extraction. In the Workshop Proceedings of the 14th International AAAI Conference 
+on Web and Social Media, pp. 1-6.

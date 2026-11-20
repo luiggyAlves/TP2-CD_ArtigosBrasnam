@@ -1,0 +1,637 @@
+VISAGE: Detection and automatic classification of urban
+violence through social media data
+Matheus Henrique C.T de Souza
+1, Eliel Roger da Silva
+2,
+Tiago Cruz de França
+3, Jonice Oliveira
+1
+1Instituto de Computação – Universidade Federal do Rio de Janeiro (UFRJ)
+Rio de Janeiro – RJ – Brazil
+2PPGI – Universidade Federal do Rio de Janeiro –
+Rio de Janeiro – RJ – Brazil
+3Departamento de Computação – Universidade Federal Rural do Rio de
+Janeiro, Seropédica – RJ – Brazil
+{matheushcts, jonice}@dcc.ufrj.br, elielsilva@ufrj.br
+tcruzfanca@ufrrj.br
+Abstract. Urban violence remains a challenge for cities, requiring innovative
+approaches to provide actionable insights for authorities. This study presents
+VISAGE, a framework designed to detect and classify urban violence in social
+media textual data using an extension of the Quantification of Violence Scale
+(QoVS). Ten Machine learning models, including BERT and Random Forest,
+were evaluated on Twitter datasets from violent events in Brazil, with BERT
+achieving an F1-score of 0.86. Results demonstrate the feasibility of automat-
+ing violence assessment from text. Limitations like dataset imbalance and label-
+ing process are discussed with future work targeting real-time and multimodal
+analysis.
+1. Introduction
+Violence has been part of mankind’s experience, and it is considered a public epidemic
+health problem [Pedersen 2002]. Violence is the cause of illness, disabilities and several
+social consequences, beside deaths. In 2021, the number of victims of homicide was
+464.000 world, and in Americas this number was close to 176.000 [Publications 2023].
+Such statistics attest to the large social and economic costs of violence.
+In an urban context, violence has also been a challenging trend. Cities need to
+understand violence records using different sources of data in order to understand its im-
+pacts and what are the necessary actions in terms of public policies. In this context,
+social media is an important crowdsource mechanism useful to extract data about vio-
+lence [Gresenz et al. 2023]. Indeed, people use social media to report different types of
+violence, that they suffer or witness. For example, the former Twitter — now known as X
+1 — has been known as a platform for reporting different types of violence like gang vi-
+olence [Patton et al. 2017] and police brutality [Hawkins 2023]. In Brazil, particularly in
+1https://www.x.com
+
+Rio de Janeiro, platforms like Fogo Cruzado 2 and OTT-RJ3 have used Twitter to crowd-
+source and disseminate real-time information about armed violence and urban conflicts.
+There are different forms of violence(sexual, domestic or verbal violence) which
+can be self-inflicted or collective [Krug et al. 2002]. Due to its wide-ranging meaning,
+this work will focous on urban violence. This can be defined as any form of violence
+occurring in cities and suburbs. It may involve delinquent acts such as theft, physical
+assault, harassment and vandalism [Belghit 2024].
+According to [Tyrer et al. 2007] planning, intent, and violence’s outcome — or
+consequence — are three key dimensions that influences the characterization of any vio-
+lent incident. Based upon these factors, a violence scale - named QOVS (Quantity of Vi-
+olence Scale) - was proposed in [Tyrer et al. 2007]. Such scale provides objective metrics
+to quantify and then assess violence. The QOVS can drive a wide number of applications
+to aide and protect citizens using social media as a source of violence report in urban
+spaces. To the best of our knowledge, there is no work that sought to classify violence in
+levels with a computational solution using the QOVS scale.
+Considering the complexity and multidimensionality of violence, as well its grow-
+ing manifestation in urban contexts and its representation on social media platforms, this
+work proposes to investigate the following research question: How is it possible to de-
+velop a computational approach to identify and quantify levels of violence from data
+extracted from social media data?
+This paper presents VISAGE (an approach for detecting and measuring levels of
+Violence expressed In Social media messages). VISAGE is a computational solution that
+analyzes violence expressed in social media in order to classify them into a violence scale.
+We have adapted a well-known violence assessment scale [Tyrer et al. 2007] in order to
+be able of to detect violence reports in social media and to assess the level of violence
+reported. The relationship between violent reports and violent real episodes are intent,
+but in future works.
+In this paper, we present as contribution: (i) a QOVS adaptation to the compu-
+tational scenario and (ii) a computational approach to identify violence reports in social
+media and their violence levels. The experiments performed had a goal to assess the
+feasibility of the proposal.
+This paper is organized as follows: (i) section 2 presents the related works, (ii)
+section 3 presents the QOVS adaptation and the computational scale to define the signifi-
+cance of violence, (iii) section 4 presents the method used for conducting the experiment,
+(iv) section 5 describes the set of experiment made to evaluate VISAGE , (v) section 6
+presents the results, (vi) section 7 presents the discussion and limitations and finally (vii)
+section 8 draws some conclusions and future works.
+2. Related works
+Violence is a subjective topic [Peixoto et al. 2021] . Its concept may vary according to
+the context it is used. For example, a scene may be considered violent by a person, while
+others can refer to it as non violent. In order to better understand what is violence, and
+2https://fogocruzado.org.br/
+3https://www.ondetemtiroteio.com/
+
+how other researches have been handling the challenging to identify violence through
+computational approaches, a review of related works was made.
+Some authors focused on identifying violence by using video classification as a
+tool to detect violence. At this context, [Kozhamkulova et al. 2023], processed videos
+by using MoveNET to identify the joints of the human body, using the positions of each
+one as parameters for a neural network to recognize bullying. Besides [Pujol et al. 2020]
+have used visual features in order to calculate the velocity and orientation of movements
+to classify them in violent or non-violent actions. Both approaches have got promising
+results for violence detection. The differences between the studies and the present work
+are: they have focused on visual features while VISAGE’s focus on text data from so-
+cial media; VISAGE’s has a urban violence context as a subject of study, while they
+focus on identify physical bullying and other physical violent actions in videos. Still in
+the context of computational approaches to detect violence, works like Ponce-León et al.
+[Ponce-León and López-Nava ] use image classification models to generate a summary
+of a image, which is used together with text recognition of the tweet the image originates
+to determine if it is violent or not, achieving better results than the text of the tweet by
+itself. Image classification is also way faster than video classification, allowing for its
+application in real-time social , provided enough processing power [Peixoto et al. 2021].
+However, VISAGE’s scope is limited only to textual data due to the nature of its theoreti-
+cal method — QOVS designed to classify violence based only in text reports.
+Other studies have used deep learning as a tool to detect other types of vio-
+lence. [Toktarova et al. 2023] compared the ROC values of deep learning models against
+traditional approaches and showed an improvement in detection of hate speech on so-
+cial media. The main difference to this paper is the violence as subject of analysis.
+[Toktarova et al. 2023] focused in using deep learning to identify hate of speech, while
+this study is performing a comparison of machine learning and deep learning methods,
+but to identify violence related to urban context.
+A similar approach was explored by [Ponce-León and López-Nava ] by using
+Large Language Models as a tool to support the process of identify violence. They used
+the GPT-3 model to balance the number of data points in each class by creating data for
+the classes that were a minority, resulting in a higher F1-score than using the original
+dataset.
+Although data augmentation by prompt engineering can be used in datasets with
+numerous entries or non-extreme data imbalance, that is not the case for this study. Be-
+sides not having an adequate amount of data, running the risk of the artificial entries
+overshadowing the real ones. In this study, the classes were also unbalanced. To handle
+it, the number of entries for each class was obtained, and the nearest integer number was
+defined to scale the other unbalanced classes.
+3. VISAGE
+The main goal of this paper is to present a computational approach to identify violence
+reports in social media and then determine the violence levels in such reports. For this,
+the Quantification of Violence Scale was adapted to allow urban violence reports to be
+objectively classified within a scale, resulting in the ability to measure the seriousness of
+that situation. Therefore, this section describes both the QOVS adaptations and presents
+
+the method to use it.
+3.1. Extending the quantification of Violence Scale
+The Quantification of Violence Scale is a method developed by [Tyrer et al. 2007] with
+the aim to record and assessing episodes of severe violence. The original version scores
+planning range from 1 to 6 (for the authors, all violent episode has a minimum planning
+as an impulsive act) and from 0 to 5 for both intent and consequence (where 0 is no
+intent or consequence and 5 is the maximum score for both). At the VISAGE adaption,
+the planning range scores from 0 to 5 as the intent and consequence dimensions. This
+decision was made in order to score a message with 0 always it does not express any
+violence. VISAGE considers scenarios where violent episodes would be unknown, and
+it has to detect the violence report. For example, in a scenario like a big event (as a
+championship final soccer game) so many messages are published in social media about
+the event. If violent episodes occur in the stadium leveraging posts about the violence, we
+should differentiate reports between expressing or not violence.
+In Table 1 is presented the range of scores for each violence dimension and the
+description about how rating a report with a score per dimension. As described above, the
+planning could score with 0 when no planing was identified. The identification of “some
+planning” will score 1 to this dimension. The maximum scores for planning, intent and
+consequence are for activities which contain ’thorough planning’ (such as kidnapping),
+’intent to murder’ (want to kill someone is considered the worst intention) and deaths (the
+worst consequence of violence), respectively. The final score of a violent act is the sum
+of the planning, intent and consequence scores.
+3.2. The Computing Scale of Violence Assessment (CSoVA)
+To simplify the classification process, the violence events must be reported within classes.
+The main idea is that these classes would function as the scale’s levels, where the first po-
+sition encompasses situations of no violence identified and the last one very high violence
+level. To that end, five classes were defined observing specifics ranges of final scores
+(according to [Tyrer et al. 2007]) which are presented in Table 1. It is important to high-
+light that the violence is calculated based upon how much a social media violent report
+is scored. As aforementioned, violent episodes may motivate citizens’ report in social
+media. We want to evaluate the violence using this report.
+Very High Violence Level (VHVL) - [9, 15] This level includes all items that
+beyond putting people’s lives at risk has resulted in drastic consequences. In order to
+achieve this level of seriousness an event must have a score at least 9 in the adapted QOVS
+final score (of a maximum of 15). This punctuation interval has been defined based on the
+description of the QOV-Matched Version which defines a cut-off since 9 to define severe
+violence.
+High Violence Level (HVL) - [7,8] This class encompasses all events that have
+high level of planning, intention and consequence. However there are similarities be-
+tween MVL and HVL, the major difference is in the fact that in HVL there is no fatal
+consequence. The small range of punctuation is due to the fact of this subtle similarity.
+Medium Violence Level (MVL) - [4,6] The MVL class is the one that includes
+low-severity situations, but in its minimum score at least one of the dimensions - planning,
+
+Table 1. The dimensions of violence (Adapted QOVS [Tyrer et al. 2007]
+Planning
+Intent
+Consequence
+Score
+No planning
+No intent
+No consequence or
+violence averted
+0
+Virtually planning,
+impulsive act or
+shortly planning
+Non-serious physical
+or psychological harm
+(e.g. bumping someone
+while walking)
+Violence interrupted
+by reaction during
+the execution (e.g.
+avoidance a punch)
+1
+Some action plan
+to promote violence
+(hiding behind walls
+waiting for someone)
+Intent to commit a
+mild degree of
+violence
+No significant harm
+resulted
+2
+Detailed planning often
+short-term (e.g. hiding
+face to steal a house)
+Intent to commit a
+moderate harm (e.g.
+punching someone
+to rob)
+Violent episode with
+minor injury
+3
+Detailed planning
+(long-term as bank
+robbery with months
+to dig a tunnel)
+Intent to commit
+serious harm (e.g.
+assault someone
+with a knife)
+Episode with major
+injury (e.g. lose an
+arm)
+4
+Careful and meticulous
+planning before to act
+(like a kidnap)
+Intent a murder
+Act which result in
+death
+5
+Final Score = planning score + intent score + consequence score
+intent, consequence - has score equal to 2. It is worth nothing that to be defined as an
+MVL event, an item can never contains a difference grater than 3 points between the
+highest punctuated variable and the lowest one.
+Low Violence Level (LVL) - [1,3] This class contains all events that are essen-
+tially impulsive acts without consequence. In other words, all acts that in their descrip-
+tions have no made clear the level of damage or level of intent included in the action will
+be classified as LRS. Finally, since this modeling will serve a inference and classifica-
+tion system, the class LVL was created with the aim of grouping all the events of low
+consequence in the view of the authors of this work.
+No Violence Identified (NVI) - [0] All content with 0 for planning, intent and
+consequence are not violence report or no violence was detected (violence was not de-
+tected in text interpretation).
+4. Method
+Machine Learning is a technique which enables computers to learn from data, identify-
+ing patterns and taking decisions with minimum human intervention [Gresenz et al. 2023,
+Llauradó et al. 2023, Mussiraliyeva et al. 2023]. In this paper, the goal is to automatically
+identify violence in social media messages and also to classify the level of violence ac-
+cording to the QOVS extension. With the concern that the results of this experiment are
+models that classify violence, and this is a safety-critical activity, this paper has followed
+
+the steps defined at the Machine Learning lifecycle.
+Figure 1. The machine learning lifecycle adapted from [Ashmore et al. 2019]
+As shown in the Figure 1, the machine learning lifecycle is a process composed
+of four stages. Data management, Model Learning and Model Verification comprise the
+activities responsible for building the machine learning model itself. The fourth stage,
+Model Deployment, comprises the activity related to the deployment of ML model within
+an operational system. However, the deployment is outside the scope of the experiment.
+The first stage, Data Management, involves preprocessing tasks to make data
+ready for training and evaluation. Text originated from social media can be noisy, which
+requires strategies for normalization, removal of irrelevant elements, and label consis-
+tency.
+The second stage, Model Learning, encompasses the selection and training of
+machine learning models. Given the complexity of natural language and the nuances
+of violent discourse, this study has experimented with various architectures, including
+traditional classifiers and deep learning models.
+In the third stage, Model Verification, we addressed the critical need for reliabil-
+ity and safety in the model’s predictions. This phase included formal verification meth-
+ods—such as checking that the model satisfies predefined behavioral requirements—and
+test-based approaches, which assessed model responses to controlled input scenarios.
+Finally, while Model Deployment was not performed in this study, we acknowl-
+edge its importance for future work. Considerations regarding model integration, moni-
+toring, and periodic updating are better described in section number 8.
+5. Experiment
+This section describes the experiments performed in order to demonstrate the use of VIS-
+AGE. We have selected Twitter as the data source. The Twitter API makes easy to retrieve
+data, so we use it to build our datasets. A M2 max mac studio with base configurations
+and a M1 macbook air with base configurations were used under macOS Sequoia version
+15.3.
+5.1. Data management
+The dataset management stage at machine learning lifecycle, is responsible by collect-
+ing, organizing and preparing the data which will be used to train and test the model
+
+[Ashmore et al. 2019]. In this paper, four datasets were collected in order to train the
+model used to implement de proposed scale. The datasets are: clashes in Rocinha, brazil-
+ian 2013’s protests, protest of police relative ES, Brazil and crime reports.
+The first dataset covers tweets about police activity in Rocinha, a Rio de Janeiro’s
+neighborhood, during a gang clash from September 13-21, 2017. The posts were searched
+through the use of hashtags such as #PMERJ, #Rocinha, and #TirosRJ. These tags are
+related to violence in this area.
+The second dataset has as background context the 2013 protests in Brazil, captur-
+ing posts from Twitter from June 24 to June 30, 2013. This period was marked by violent
+protests reported in news media 4. This dataset includes posts related to general topics,
+not only violent reports, as detailed by [França et al. 2017].
+The third dataset is formed by posts related to the strike of military police from
+Espírito Santo, Brazil in February 2017. With the streets without policemen, violent
+episodes occurred, with 80 deaths and widespread robberies. Tweets from February 03
+to February 09, 2017, were collected using hashtags like like ”#EspiritoSanto”, #espiri-
+tosanto, and ”#pmes.”
+The fourth has messages from well-known crime-reporting profiles in Rio de
+Janeiro (@fogocruzadoapp, @AlertaAssaltoRj, @PMERJ). The tweets were collected
+from June 01 up to July 25, 2017. This period reflects a moment of escalating violence in
+Rio, culminating in a military intervention, as noted in [Phillips 2018].
+Figure 2. The amount of tweets by dataset
+Figure 3. Class distribu-
+tion after labeling.
+The four datasets are presented in Fig 2. They have mostly tweets written in
+Brazilian Portuguese. Each one vary on date range and period of data scraping. Besides,
+the amount of data is different too. The Rocinha dataset has 44.050, the cut made in
+2013 protests of Brazil dataset has 137.801, the PMES dataset has 501.875 and the crime
+reports dataset has 2 thousand tweets.
+The previous events were chosen to be made into datasets due to containing high
+levels of violent posts relevant to the types of violence in these areas and often discussed
+in social media - assault, shootouts, violent protests and police brutality. There is also a
+lack of datasets related to violence on the South East of Brazil.
+4https://en.wikipedia.org/wiki/2013 protests in Brazil
+
+Once collected, approximately 500 tweets were randomly selected from each
+dataset. Therefore, four sampled datasets were built and proceeded to be labeled by
+humans. Two undergraduate students proficient in Brazilian Portuguese labeled them.
+They assessed planning, intent and consequence. To do that, they asked themselves the
+of planing, intent and consequence and then answered according to the Table 1. The final
+violence level was obtained by the sum of scores. A label was assigned to each tweet mes-
+sage obeying the CSoVA (Table 2) and the final score it received. These labeled datasets
+have their duplicate texts removed during division, reducing the total number of entries
+down to 1758. They are shown in Figure 3.
+After, the datasets were preprocessed through two main tasks: division and up-
+sampled division. Division processes the data and divides it in training and test subsets.
+At the division, duplicates entries were deleted, then all the texts are normalized using
+the Enelvo normalizer 5 which is used to sanitize the text, removing punctuations, emojis
+and other special characters. The normalizer also removes word suffixes, thus reducing
+inflected words. Stop words were removed using the NLTK Portuguese stop words list
+[Steven Bird et al. 2009]. The text is vectorized using the TF-IDF method and the data
+is split in training and test. This method was selected due to better comprehending the
+importance of rare words by considering their frequency within the text, showing better
+accuracy for classification of hate speech than Count Vectorizer [Suryaningrum 2023] and
+being widely used for text classification. After training the non upsampled models, the
+dataset is upsampled and select models are trained with the new data.
+5.2. Model Learning
+In order to validate the proposed scale, this study performed a comparison between six
+machine learning algorithms. The chosen algorithms for this task were: BERT classi-
+fier, Naive Bayes classifier, Ada Boost classifier, Forest Model, Tree Model and Dummy
+Model. Since there are 5 distinct classes (levels of violence) it was adopted a one-vs-all
+multiclass classification strategy. Each model was trained considering the following divi-
+sion: 70% of the samples were designated for the training task and 30% to the evaluation
+of the model. Also, each model was trained against the normal version of the dataset and
+the upsampled version in order to compare the performance of each model in an unbal-
+anced and balanced scenario, except the BERT, Dummy and Ada Boost model.
+To implement the algorithms and its dependencies, the Scikit-learn 6 and trans-
+formers 7 toolkits were used. Also, a framework was implemented in order to ensure
+the consistency in training and performance assessment. Basically, the work was done
+using 3 main components: Model Processing, Data Processing, Metrics Processing and
+BERT Processing. The Data Processing component is responsible for every preprocess-
+ing task, such as removing the stopwords or vectorize the text with TD-IDF method on all
+models except BERT - that uses its own tokenizer. The Model Processing component is
+responsible for actually training and returning instances of each trained model. The Met-
+rics Processing component is the responsible for performing analyses of a trained model
+producing graphs and other manners to check metrics related to a model. The BERT
+5https:thalesbertaglia.com/enelvo/
+6https://scikit-learn.org/stable/index.html
+7https://huggingface.co/docs/transformers/index
+
+Processing component is responsible for processing the text, training the model and per-
+forming analyses for the BERT model, being a fusion of all the functions for BERT that
+would normally go to the other components for greater ease of use.
+The Dummy classifier is an artifact that makes predictions that ignore the input
+features according to [Pedregosa et al. 2011]. This classifier purpose is to work as a sim-
+ple baseline to compare against other, more complex classifiers. The strategy used in this
+study was to make the instances of dummy classifier always returning the most frequent
+class in the training data and classifies all test input as this class.
+The BERT model uses a transformers based architecture with bidirectional en-
+coding, allowing for great accuracy and fine tuning of pre-trained models with only one
+additional output layer [Devlin et al. 2019]. For this study, a BERTimbau pre-trained
+model [Souza et al. 2020] was fine-tuned using the trainer 8 class.
+The Adaboost model is a classification model based on the concept of a forest.
+This classifier uses fixed-size trees (one node with two leaves each) that makes use of
+boosting — a training technique with iterations that assigns more weight to the classes
+the model misclassified previously. In this study, the classifier was trained 100 times,
+increasing the number of trees from 1 to 100. After the best model is selected. The output
+includes the number of trees for the best model obtained in the iterations.
+As the Adaboost model, the forest classifier is also based on forests with variable-
+sized trees. In our study the classifier was trained with 1500 interactions and the number
+of trees was increased from 1 to 50 and maximum depth from 1 to 30. The best settings
+as the number of trees and the maximum depth is returned as an output in the ending of
+Forest model.
+The last tree based classifier used in this study was the decision tree classifier
+implemented by the sklearn library. This is also a variable-sized tree model. The number
+of iterations set for the decision tree were 100. The maximum depth hyperparameter was
+from 1 to 100.
+The Naive Bayes methods are a set of supervised learning based on applying
+Bayes’ theorem with the assumption of conditional independence between every pair
+of features given the value of the class variable [Pedregosa et al. 2011].For this study,
+it was selected Gaussian implementation of the Naive Bayes. Besides being based on the
+probabilistic approach, the Gaussian approaches assume that each class follows a normal
+distribution. The hyperparameter used were: prior probabilities of classes equals ”None”,
+and portion of the largest variance of all features equals 1e-9.
+5.3. Model Verification
+All the models were evaluated using the metrics Processing component. This component
+has to evaluate model interface which receives as parameter a model and returns a F1
+graph of the model as the threshold increases, the micro average ROC graph and the
+micro average PRC graph. An example of this output is represented in the Figure 6. The
+metrics outputted from training were also used to evaluate the models, with recall being
+considered priority. For the recall, F1, precision and accuracy it was used a weighted
+mean between classes.
+8https://huggingface.co/docs/transformers/en/main_classes/trainer
+
+Other evaluation performed was the comparison between models trained with
+the original labeled dataset against the upsampled dataset. Every model, except for the
+Dummy classifier, BERT and AdaBoost model, was trained, and the comparison was
+made in order to understand if the upsampled dataset helped to perform better generaliza-
+tions when compared with the models trained with the unbalanced classes.
+Figure 4. Forest classifier with upsampling.
+Figure 5. Forest classifier without upsampling.
+Figure 6. Comparison between forest classifier with and without upsampling.
+6. Results
+The conducted experiments evaluated the effectiveness of different models in classifying
+different reports that talk about urban violence in social media by adapting the QOVS
+scale. Different machine learning models were trained and tested in order to determine
+their performance in identifying and leveling these reports. The table 2 presents a sum-
+mary of the obtained results for each model used in this study.
+The results show that the BERT model without the upsampling presented the best
+general performance, considering as metrics the precision, recall and F1-score. The Ran-
+dom Forest classifier presented a better performance when considering the ROC AUC and
+APS compared to other machine learning models, which suggests a better capability in
+terms of generalization, but that might be due to a lack of probability score for each class
+on the BERT model, forcing the conversion of its output into a probability matriz suitable
+for the ROC AUC and downgrading the metric.
+A PCA (Principal Component analysis) analysis was also made. As show in the
+picture 7, the graph revealed that with less than 15 dimensions, the recall got 92.5%
+
+Table 2. The results of each model with best results in red.
+Models
+Recall
+F1
+Precision
+Accuracy
+ROC AUC
+APS
+Dummy
+0.68
+0.55
+0.46
+0.68
+0.80
+0.53
+BERT
+0.87
+0.86
+0.85
+0.87
+0.92
+0.78
+AdaBoost
+0.75
+0.69
+0.69
+0.75
+0.92
+0.68
+Tree
+0.82
+0.81
+0.81
+0.82
+0.87
+0.67
+Upsampled Tree
+0.79
+0.79
+0.81
+0.79
+0.88
+0.68
+Florest
+0.79
+0.75
+0.78
+0.79
+0.96
+0.88
+Upsampled Florest
+0.76
+0.72
+0.79
+0.76
+0.93
+0.81
+Naive Bayes
+0.73
+0.75
+0.78
+0.73
+0.83
+0.59
+Upsampled Naive Bayes
+0.73
+0.75
+0.78
+0.73
+0.83
+0.59
+Figure 7. PCA showing the analysis of data complexity
+of the original value, what indicates that the data is highly redundant using the TF-IDF
+vectorizer. This analysis also showed that the upsampling did not significantly increase
+the data complexity, which can justify the slight difference between models trained with
+and without the upsampled dataset.
+7. Discussion
+In this experiment, it was performed the evaluation of the proposed adaptation of the
+QOVS scale in the task of classifying data originated from social media. To do these, 4
+different datasets were collected from X (Twitter) social media, observing tags that refer
+to contexts which were related to urban violence. After, a subset of this data was manually
+labeled following the proposed QOVS adaption.
+The experiment suggests that tree-based models have better performance when
+compared to the other approaches. The best models were the BERT model and the For-
+est model, with a highlight to the Forest Classifier capability to classifying new data —
+generalization. This was show thanks to the 0.93 of ROC AUC.
+7.1. Limitations
+The human annotation task, which consist in to assign score to the three dimensions, can
+be biased because the raters can be influenced to assign violence as high as possible in
+
+order to prove the proposal’s usefulness. Though, we have oriented them to follow the
+adapted QOVS as reference. Besides, tweets are short messages which could not provide
+enough context to understanding. As consequence, the dimensions (manly planning and
+intent) could be rated inadequately during the human annotation task. Other social media
+could produce more detailed violent episode descriptions, which will also bring different
+technical challenges.
+The QOVS scale is intended for analyzing the severity of violence though long
+texts, and the use of it in short messages has not been widely tested. While this paper
+might present some clues on its possible effectiveness for classification of violence on
+short messages, further research is required on a wide range of violent texts through social
+media to confirm it.
+Another limitation was the lack of samples messages labeled as high, medium and
+low violence. This scenario ended up producing an unbalanced dataset, which can make
+it difficult for the chosen models to generalize the classification of new messages within
+this level of violence.
+Finally, the lack of use of K-Fold Cross Validation could have slightly warped
+some of the metrics, inserting a extra layer of uncertainty for the future production de-
+ployment results of the models. K-Fold Cross Validation will be used in future works.
+8. Conclusion
+In this paper we presented VISAGE, a computational approach to assess violence using
+social media. An adaptation of the QOVS scale and a consolidation of violence level as
+being classified into five levels were present as part of VISAGE. After, the visage usage
+method was presented as a flow of tasks in the Figure 1. Then we formed four different
+datasets of Twitter’ messages. These datasets were used to test and train inference ma-
+chine learning systems according to VISAGE’s approach. These systems were used to
+perform the experiments. The obtained results have shown that the proposed approach is
+feasible.
+As future works we intend to: (i) link messages from correlated episodes in other
+to be able to infer the episode violence level, (ii) use datasets from other social media,
+(iii) use VISAGE on data received on-the-fly, (iv) predict future risk situations given in-
+put conditions such as events, economic crisis, religious manifestations and etc, (v) elim-
+inate opinion bias in data collection, (vi) combine different machine learning algorithms
+in order to further enhance the violence classification, (vii) experiment with other classi-
+fication techniques, and the dataset will be made available in the future after the sensible
+information, in the form of user IDs, is eliminated. The code used in this study is available
+in the repository9.
+Acknowledgements
+This work was supported by CNPq, CAPES, and FAPERJ, with special thanks for the
+grant E-26/210.936/2024.
+9https://github.com/ufrrj-labweb/visage
+
+References
+Ashmore, R., Calinescu, R., and Paterson, C. (2019). Assuring the Machine Learning
+Lifecycle: Desiderata, Methods, and Challenges. arXiv:1905.04223 [cs].
+Belghit, M. T. (2024). Urban violence and criminality: a socio-ethnographic study. Man-
+agement Intercultural, (52):17–24. Publisher: Romanian Foundation for Business In-
+telligence, Editorial Department.
+Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K. (2019). BERT: Pre-training of Deep
+Bidirectional Transformers for Language Understanding. arXiv:1810.04805 [cs].
+França, T., Gomes, J., and Oliveira, J. (2017). A Twitter Opinion Mining Gold Standard
+for Brazilian Uprising in 2013.
+Gresenz, C. R., Singh, L., Wang, Y., Haber, J., and Liu, Y. (2023). Development and
+Assessment of a Social Media–Based Construct of Firearm Ownership: Computa-
+tional Derivation and Benchmark Comparison. Journal of Medical Internet Research,
+25:e45187.
+Hawkins, D. S. (2023). “When you Search a #Hashtag, it Feels Like You’re Searching for
+Death:” Black Twitter and Communication About Police Brutality Within the Black
+Community. Social Media + Society, 9(2):20563051231179705. Publisher: SAGE
+Publications Ltd.
+Kozhamkulova, Z., Kirgizbayeva, B., Sembina, G., Smailova, U., Suleimenova, M., Ke-
+neskanova, A., and Baizakova, Z. (2023). MoveNET Enabled Neural Network for Fast
+Detection of Physical Bullying in Educational Institutions. International Journal of
+Advanced Computer Science and Applications, 14(5).
+Krug, E. G., Mercy, J. A., Dahlberg, L. L., and Zwi, A. B. (2002). The world report on
+violence and health. Lancet (London, England), 360(9339):1083–1088.
+Llauradó, J. M., Pujol, F. A., Tomás, D., Visvizi, A., and Pujol, M. (2023). Study of image
+sensors for enhanced face recognition at a distance in the Smart City context. Scientific
+Reports, 13(1). Type: Article.
+Mussiraliyeva, S., Bagitova, K., and Sultan, D. (2023). Social Media Mining to Detect
+Online Violent Extremism using Machine Learning Techniques. International Journal
+of Advanced Computer Science and Applications, 14(6).
+Patton, D. U., Lane, J., Leonard, P., Macbeth, J., and Smith Lee, J. R. (2017). Gang
+violence on the digital street: Case study of a South Side Chicago gang member’s
+Twitter communication. New Media & Society, 19(7):1000–1018. Publisher: SAGE
+Publications.
+Pedersen, S. (2002). What is Political History Now?
+pages 36–56, London. Palgrave
+Macmillan UK. Book Title: What is History Now?
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel,
+M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A., Cournapeau,
+D., Brucher, M., Perrot, M., and Duchesnay, (2011). Scikit-learn: Machine Learning
+in Python. Journal of Machine Learning Research, 12(85):2825–2830.
+
+Peixoto, B. M., Lavi, B., Dias, Z., and Rocha, A. (2021). Harnessing high-level con-
+cepts, visual, and auditory features for violence detection in videos. Journal of Visual
+Communication and Image Representation, 78:103174.
+Phillips, D. (2018). Brazil military’s growing role in crime crackdown fuels fears among
+poor. The Guardian.
+Ponce-León, E. and López-Nava, I. H. CICESE at DA-VINCIS 2023: Violent Events
+Detection in Twitter using Data Augmentation Techniques.
+Publications, U. N. (2023). Global Study on Homicide 2023. United Nations Fund for
+Population Activities. Google-Books-ID: nACJ0AEACAAJ.
+Pujol, F. A., Mora, H., and Pertegal, M. L. (2020). A soft computing approach to violence
+detection in social media for smart cities. Soft Computing, 24(15):11007–11017.
+Souza, F., Nogueira, R., and Lotufo, R. (2020). BERTimbau: Pretrained BERT Models
+for Brazilian Portuguese. In Cerri, R. and Prati, R. C., editors, Intelligent Systems,
+pages 403–417, Cham. Springer International Publishing.
+Steven Bird, Ewan Klein, and Edward Loper (2009). Natural Language Processing with
+Python[Book]. ISBN: 9780596516499.
+Suryaningrum, K. M. (2023). Comparison of the TF-IDF Method with the Count Vec-
+torizer to Classify Hate Speech. Engineering, MAthematics and Computer Science
+Journal (EMACS), 5(2):79–83. Number: 2.
+Toktarova, A., Syrlybay, D., Myrzakhmetova, B., Anuarbekova, G., Rakhimbayeva, G.,
+Zhylanbaeva, B., Suieuova, N., and Kerimbekov, M. (2023). Hate Speech Detection in
+Social Networks using Machine Learning and Deep Learning Methods. International
+Journal of Advanced Computer Science and Applications, 14(5).
+Tyrer, P., Cooper, S., Herbert, E., Duggan, C., Crawford, M., Joyce, E., Rutter, D.,
+Seivewright, H., O’Sullivan, S., Rao, B., Cicchetti, D., and Maden, T. (2007). The
+Quantification of Violence Scale: a Simple Method of Recording Significant Violence.
+International Journal of Social Psychiatry, 53(6):485–497. Publisher: SAGE Publica-
+tions Ltd.

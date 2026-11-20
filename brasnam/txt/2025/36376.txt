@@ -1,0 +1,1303 @@
+Análise da Percepção Pública sobre Ministros da Área
+Econômica Brasileira no YouTube com PLN
+Daniel M. Prates1, Guilherme O. Santos2,
+Vinícius da F. Vieira3, Carlos H. G. Ferreira2
+1 Departamento de Engenharia de Produção - Universidade Federal de Ouro Preto
+2Departamento de Computação e Sistemas - Universidade Federal de Ouro Preto
+3Departamento de Ciência da Computação - Universidade Federal de São João del-Rei
+daniel.prates@aluno.ufop.edu.br,guilherme.os1@aluno.ufop.edu.br
+vinicius@ufsj.edu.br,chgferreira@ufop.edu.br
+Abstract. This study investigates how Brazil’s economic ministers are percei-
+ved by the public through comments posted on YouTube. Despite the growing
+use of social media for political and economic analysis, there is still a gap in
+the national literature regarding the perception of key economic figures outside
+electoral contexts. To address this gap, we analyze over 679,000 comments rela-
+ted to Paulo Guedes and Fernando Haddad using Natural Language Processing
+techniques and a fine-tuned BERT-based model for stance detection. The results
+reveal distinct patterns of support and criticism for each minister, evidence of
+polarization in user interactions, and notable temporal variations. The findings
+highlight YouTube’s potential as a complementary source for understanding pu-
+blic discourse around economic policy in Brazil.
+Resumo. Este trabalho investiga como ministros da área econômica são perce-
+bidos pela população brasileira a partir de comentários publicados no YouTube.
+Apesar do crescente uso de redes sociais para análises políticas e econômicas,
+ainda há uma lacuna na literatura nacional sobre a percepção pública de figu-
+ras centrais da política econômica fora de contextos eleitorais. Para preencher
+essa lacuna, analisamos mais de 679 mil comentários relacionados a Paulo
+Guedes e Fernando Haddad, utilizando técnicas de Processamento de Lingua-
+gem Natural e um modelo BERT ajustado para detecção de posicionamento
+político. Os resultados revelam padrões distintos de apoio e rejeição entre os
+dois ministros, evidências de polarização nas interações e variações temporais
+relevantes. A análise aponta o potencial do YouTube como fonte complementar
+para compreender o debate público sobre política econômica no Brasil.
+1. Introdução
+As plataformas de mídias sociais desempenham um papel central na disseminação de
+informações e na formação da opinião pública. No campo econômico, redes como Twit-
+ter (X), YouTube e WhatsApp possibilitam a rápida circulação de notícias, análises e
+narrativas que influenciam debates sobre inflação, câmbio, políticas governamentais e de-
+cisões de bancos centrais [Malagoli et al. 2021, da Rosa Jr et al. 2022, Born et al. 2023,
+Gorodnichenko et al. 2024]. Essas plataformas atuam também como termômetros das ex-
+pectativas do mercado, refletindo e amplificando reações a eventos econômicos e políticos
+
+[Shen et al. 2017].
+Entre elas, o YouTube destaca-se como uma importante fonte de
+informação econômica, com impacto direto na percepção pública sobre políticas e agentes
+do cenário nacional [Reis et al. 2019].
+A análise computacional de mídias sociais tem sido empregada para investigar
+padrões de comportamento e posicionamentos relacionados a temas econômicos. Di-
+versos estudos utilizaram dados de plataformas como Twitter e Facebook para ava-
+liar percepções públicas sobre inflação, decisões de bancos centrais e eventos macro-
+econômicos, recorrendo a técnicas de Processamento de Linguagem Natural (PLN) e
+aprendizado de máquina para tratar ruídos e extrair sinais relevantes [Effing et al. 2011,
+Baldwin et al. 2013, Antenucci et al. 2014, Hossain et al. 2020, Mehta and Pandya 2020,
+Chandra and Saini 2021, Born et al. 2023, Gorodnichenko et al. 2024].
+No YouTube,
+pesquisas exploraram sua função na circulação de conteúdo político e econômico, des-
+tacando seu papel na formação de expectativas e percepção pública [Reis et al. 2019,
+Lai et al. 2020].
+Apesar do avanço dessas pesquisas, a maioria dos estudos concentra-se em con-
+textos internacionais ou em eventos eleitorais específicos. No caso brasileiro, observa-se
+uma lacuna importante no sentido de que pouco se sabe sobre como figuras centrais da
+política econômica — como os ministros da Fazenda e da Economia — são percebidas
+nas redes sociais ao longo de seus mandatos. Mais especificamente, não há estudos que
+caracterizem de forma sistemática os padrões de apoio ou rejeição pública em larga escala
+a essas autoridades, tampouco que explorem a dinâmica discursiva associada a elas em
+plataformas como o YouTube.
+Este trabalho busca preencher essa lacuna ao analisar a percepção pública de dois
+ministros com papel central na condução econômica do país: Paulo Guedes, ministro da
+Economia durante o governo Jair Bolsonaro (2019–2022), e Fernando Haddad, atual mi-
+nistro da Fazenda no governo Luiz Inácio Lula da Silva (2023–2024). A partir da coleta e
+pré-processamento de mais de 679.000 comentários do YouTube, empregamos técnicas de
+PLN para detectar automaticamente o posicionamento político dos usuários com relação a
+cada ministro. Utilizamos o modelo BERTimbau [Souza et al. 2020], adaptado com fine-
+tuning supervisionado para a tarefa de detecção de posicionamento (stance detection),
+classificando os comentários em três categorias: favorável, contrário ou inconclusivo.
+Os resultados indicam diferenças na percepção dos ministros, com polarização:
+comentários negativos geram respostas negativas, enquanto os positivos recebem reações
+mistas. O modelo teve F1-macro de 77%, distinguindo com boa precisão apoio e rejeição,
+e a análise comparativa com pesquisas institucionais mostrou correlações moderadas, em-
+bora os achados devam ser interpretados com cautela.
+O restante deste documento está estruturado da seguinte forma: a Seção 2 apre-
+senta os trabalhos relacionados ao nosso estudo. A Seção 3 descreve a metodologia uti-
+lizada, incluindo detalhes sobre a coleta de dados e a modelagem adotada. A Seção 4
+apresenta os resultados obtidos e as análises realizadas. Por fim, a Seção 5 discute as
+principais conclusões do estudo e sugestões para trabalhos futuros.
+2. Trabalhos Relacionados
+O uso de abordagens computacionais para análise de mídias sociais tem sido amplamente
+explorado em diversas áreas, incluindo política, economia e saúde [Effing et al. 2011,
+2
+
+Antenucci et al. 2014, Hossain et al. 2020]. Dados extraídos de plataformas como Twit-
+ter e YouTube têm sido utilizados para identificar padrões de comportamento e posici-
+onamento da população [Mehta and Pandya 2020, Chandra and Saini 2021], permitindo
+inferências sobre percepções públicas, especialmente em períodos eleitorais e momentos
+de crise política.
+Especificamente
+no
+YouTube,
+pesquisas
+vêm
+analisando
+seu
+papel
+na
+disseminação de conteúdo político e econômico. Carter et al. investigaram o uso es-
+tratégico da plataforma na China para moldar a opinião pública, analisando padrões
+de publicação e engajamento nos comentários [Carter et al. 2023]. Keller et al. exa-
+minaram o impacto da desinformação nas eleições presidenciais da Coreia do Sul
+[Franziska B. Keller and Yang 2020], enquanto Krihova destacou a influência das mídias
+sociais na mobilização política durante o pleito presidencial do Irã [Krihova 2013]. Esses
+estudos indicam que o YouTube exerce influência significativa na construção da percepção
+pública, embora traga desafios analíticos associados à polarização dos comentários e à
+presença de ruídos.
+Além disso,
+diversos trabalhos com foco em PLN têm buscado avaliar
+a percepção pública sobre fenômenos financeiros.
+Entre eles, destacam-se es-
+tudos que utilizaram postagens em redes sociais para prever expectativas in-
+flacionárias [Born et al. 2023],
+mensurar reações a decisões de bancos centrais
+[Gorodnichenko et al. 2024], e analisar o impacto de eventos políticos, como o Bre-
+xit, sobre a opinião pública [Celli et al. 2016, Lai et al. 2020]. Em contextos políticos,
+técnicas de detecção de posicionamento (stance detection) têm sido empregadas para
+capturar discursos e medir níveis de polarização ideológica em variados contex-
+tos [Christhie et al. 2018, Grimminger and Klinger 2021, Kawintiranon and Singh 2021,
+Feitosa et al. 2022, Santos and Goya 2022, Rocha et al. 2024].
+Apesar da relevância desses avanços, observa-se uma concentração predominante
+de estudos em contextos internacionais e eventos eleitorais pontuais. Ainda são escassas
+as investigações que analisam a percepção pública sobre ministros da economia ao longo
+do tempo, especialmente no caso brasileiro. Também são raros os trabalhos que explo-
+ram possíveis relações entre manifestações espontâneas em redes sociais e resultados de
+pesquisas institucionais de opinião. Este trabalho busca avançar nesse campo ao analisar
+comentários do YouTube sobre os ministros Paulo Guedes e Fernando Haddad, por meio
+de técnicas de PLN para classificação de posicionamento, investigando possíveis padrões
+de percepção pública e sua relação com dados formais de opinião.
+3. Metodologia
+Nesta seção, detalhamos os procedimentos adotados para coleta, processamento, mode-
+lagem e análise dos comentários do YouTube, com o objetivo de identificar o posiciona-
+mento público em relação aos ministros da área econômica.
+3.1. Coleta e Pré-processamento dos Dados
+A coleta de dados foi realizada por meio da Application Programming Interface (API)
+do YouTube V31, extraindo informações sobre canais, vídeos, e comentários. Um dos
+1https://developers.google.com/youtube/v3/getting-started
+3
+
+principais desafios desse processo foi definir um conjunto de palavras-chave que maximi-
+zasse a recuperação de conteúdos relevantes, abrangendo diferentes perspectivas sobre os
+ministros da economia analisados. Assim, foram incluídas tanto menções diretas quanto
+indiretas aos ministros e suas pastas, captando desde comentários de apoio até críticas
+políticas. Para Paulo Guedes, considerou-se o período de janeiro de 2019 a dezembro de
+2022, e para Fernando Haddad, de janeiro de 2023 a agosto de 2024. As palavras-chave
+incluíram variações como Ministro Guedes, Ministro Paulo Guedes, Guedes, Fernando
+Guedes, Ministro da Economia, Ministério da Economia para Paulo Guedes, e Ministro
+Haddad, Ministro Fernando Haddad, Haddad, Fernando Haddad, Ministro da Fazenda,
+Ministério da Fazenda para Fernando Haddad. Evitamos palavras-chave adotadas com
+eventuais “apelidos pejorativos” por questões éticas.
+Uma vez que a API do YouTube disponibiliza conteúdo em diversos idiomas,
+foi necessário filtrar os comentários em português. Para isso, utilizamos dois métodos
+complementares: o modelo RoBERTa (Robustly optimized BERT approach)2, ajustado
+para identificação linguística, e a biblioteca LangDetector3, reconhecida por sua precisão
+na classificação de textos curtos. Um comentário foi mantido caso ao menos um dos
+métodos o classificasse como português, garantindo maior cobertura e mitigando falsos
+negativos.
+Após essa filtragem, realizamos um refinamento adicional para remover vídeos e
+comentários não relacionados ao escopo do estudo. Termos como Beatriz Haddad, Bia
+Haddad foram excluídos por referirem-se a contextos distintos. Da mesma forma, vídeos
+sobre Curso de Paulo Guedes, Universidade Paulo Guedes e Primo Rico foram remo-
+vidos, pois geravam grande volume de dados irrelevantes. Ao final, 99,92% dos vídeos
+inicialmente coletados permaneceram na base final. Além dos comentários, foram coleta-
+dos metadados como número de visualizações e curtidas, utilizados como indicadores de
+engajamento. O conjunto final de dados compreendeu 912 canais, 4.439 vídeos, 676.919
+comentários e 331.400 usuários distintos.
+3.2. Modelo para Detecção de Posicionamento
+Esta seção descreve a metodologia adotada para a construção e aplicação do modelo de
+detecção de posicionamento nos comentários coletados. A abordagem seguiu três etapas
+principais: (i) rotulação manual de uma amostra representativa dos comentários em três
+categorias: favorável, contrário e inconclusivo; (ii) treinamento e validação do modelo
+supervisionado para otimizar a detecção de posicionamento; e (iii) aplicação do modelo
+treinado sobre o conjunto completo de comentários, permitindo a inferência do posici-
+onamento em larga escala. Essa última etapa possibilitou a identificação de padrões de
+opinião pública ao longo do tempo e a caracterização do discurso direcionado aos minis-
+tros da Economia.
+3.2.1. Rotulação dos Dados
+A rotulação parcial dos dados teve como objetivo classificar os comentários em três cate-
+gorias: favorável, contrário e inconclusivo. Comentários favoráveis expressam apoio
+2https://huggingface.co/papluca/xlm-roberta-base-language-detection
+3https://pypi.org/project/langdetect/
+4
+
+ao ministro, suas políticas ou gestão econômica, enquanto os contrários manifestam
+desaprovação. Os inconclusivos têm posicionamento ambíguo ou neutro.
+Foi selecionada uma amostra estratificada devido à inviabilidade de rotular toda a
+base: 20 comentários mensais para a gestão de Paulo Guedes (960 no total) e 57 para a
+gestão de Fernando Haddad (1.140 no total) para que houvesse uma amostra de tamanho
+próximo em ambos os períodos, resultando em 2.066 comentários únicos após remoção
+de duplicatas. A rotulação foi realizada por três avaliadores independentes, de 24 a 28
+anos, com ensino superior em andamento e ideologias variadas.
+A consistência entre os avaliadores foi mensurada pelo coeficiente Kappa de Fleiss
+[Fleiss et al. 2013], uma métrica utilizada para medir concordância em classificações ca-
+tegóricas. O valor obtido foi de 0,76, indicando uma concordância substancial segundo
+a literatura [Landis and Koch 1977]. O rótulo final de cada comentário foi definido pelo
+voto majoritário dos três rotuladores. Em casos de empate, isto é, quando cada avaliador
+atribuía um rótulo distinto, o comentário foi revisado coletivamente para atingir um con-
+senso. No total, 41 comentários passaram por essa etapa de revisão. A amostra rotulada
+foi composta por 2.066 comentários, sendo 633 classificados como contrários, 433 como
+favoráveis e 1.000 como inconclusivos.
+3.2.2. Construção do Modelo
+O modelo desenvolvido para a detecção de posicionamento neste trabalho é baseado
+no BERTimbau [Souza et al. 2020], uma versão do BERT treinada exclusivamente em
+português. A escolha do BERTimbau se justifica por sua eficácia em tarefas de PLN
+em português e sua capacidade de capturar nuances linguísticas e culturais do Brasil
+[Dias et al. 2024, Costa et al. 2025]. A tarefa de detecção de posicionamento (stance de-
+tection) foi formulada como um problema de classificação em três categorias: favorável,
+contrário e inconclusivo. Para o treinamento supervisionado, utilizamos o conjunto de
+dados rotulado descrito na seção anterior. O conjunto de dados foi dividido em 80% para
+treino, 10% para validação e 10% para teste.
+A arquitetura do modelo foi ajustada (fine-tuned) utilizando a técnica de Trans-
+fer Learning [Durrani et al. 2021]. O modelo recebeu como entrada os textos dos co-
+mentários e retornou a classe predita para cada um deles. Para a otimização, utilizamos
+a função de perda Cross-Entropy Loss, empregada em problemas de classificação multi-
+classe [Liu et al. 2021, Hui and Belkin 2021].
+A etapa de otimização dos hiperparâmetros foi conduzida por meio da técnica
+de busca exaustiva (grid search), explorando todas as combinações possíveis de valores
+em um intervalo previamente definido. Foram testadas diferentes configurações para três
+hiperparâmetros essenciais: taxa de aprendizado {1e−5, 2e−5, 3e−5, 4e−5, 5e−5}, probabi-
+lidade de dropout {0.1, 0.2, 0.3, 0.4} e taxa de decaimento de peso {0.01, 0.1, 1, 10}.
+Durante o grid search, aplicou-se também a técnica de early stopping, com moni-
+toramento da função de perda no conjunto de validação. O treinamento era interrompido
+caso não houvesse melhora após três épocas consecutivas (early stopping), a fim de evitar
+sobreajuste (overfitting). A melhor configuração encontrada foi uma taxa de aprendizado
+5
+
+de 4e−5, taxa de decaimento de peso de 1, probabilidade de dropout de 0.1, um número
+total de 1 época de treinamento.
+Após a definição dos hiperparâmetros, o modelo foi re-treinado utilizando os con-
+juntos de treinamento e validação combinados e, em seguida, avaliado no conjunto de
+teste. Para medir o desempenho do modelo, utilizamos as métricas accuracy, precision,
+recall e F1-score, amplamente reconhecidas na literatura. Por fim, para garantir a robustez
+dos resultados, aplicamos a técnica de bootstrapping [Eyal et al. 2021, Keet 2022], que
+consiste em gerar múltiplas amostras do conjunto de teste por meio de amostragem com
+reposição. Realizamos 300 iterações desse processo, em que cada amostra foi formada
+selecionando exemplos aleatoriamente do conjunto de teste, permitindo repetições. Em
+cada iteração, calculamos as métricas de desempenho para cada classe individualmente.
+Com base nesses valores, foram computados a média, o desvio padrão e o intervalo de
+confiança de 95%, fornecendo uma estimativa mais confiável da variação das métricas no
+conjunto de teste.
+3.2.3. Inferência e Caracterização dos Posicionamentos
+Com o modelo de detecção de posicionamento devidamente treinado e validado, a etapa
+seguinte consistiu em aplicá-lo ao restante do conjunto de dados, que não havia sido utili-
+zado no processo de treinamento. Essa inferência permitiu a classificação automática de
+um volume expressivo de comentários em três categorias: favorável, contrário e inconclu-
+sivo. O objetivo principal desta etapa foi caracterizar, em larga escala, o posicionamento
+público expresso nos comentários relacionados aos ministros da área econômica.
+A análise foi conduzida em diferentes níveis. Primeiramente, buscamos compre-
+ender a distribuição das classes de posicionamento para cada ministro separadamente, per-
+mitindo uma comparação geral da percepção pública entre os dois mandatos. Em seguida,
+exploramos a evolução temporal dos posicionamentos, a fim de identificar variações as-
+sociadas a eventos econômicos ou políticos específicos. Também realizamos análises vol-
+tadas à dinâmica das interações, avaliando se comentários originais geram respostas com
+o mesmo alinhamento ou com posicionamentos opostos. Essa abordagem permitiu in-
+vestigar padrões de reforço ou contraposição nas discussões, oferecendo uma perspectiva
+sobre o grau de polarização presente nos debates.
+Por fim, a última etapa desta caracterização buscou examinar a relação entre os
+posicionamentos inferidos nos comentários e os resultados de uma base histórica de pes-
+quisas institucionais de opinião pública (descrito na próxima seção). O objetivo foi avaliar
+em que medida os dados espontâneos extraídos do YouTube conseguem refletir — ainda
+que parcialmente — variações na aprovação dos governos associados a cada ministro,
+contribuindo para o entendimento do potencial dessas métricas como indicadores com-
+plementares de opinião pública.
+3.3. Correlação entre Posicionamento Online e Pesquisas de Opinião Pública
+Como etapa final de nossa abordagem metodológica, buscamos investigar em que medida
+os posicionamentos expressos espontaneamente por usuários no YouTube se relacionam
+com os resultados de pesquisas institucionais de opinião pública sobre os ministros da
+Economia analisados. É importante destacar que pesquisas de opinião refletem múltiplos
+6
+
+aspectos do governo, tais como, segurança, saúde, educação e imagem pessoal dos gover-
+nantes, e não se restringem à atuação econômica. Portanto, esta análise deve ser compre-
+endida como um esforço preliminar, cujo objetivo é explorar o potencial dos comentários
+online como indicador complementar de percepção pública.
+Foram coletadas 69 pesquisas conduzidas por diversos institutos — entre os quais
+se destacam IPEC, Datafolha, Folha de São Paulo, AtlasIntel e FUTURA. Dentre essas
+investigações, 26 foram associadas ao período de atuação do ministro Paulo Guedes e
+43 ao de Fernando Haddad, considerando-se, para as pesquisas relacionadas ao governo,
+o ministro vigente na época. Para viabilizar uma análise comparativa, padronizamos os
+dados em duas categorias: os Porcentuais Positivos (P.P.), que englobam respostas acima
+de “Regular” (como “ Ótimo”, “Bom”, “Muito Bom” etc.), e os Porcentuais Negativos
+(P.N.), correspondentes às respostas abaixo de “Regular” (como “Ruim”, “Muito Ruim”,
+“Péssimo” etc.). As Tabelas 1 e 2 sintetizam os dados considerados na análise.
+Tabela 1. Pesquisas Utilizadas.
+Ministro
+Instituto
+Data
+Link
+P.P
+P.N
+Paulo Guedes
+XP
+19/01/2024
+Link
+40
+20
+Paulo Guedes
+XP
+19/02/2024
+Link
+40
+17
+Paulo Guedes
+XP
+19/03/2024
+Link
+37
+24
+Paulo Guedes
+XP
+19/04/2024
+Link
+35
+26
+Paulo Guedes
+XP
+19/05/2019
+Link
+35
+31
+Paulo Guedes
+Folha
+03/04/2020
+Link
+32
+30
+Paulo Guedes
+Folha
+05/07/2020
+Link
+33
+33
+Paulo Guedes
+Folha
+30/08/2020
+Link
+29
+38
+Paulo Guedes
+Folha
+06/12/2020
+Link
+30
+36
+Paulo Guedes
+Folha
+27/04/2021
+Link
+33
+38
+Paulo Guedes
+Folha
+26/05/2021
+Link
+33
+43
+Paulo Guedes
+Datafolha
+01/02/2025
+Link
+31
+40
+Paulo Guedes
+AtlasIntel
+31/01/2024
+Link
+43
+51
+Paulo Guedes
+Poder Data
+15/04/2020
+Link
+36
+33
+Paulo Guedes
+Poder Data
+29/04/2020
+Link
+29
+40
+Paulo Guedes
+Poder Data
+13/05/2020
+Link
+30
+39
+Paulo Guedes
+Poder Data
+27/05/2020
+Link
+28
+44
+Paulo Guedes
+Poder Data
+10/06/2020
+Link
+28
+47
+Paulo Guedes
+Poder Data
+24/06/2020
+Link
+29
+48
+Paulo Guedes
+Poder Data
+08/07/2020
+Link
+29
+46
+Paulo Guedes
+Poder Data
+22/07/2020
+Link
+30
+43
+Paulo Guedes
+Poder Data
+05/08/2020
+Link
+32
+41
+Paulo Guedes
+Poder Data
+19/08/2020
+Link
+38
+35
+Paulo Guedes
+Poder Data
+02/09/2020
+Link
+39
+34
+Paulo Guedes
+Poder Data
+02/09/2020
+Link
+34
+20
+Fernando Haddad
+Datafolha
+16/12/2024
+Link
+27
+34
+Fernando Haddad
+Datafolha
+16/12/2024
+Link
+29
+42
+Fernando Haddad
+Datafolha
+16/12/2024
+Link
+17
+80
+Fernando Haddad
+Datafolha
+30/03/2023
+Link
+38
+29
+Fernando Haddad
+Datafolha
+14/06/2023
+Link
+37
+27
+Fernando Haddad
+Datafolha
+13/09/2023
+Link
+38
+31
+Fernando Haddad
+Datafolha
+05/12/2023
+Link
+38
+30
+Fernando Haddad
+Datafolha
+20/03/2024
+Link
+35
+33
+Fernando Haddad
+Datafolha
+13/06/2024
+Link
+36
+31
+Tabela 2.
+Pesquisas Utilizadas
+(Cont.).
+Ministro
+Instituto
+Data
+Link
+P.P
+P.N
+Fernando Haddad
+Datafolha
+31/07/2024
+Link
+35
+33
+Fernando Haddad
+Datafolha
+08/10/2024
+Link
+36
+32
+Fernando Haddad
+Datafolha
+13/12/2024
+Link
+35
+34
+Fernando Haddad
+Datafolha
+01/02/2025
+Link
+24
+41
+Fernando Haddad
+IPEC
+12/03/2023
+Link
+41
+24
+Fernando Haddad
+IPEC
+12/04/2023
+Link
+39
+26
+Fernando Haddad
+IPEC
+12/06/2023
+Link
+37
+28
+Fernando Haddad
+IPEC
+12/09/2023
+Link
+40
+25
+Fernando Haddad
+IPEC
+12/12/2023
+Link
+38
+30
+Fernando Haddad
+IPEC
+12/03/2024
+Link
+33
+32
+Fernando Haddad
+IPEC
+12/07/2024
+Link
+37
+31
+Fernando Haddad
+IPEC
+12/09/2024
+Link
+35
+34
+Fernando Haddad
+IPEC
+12/12/2024
+Link
+34
+34
+Fernando Haddad
+Paraná
+16/02/2025
+Link
+28,8
+45
+Fernando Haddad
+IPEC
+24/09/2024
+Link
+30
+41
+Fernando Haddad
+IPEC
+24/09/2024
+Link
+23
+47
+Fernando Haddad
+IPEC
+24/09/2024
+Link
+33
+38
+Fernando Haddad
+IPEC
+24/09/2024
+Link
+29
+36
+Fernando Haddad
+IPEC
+24/09/2024
+Link
+27
+39
+Fernando Haddad
+IPEC
+24/09/2024
+Link
+38
+34
+Fernando Haddad
+IPEC
+24/09/2024
+Link
+33
+37
+Fernando Haddad
+FUTURA
+23/03/2024
+Link
+21,5
+43
+Fernando Haddad
+FUTURA
+23/07/2024
+Link
+21,5
+33,9
+Fernando Haddad
+FUTURA
+23/10/2024
+Link
+26,1
+39
+Fernando Haddad
+FUTURA
+24/02/2024
+Link
+25,2
+35
+Fernando Haddad
+FUTURA
+24/06/2024
+Link
+21,9
+31,8
+Fernando Haddad
+FUTURA
+24/11/2024
+Link
+40,7
+27,9
+Fernando Haddad
+FUTURA
+05/12/2024
+Link
+32,4
+43,5
+Fernando Haddad
+AtlasIntel
+23/01/2023
+Link
+38
+41
+Fernando Haddad
+AtlasIntel
+23/04/2023
+Link
+40
+45
+Fernando Haddad
+AtlasIntel
+23/07/2023
+Link
+41
+40
+Fernando Haddad
+AtlasIntel
+23/09/2023
+Link
+42
+43
+Fernando Haddad
+AtlasIntel
+23/11/2023
+Link
+39
+41
+Fernando Haddad
+AtlasIntel
+24/01/2024
+Link
+42
+39
+Fernando Haddad
+AtlasIntel
+31/01/2024
+Link
+42,2
+39,1
+Para estabelecer uma comparação entre a percepção expressa nos comentários e
+os dados das pesquisas institucionais, calculamos os percentuais mensais de comentários
+classificados como favoráveis e contrários, permitindo assim uma comparação direta com
+as pesquisas de opinião realizadas no mesmo período. Em seguida, avaliamos a relação
+entre essas métricas: correlacionamos os comentários favoráveis com os resultados P.P. e
+os comentários contrários com os resultados P.N., utilizando o coeficiente de correlação
+de Pearson, cuja variação vai de -1 (correlação negativa perfeita) a 1 (correlação positiva
+perfeita), sendo 0 indicativo de ausência de correlação [Cohen et al. 2009]. Adotamos um
+nível de significância α = 0,05 para identificar correlações estatisticamente relevantes.
+7
+
+4. Resultados
+Nesta seção, apresentamos os principais resultados do estudo. Inicialmente, caracteriza-
+mos o conjunto de dados coletado. Em seguida, avaliamos o desempenho do modelo de
+classificação e aplicamos a inferência em larga escala para analisar os padrões de posici-
+onamento nos comentários. Por fim, exploramos a relação entre essas manifestações e os
+resultados de pesquisas tradicionais de opinião pública.
+4.1. Caracterização dos Dados
+Para entender a dinâmica de engajamento em torno dos ministros da Economia, anali-
+samos a evolução acumulada de comentários, vídeos e visualizações ao longo do tempo
+(Figura 1). Os dados indicam que Fernando Haddad gerou maior volume de interações em
+um período mais curto, superando Paulo Guedes em número de vídeos (mais de 2.500)
+e visualizações (acima de 80 milhões). Ambos acumulam centenas de milhares de co-
+mentários — aproximadamente 400 mil para Guedes e 300 mil para Haddad —, em-
+bora o período analisado de Haddad seja significativamente menor (cerca de 1,5 ano, em
+comparação a 4 anos no caso de Guedes). Isso evidencia a relevância crescente das pla-
+taformas digitais como espaço de debate sobre temas econômicos. A diferença de ritmo
+e intensidade entre os dois casos também reflete o contexto político e a visibilidade dos
+ministros em cada gestão.
+0
+6
+12
+18
+24
+30
+36
+42
+48
+Mês
+0
+100000
+200000
+300000
+400000
+# Comentários Acumulados
+Paulo Guedes
+Fernando Haddad
+(a) Comentários
+0
+6
+12
+18
+24
+30
+36
+42
+48
+Mês
+0
+500
+1000
+1500
+2000
+2500
+# Vídeos Acumulados
+Paulo Guedes
+Fernando Haddad
+(b) Vídeos
+0
+6
+12
+18
+24
+30
+36
+42
+48
+Mês
+0
+2
+4
+6
+8
+# Visualizações Acumuladas
+1e7
+Paulo Guedes
+Fernando Haddad
+(c) Visualizações
+Figura
+1.
+Evoluç ão
+acumulada
+do
+número
+de
+comentários,
+vídeos
+e
+visualizaç ões relacionados aos ministros.
+4.2. Inferência de Posicionamentos
+Aplicamos o modelo BERTimbau ajustado para classificar o posicionamento político em
+comentários do YouTube relacionados aos ministros da Economia brasileiros. Os resul-
+tados de desempenho são apresentados na Tabela 3. A acurácia geral foi de 0,78 ± 0,06,
+indicando que aproximadamente 78% das previsões foram corretas. Dado o desbalance-
+amento entre classes e a complexidade semântica dos comentários, métricas como F1-
+score oferecem uma visão mais robusta do desempenho, especialmente para as categorias
+Contrário e Favorável.
+Apesar dos bons resultados, os intervalos de confiança revelam desafios associa-
+dos à linguagem ambígua, irônica ou sarcástica — elementos comuns em discursos sobre
+figuras públicas. Mesmo com um modelo treinado em português e adaptado ao contexto,
+nuances subjetivas ainda impõem limitações à acurácia da classificação. A Tabela 4 ilus-
+tra exemplos que evidenciam essas dificuldades. A distribuição final de comentários por
+classe é mostrada na Tabela 5.
+8
+
+Tabela 3.
+Desempenho do mo-
+delo ajustado.
+Métrica
+Classe
+M ± IC (95%)
+Precision
+Contrário
+0,78 ± 0,11
+Favorável
+0,78 ± 0,10
+Inconclusivo
+0,78 ± 0,07
+Recall
+Contrário
+0,61 ± 0,11
+Favorável
+0,84 ± 0,10
+Inconclusivo
+0,87 ± 0,07
+F1-Score
+Contrário
+0,68 ± 0,09
+Favorável
+0,81 ± 0,07
+Inconclusivo
+0,82 ± 0,06
+Acurácia
+Geral
+0,78 ± 0,06
+Tabela 4. Exemplos de rotulaç ão
+e prediç ão de comentários.
+Comentário
+Predito
+Real
+Meu Deus trocaram o Guedes por
+um jum****!!
+Contrário
+Contrário
+Té quenfim algo bom no Haddad
+kkkkkkk
+Inconclusivo
+Contrário
+Aí não é ficção científica não!!! Aí
+é Paulo Guedes p****!!!
+Contrário
+Favorável
+TAXA E TAXAR E TAXAR!!! Ta-
+xadd ministro !!! DESGRA****
+Inconclusivo
+Contrário
+Tabela 5. Distribuiç ão de comentários preditos por ministro e classe.
+Ministro
+Classe
+Número de Comentários
+Proporção (%)
+Guedes
+Contrário
+31.207
+4,61%
+Favorável
+33.414
+4,94%
+Inconclusivo
+324.087
+47,88%
+Haddad
+Contrário
+16.842
+2,49%
+Favorável
+26.570
+3,93%
+Inconclusivo
+244.799
+36,16%
+Total
+676.919
+100%
+Em termos absolutos, os volumes de comentários classificados como Contrário
+e Favorável são expressivos: 31.207 e 33.414 para Paulo Guedes, e 16.842 e 26.570
+para Fernando Haddad, respectivamente. Esses números superam o alcance típico de
+pesquisas tradicionais de opinião pública [Celli et al. 2016], evidenciando o potencial do
+uso de PLN para captar percepções públicas em larga escala, sem amostragem e com
+cobertura temporal contínua. Observa-se também uma proporção aproximadamente 25%
+maior de comentários contrários em relação aos favoráveis, em ambos os casos — o que
+pode refletir tendências de polarização política no debate econômico brasileiro.
+4.2.1. Evolução Temporal dos Posicionamentos
+2019-01
+2019-07
+2020-01
+2020-07
+2021-01
+2021-07
+2022-01
+2022-07
+2023-01
+Data
+0
+5000
+10000
+15000
+20000
+25000
+30000
+35000
+# Comentários Acumulados
+Classificação
+Contrário
+Favorável
+(a) Paulo Guedes
+2023-01
+2023-03
+2023-05
+2023-07
+2023-09
+2023-11
+2024-01
+2024-03
+2024-05
+2024-07
+2024-09
+Data
+0
+5000
+10000
+15000
+20000
+25000
+# Comentários Acumulados
+Classificação
+Contrário
+Favorável
+(b) Fernando Haddad
+Figura 2. Evoluç ão temporal acumulada dos comentários rotulados por posiç ão
+(favorável e contrário).
+Para compreender como as opiniões favoráveis e contrárias evoluíram ao longo
+do tempo, as Figuras 2(a) e 2(b) apresentam as séries temporais acumuladas de co-
+mentários rotulados pelo modelo como favoráveis ou contrários. Essa análise permite
+identificar padrões de engajamento e variações na percepção pública ao longo dos respec-
+tivos mandatos. Na Figura 2(a), observa-se que os volumes de comentários favoráveis e
+contrários direcionados a Paulo Guedes seguem trajetórias próximas durante a maior parte
+do período analisado. A partir de 2021, há um distanciamento gradual, com crescimento
+9
+
+Contrário
+Favorável
+Classificação por classe
+0
+20
+40
+60
+80
+% Respostas
+62.0%
+38.0%
+81.7%
+18.3%
+Classificação
+Favorável
+Contrário
+(a) Paulo Guedes
+Contrário
+Favorável
+Classificação por classe
+0
+20
+40
+60
+80
+% Respostas
+68.2%
+31.8%
+79.8%
+20.2%
+Classificação
+Favorável
+Contrário
+(b) Fernando Haddad
+Figura 3. Distribuiç ão percentual das classes das respostas aos comentários
+originais (favorável ou contrário).
+mais acentuado nos comentários classificados como contrários. No entanto, a partir de
+meados de 2022, a curva de comentários favoráveis acelera, reduzindo a diferença entre
+as categorias e resultando em trajetórias quase paralelas até o fim do mandato.
+A Figura 2(b), por sua vez, mostra que Fernando Haddad recebeu, desde o início
+do período analisado, um volume maior de comentários contrários em relação aos fa-
+voráveis, com uma diferença consistente entre as curvas. Em abril de 2024, observa-se
+uma intensificação no volume de comentários em ambas as categorias, com crescimento
+mais expressivo na classe contrária. Esses picos podem estar associados a eventos com
+grande repercussão nas redes sociais, que mobilizaram tanto críticas quanto apoios. Ao
+comparar os primeiros 18 meses de cada mandato, nota-se que a trajetória de Fernando
+Haddad apresenta um padrão mais polarizado em comparação com Paulo Guedes. En-
+quanto Guedes teve períodos de equilíbrio entre críticas e apoios, Haddad enfrentou,
+desde o início, uma predominância de comentários negativos. Esse padrão pode refle-
+tir uma maior polarização em torno de sua figura pública ou uma reação crítica a decisões
+recentes. Por outro lado, os momentos em que ambas as categorias crescem simultane-
+amente sugerem que certos eventos provocaram reações mistas, intensificando o debate
+público.
+4.2.2. Análise Condicional das Respostas
+Até aqui, a análise considerou os comentários e respostas de forma agregada. Nesta etapa,
+investigamos como o posicionamento de um comentário inicial influencia o alinhamento
+das respostas recebidas. A Figura 3 apresenta a distribuição percentual das classes das
+respostas, condicionada à classe do comentário original, para cada um dos dois ministros
+analisados.
+Para Paulo Guedes, comentários inicialmente classificados como contrários rece-
+beram majoritariamente respostas da mesma classe 81,7%, enquanto 18,3% foram res-
+postas favoráveis, indicando algum grau de contraponto. Já os comentários favoráveis
+tiveram 62% de respostas alinhadas e 38% de oposição, revelando maior propensão a
+receber críticas. No caso de Fernando Haddad, observa-se padrão semelhante em que co-
+mentários contrários atraíram 79,8% de respostas também contrárias, enquanto 20,2%
+foram favoráveis. Comentários favoráveis receberam 68,2% de respostas alinhadas e
+10
+
+30
+35
+40
+45
+50
+55
+60
+65
+70
+% Comentários Contrários do Youtube
+20
+25
+30
+35
+40
+45
+50
+% Respostas Negativas da Pesquisa
+Paulo Guedes - Contrário vs Negativa
+Correlação de Pearson: -0.507
+p-value: 0.0267
+(a) Contrários (Guedes)
+30
+35
+40
+45
+50
+55
+60
+65
+70
+% Comentários Favoráveis do Youtube
+28
+30
+32
+34
+36
+38
+40
+% Respostas Positivas da Pesquisa
+Paulo Guedes - Favorável vs Positiva
+Correlação de Pearson: -0.506
+p-value: 0.027
+(b) Favoráveis (Guedes)
+45
+50
+55
+60
+65
+70
+75
+% Comentários Contrários do Youtube
+25
+30
+35
+40
+45
+% Respostas Negativas da Pesquisa
+Fernando Haddad - Contrário vs Negativa
+Correlação de Pearson: -0.116
+p-value: 0.579
+(c) Contrários (Haddad)
+25
+30
+35
+40
+45
+50
+55
+% Comentários Favoráveis do Youtube
+20
+25
+30
+35
+40
+45
+% Respostas Positivas da Pesquisa
+Fernando Haddad - Favorável vs Positiva
+Correlação de Pearson: 0.568
+p-value: 0.00306
+(d) Favoráveis (Haddad)
+Figura 4. Correlaç ão entre o posicionamento nos comentários do YouTube e os
+percentuais de aprovaç ão/reprovaç ão.
+31,8% contrárias. Esses resultados sugerem que interações no YouTube tendem a reforçar
+o posicionamento do comentário inicial, embora haja espaço para contraposição.
+Esse padrão está alinhado ao chamado chamber effect [Cinelli et al. 2021], no qual
+usuários tendem a interagir com conteúdos que confirmam suas próprias opiniões. No en-
+tanto, a presença expressiva de respostas divergentes — especialmente em comentários
+favoráveis — indica que o ambiente também favorece o confronto de ideias. Alguns
+exemplos ilustram bem essa dinâmica: um comentário como “Paulo Guedes é o me-
+lhor ministro da economia que o Brasil já teve. Palavra de economista.” recebeu como
+resposta “Esse Paulo Guedes se você precisar de um vagabundo esse não serve, porque
+ele é um vagabundo e meio.”, revelando uma interação de confronto direto. Da mesma
+forma, um comentário inicial contrário — “PIOR MINISTRO DA HIST ÓRIA DO BRA-
+SIL” — foi respondido com “Paulo Guedes, o melhor MINISTRO DA ECONOMIA DE
+SEMPRE!!!”, reforçando a polarização nos diálogos. No caso de Haddad, críticas como
+“Haddad é um trauma na população paulistana. Sai, assombração.” foram respondidas
+com mensagens como “Brasil 7ª economia do mundo com Haddad.”, evidenciando nova-
+mente o embate de opiniões dentro das plataformas. Esses exemplos reforçam a ideia de
+que os comentários não apenas refletem apoio ou rejeição, mas também funcionam como
+pontos de partida para disputas narrativas nas redes.
+4.3. Aproximações entre Comentários Online e Pesquisas de Opinião
+Nesta etapa, exploramos possíveis relações entre o posicionamento extraído dos co-
+mentários no YouTube e os resultados de pesquisas institucionais de opinião, conforme
+descrito na Seção 3.3. Utilizamos o coeficiente de correlação de Pearson para avaliar
+a associação entre os percentuais mensais de comentários favoráveis e contrários, e os
+percentuais positivos e negativos das pesquisas. Cabe destacar que as pesquisas institu-
+cionais avaliam o desempenho geral do governo e abrangem múltiplos aspectos — como
+saúde, segurança, educação e gestão política — não se limitando à atuação dos ministros
+da área econômica. Já os comentários analisados referem-se especificamente a figuras
+individuais, em contextos específicos e frequentemente polarizados.
+As Figuras 4 apresentam os gráficos de dispersão para cada combinação, se-
+paradamente para Paulo Guedes e Fernando Haddad. No caso de Guedes, observou-
+se uma correlação negativa moderada entre comentários contrários e os percentuais de
+reprovação do governo nas pesquisas (r = −0,50, p = 0,02), e também entre comentários
+favoráveis e os percentuais de aprovação (r = −0,50, p = 0,02). Esses resultados suge-
+rem que as manifestações no YouTube nem sempre acompanham os dados institucionais,
+11
+
+possivelmente por refletirem públicos distintos ou momentos de maior ativação emoci-
+onal em redes. Para Fernando Haddad, o padrão é menos definido. A correlação entre
+comentários favoráveis e aprovação foi positiva e moderada (r = 0,56, p = 0,003),
+enquanto a correlação entre comentários contrários e reprovação foi fraca e não signifi-
+cativa (r = −0,11, p = 0,57). Essa assimetria reforça o caráter preliminar da análise e a
+limitação do uso direto de comentários como indicadores substitutivos de opinião pública
+formal.
+Em síntese, os resultados variam conforme o ministro e o tipo de métrica obser-
+vada. Embora indiquem certa sensibilidade do modelo aos ciclos de aprovação, não per-
+mitem inferências conclusivas. A análise serve como uma investigação inicial sobre o po-
+tencial dos comentários espontâneos em redes sociais como indicativo complementar ao
+monitoramento da opinião pública. Fatores como viés de engajamento, perfil demográfico
+das plataformas e repercussões pontuais de eventos políticos devem ser considerados em
+estudos futuros mais aprofundados.
+5. Conclusão e Trabalhos Futuros
+Este trabalho abordou uma lacuna importante na literatura nacional ao investigar, pela pri-
+meira vez em larga escala, como ministros da área econômica são percebidos pelo público
+brasileiro em uma plataforma digital. Enquanto estudos anteriores focaram em contextos
+eleitorais ou em figuras presidenciais, nossa análise concentrou-se em dois ministros com
+papéis centrais na condução da política econômica recente — Paulo Guedes e Fernando
+Haddad — a partir de mais de 679 mil comentários publicados no YouTube. Combinando
+técnicas de PLN e um modelo BERT ajustado para a tarefa de detecção de posiciona-
+mento político, obtivemos resultados consistentes, com bom desempenho de classificação
+(F1-macro de 77%). A aplicação do modelo possibilitou caracterizar os padrões de apoio
+e rejeição ao longo do tempo, revelando diferenças significativas entre os dois ministros
+e evidências de polarização nas interações, especialmente em respostas condicionadas a
+comentários iniciais.
+Nossos achados indicam que mídias sociais como o YouTube podem funcionar
+como uma interface útil para compreender tendências de opinião pública sobre figuras da
+política econômica, permitindo análises em alta granularidade temporal e sem a neces-
+sidade de amostragem convencional. No entanto, a análise de correlação com pesquisas
+institucionais de opinião revelou resultados heterogêneos e, em alguns casos, pouco in-
+formativos. Esses indícios reforçam que se trata de uma investigação preliminar, e que
+o potencial dessas plataformas como espelho da opinião pública ainda exige maior apro-
+fundamento.
+Como possibilidades para trabalhos futuros, sugerimos a comparação entre dife-
+rentes institutos de pesquisa para verificar quais capturam melhor os padrões detectados
+em redes sociais, bem como o desenvolvimento de modelos mais amplos que conside-
+rem a avaliação do governo como um todo — incorporando temas diversos, como saúde,
+educação e segurança. Além disso, o uso combinado de múltiplas plataformas e fontes de
+dados pode ajudar a mitigar vieses e enriquecer a compreensão sobre os mecanismos de
+formação de opinião pública no ambiente digital.
+Agradecimentos. Os autores agradecem ao CNPq, à CAPES e à FAPEMIG pelo apoio
+financeiro e pelo suporte à realização desta pesquisa.
+12
+
+Referências
+[Antenucci et al. 2014] Antenucci, D., Cafarella, M., Levenstein, M., Ré, C., and Shapiro, M. D. (2014).
+Using social media to measure labor market flows. Technical report, NBER.
+[Baldwin et al. 2013] Baldwin, T., Cook, P., Lui, M., MacKinlay, A., and Wang, L. (2013). How noisy social
+media text, how diffrnt social media sources? In Mitkov, R. and Park, J. C., editors, International Joint
+Conference on Natural Language Processing, pages 356–364.
+[Born et al. 2023] Born, B., Dalal, H., Lamersdorf, N., and Steffen, S. (2023). Monetary policy in the age of
+social media: A twitter-based inflation analysis. Available at SSRN.
+[Carter et al. 2023] Carter, D., Westcott, M., Boitel, R., and Wang, A. H.-E. (2023). Puppet anchors and
+china’s youtube information operation. Taiwan Politics.
+[Celli et al. 2016] Celli, F., Stepanov, E., Poesio, M., and Riccardi, G. (2016). Predicting brexit: Classifying
+agreement is better than sentiment and pollsters. In Proceedings of the Workshop on Computational
+Modeling of People’s Opinions, Personality, and Emotions in Social Media (PEOPLES).
+[Chandra and Saini 2021] Chandra, R. and Saini, R. (2021). Biden vs trump: modeling us general elections
+using bert language model. IEEE access, 9:128494–128505.
+[Christhie et al. 2018] Christhie, W., Reis, J. C., Moro, F. B. M. M., and Almeida, V. (2018).
+Detecção
+de posicionamento em tweets sobre política no contexto brasileiro. In Brazilian Workshop on Social
+Network Analysis and Mining (BraSNAM). SBC.
+[Cinelli et al. 2021] Cinelli, M., De Francisci Morales, G., Galeazzi, A., Quattrociocchi, W., and Starnini, M.
+(2021). The echo chamber effect on social media. Proceedings of the national academy of sciences.
+[Cohen et al. 2009] Cohen, I., Huang, Y., Chen, J., Benesty, J., Benesty, J., Chen, J., Huang, Y., and Cohen, I.
+(2009). Pearson correlation coefficient. Noise reduction in speech processing, pages 1–4.
+[Costa et al. 2025] Costa, J., Oliveira, G., Fonseca, G., Reis, D., Teixeira, G., Cunha, W., Rocha, L., and
+Ferreira, C. H. (2025). Characterizing youtube’s role in online gambling promotion: A case study of
+fortune tiger in brazil. In Proceedings of the 17th ACM Web Science Conference 2025.
+[da Rosa Jr et al. 2022] da Rosa Jr, J. M., Linhares, R. S., Ferreira, C. H. G., Nobre, G. P., Murai, F., and
+Almeida, J. M. (2022). Uncovering discussion groups on claims of election fraud from twitter. In
+International conference on social informatics, pages 320–336. Springer.
+[Dias et al. 2024] Dias, A., Tanure, R. R., Almeida, J. M., Lima, H. C., and Ferreira, C. H. (2024). Análise
+da percepção do uso de cigarros eletrônicos no brasil por meio de comentários no youtube. In Brazilian
+Symposium on Multimedia and the Web (WebMedia).
+[Durrani et al. 2021] Durrani, N., Sajjad, H., and Dalvi, F. (2021). How transfer learning impacts linguistic
+knowledge in deep NLP models?
+[Effing et al. 2011] Effing, R., Van Hillegersberg, J., and Huibers, T. (2011). Social media and political par-
+ticipation: are facebook, twitter and youtube democratizing our political systems? In Electronic Par-
+ticipation: Third IFIP WG 8.5 International Conference, ePart 2011, Delft, The Netherlands, August
+29–September 1, 2011. Proceedings 3, pages 25–35. Springer.
+[Eyal et al. 2021] Eyal, M., Amrami, A., Taub-Tabib, H., and Goldberg, Y. (2021). Bootstrapping relation
+extractors using syntactic search by examples. arXiv preprint arXiv:2102.05007.
+[Feitosa et al. 2022] Feitosa, M., Ferreira, C., Gonçalves, G., and Almeida, J. (2022). Análise da percepção
+das pessoas no twitter sobre ações policiais. In Anais do XI Brazilian Workshop on Social Network
+Analysis and Mining, pages 73–84, Porto Alegre, RS, Brasil. SBC.
+[Fleiss et al. 2013] Fleiss, J. L., Levin, B., and Paik, M. C. (2013). Statistical methods for rates and proporti-
+ons. john wiley & sons.
+13
+
+[Franziska B. Keller and Yang 2020] Franziska B. Keller, David Schoch, S. S. and Yang, J. (2020). Political
+astroturfing on twitter: How to coordinate a disinformation campaign. Political Communication.
+[Gorodnichenko et al. 2024] Gorodnichenko, Y., Pham, T., and Talavera, O. (2024). Central bank communi-
+cation on social media: What, to whom, and how? Journal of Econometrics, page 105869.
+[Grimminger and Klinger 2021] Grimminger, L. and Klinger, R. (2021). Hate towards the political opponent:
+A twitter corpus study of the 2020 us elections on the basis of offensive speech and stance detection.
+In Proceedings of the Eleventh Workshop on Computational Approaches to Subjectivity, Sentiment and
+Social Media Analysis.
+[Hossain et al. 2020] Hossain, T., Logan IV, R. L., Ugarte, A., Matsubara, Y., Young, S., and Singh, S. (2020).
+COVIDLies: Detecting COVID-19 misinformation on social media. In Proceedings of the 1st Workshop
+on NLP for COVID-19 (Part 2) at EMNLP 2020.
+[Hui and Belkin 2021] Hui, L. and Belkin, M. (2021). Evaluation of neural architectures trained with square
+loss vs cross-entropy in classification tasks. In International Conference on Learning Representations.
+[Kawintiranon and Singh 2021] Kawintiranon, K. and Singh, L. (2021). Knowledge enhanced masked lan-
+guage model for stance detection. In Proceedings of the 2021 conference of the north american chapter
+of the association for computational linguistics: human language technologies, pages 4725–4735.
+[Keet 2022] Keet, C. M. (2022). Bootstrapping nlp tools across low-resourced african languages: an overview
+and prospects. arXiv preprint arXiv:2210.12027.
+[Krihova 2013] Krihova, Z. (2013). Media, power, and politics in the digital age. the 2009 presidential election
+uprising in iran. CyberOrient, 7(1):119–123.
+[Lai et al. 2020] Lai, M., Patti, V., Ruffo, G., and Rosso, P. (2020). # brexit: Leave or remain? the role of
+user’s community and diachronic evolution on stance detection. Journal of Intelligent & Fuzzy Systems.
+[Landis and Koch 1977] Landis, J. R. and Koch, G. G. (1977). An application of hierarchical kappa-type
+statistics in the assessment of majority agreement among multiple observers. Biometrics.
+[Liu et al. 2021] Liu, J., Duan, X., Zhang, R., Sun, Y., Guan, L., and Lin, B. (2021). Relation classification
+via bert with piecewise convolution and focal loss. Plos one, 16(9):e0257092.
+[Malagoli et al. 2021] Malagoli, L., Stancioli, J., Ferreira, C. H., Vasconcelos, M., da Silva, A. P. C., and
+Almeida, J. (2021). Caracterizaçao do debate no twitter sobre a vacinaçao contra a covid-19 no brasil.
+In Brazilian Workshop on Social Network Analysis and Mining (BraSNAM), pages 55–66. SBC.
+[Mehta and Pandya 2020] Mehta, P. and Pandya, S. (2020). A review on sentiment analysis methodologies,
+practices and applications. International Journal of Scientific and Technology Research, 9(2):601–609.
+[Reis et al. 2019] Reis, R., Zanetti, D., and Frizzera, L. (2019). Algorítmos e desinformação: o papel do
+youtube no cenário político brasileiro. In Assoc. Brasileira de Pesquisadores em Comunicação e Política.
+[Rocha et al. 2024] Rocha, S., Silva, C., Ferreira, C., Gonçalves, G., and Almeida, J. (2024). Monitorando a
+opinião pública sobre operações policiais no brasil via comentários de vídeos no youtube. In Anais do
+XIII Brazilian Workshop on Social Network Analysis and Mining.
+[Santos and Goya 2022] Santos, P. D. and Goya, D. H. (2022).
+Detecção de posicionamento e rotulação
+automática de usuários do twitter: estudo sobre o embate científico-político no contexto da cpi da covid-
+19. In Brazilian Workshop on Social Network Analysis and Mining (BraSNAM), pages 49–60. SBC.
+[Shen et al. 2017] Shen, J., Najand, M., Dong, F., and He, W. (2017). News and social media emotions in the
+commodity market. Review of Behavioral Finance, 9(2):148–168.
+[Souza et al. 2020] Souza, F., Nogueira, R., and Lotufo, R. (2020). Bertimbau: Pretrained bert models for
+brazilian portuguese. In Intelligent Systems.
+14

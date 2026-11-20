@@ -1,0 +1,240 @@
+Brechó-SocialSECO: Uma Ferramenta para Apoiar 
+Modelagem e Análise de Ecossistemas de Software 
+Gabriel Barbosa, Thaiana Lima, Rodrigo Pereira dos Santos, Cláudia Werner 
+COPPE/UFRJ – Universidade Federal do Rio de Janeiro 
+Caixa Postal 68511 – CEP 21941-972 – Rio de janeiro, RJ, Brasil 
+{gabrielsb, thaiana, rps, werner}@cos.ufrj.br 
+Abstract. In any software system, there is interaction between components. By 
+joining a technical network of artifacts with a social environment, a socio-
+technical network can be created. In order to develop a tool to model, analyze 
+and encourage social relations in this socio-technical network, Brechó 
+SocialSECO is proposed. It extends a component library called Brechó. The 
+goal is to provide a better understanding of software ecosystem and a support 
+for decision-making. This paper presents the tool and its operation. 
+Resumo. Em todo sistema de software, existe interação entre componentes. Ao 
+unir uma rede técnica de artefatos com um ambiente social, cria-se uma rede 
+socio-técnica. Visando desenvolver uma ferramenta que modele, analise e 
+incentive as relações sociais na rede socio-técnica, foi proposta a Brechó 
+SocialSECO. Estendeu-se a biblioteca de componente Brechó para melhor 
+entender ecossistemas de software e dar suporte para tomadas de decisão. 
+Este trabalho apresenta a ferramenta e seu funcionamento. 
+1. Introdução 
+Mecanismos de socialização são meios para estimular a relação entre atores de um 
+sistema. Segundo Seichter et al. (2010), a comunicação e a interação entre esses atores 
+durante o processo de desenvolvimento de software são realizadas por meio dos 
+artefatos que eles compartilham. Jansen et al. (2009) definem um Ecossistema de 
+Software (ECOS) como um conjunto de atores funcionando como uma unidade que 
+interage com um mercado distribuido entre software e serviços, juntamente com as 
+relações entre estas entidades. Essas relações são apoiadas por uma plataforma 
+tecnológica ou por um mercado comum, e realizadas pela troca de informação, recursos 
+e artefatos. Nesse contexto, a intensidade da interação entre atores e artefatos no ECOS 
+leva à fusão da rede de atores (rede social) e da rede de artefato (rede técnica), 
+resultando em uma rede socio-técnica (Cukierman et al., 2007). 
+A aplicação de conceitos da análise de interações sociais aparece em poucos 
+trabalhos de ECOS, de modo que seu domínio ainda carece de efetiva exploração desses 
+conceitos (Santos & Oliveira, 2013). À medida que uma organização evolui, deixando 
+de construir um produto de software isolado, e busca parcerias para abrir seus negócios, 
+ela ultrapassa suas fronteiras e encontra um ecossistema formado por várias outras (Berk 
+et al., 2010). Cria-se então a necessidade de se estudar ECOS como um conjunto 
+formado por plataforma, rede de atores (stakeholders) e rede de artefatos (Manikas & 
+Hansen, 2013). A partir disto, surge outra necessidade: gerir as informações 
+provenientes deste ECOS. Com o aumento das interações entre os atores e artefatos,
+
+uma gama de informações novas surge a todo momento no ECOS, impactando o seu 
+estado e a organização de seus elementos (Lima et al., 2014). 
+Em Peréz et al.(2012), é apresentada a ferramenta SECONDA, que visa a análise 
+do ECOS e sua evolução. Por meio de métricas de projeto, analisa-se o comportamento 
+do ECOS e suas principais características. Porém, a ferramenta apresenta limitações, 
+pois não contempla as relações sociais que ocorrem durante o ciclo de vida do ECOS. 
+Outra carência é a previsão de tendências, pois a ferramenta analisa informações 
+coletadas e não prevê necessidades e tendências sobre as relações no ECOS. O Portal do 
+Software Público Brasileiro1, por sua vez, é uma plataforma de ECOS que possui uma 
+gama de interações sociais, como fóruns e comunidades. Além de um repositório para 
+usuários finais e desenvolvedores, o SPB armazena informações das relações entre 
+atores. Porém, o SPB não possui gamificação, mineração de dados e a visualização da 
+rede, ferramentas que possuem que fazem parte da proposta deste trabalho. Outra 
+ferramenta é apresentada por Goeminne et al. (2010), constituída por um framework que 
+capta informações do ECOS por meio de extensões e, ao utilizar mineração de dados, 
+gera um conjunto de gráficos e dados sobre o ECOS e seu ciclo de vida. O framework, 
+porém, por ser bastante genérico, necessita de um conjunto de implementações para se 
+adequar a cada ECOS, necessitando programar as informações que se deseja minerar. 
+O objetivo deste trabalho é apresentar a Brechó-SocialSECO, uma ferramenta 
+para incentivar relações sociais no ECOS e transformar os dados gerados dessas 
+interações em informações úteis para a tomada de decisão dos stakeholders, ajudando na 
+compreensão das demandas e necessidades que surgem da rede. Para isso, a ferramenta 
+apoia na modelagem e análise de ECOS. Com o suporte de mecanismos de análise e 
+mineração implementados na Brechó-SocialSECO, um plugin de visualização da rede 
+socio-técnica do ECOS foi desenvolvido na ferramenta Gephi2. São obtidas informações 
+acerca da formação de grupos com interesses similares e a identificação de tendências 
+do mercado, entre outras análises. Além desta seção de introdução e fundamentação, a 
+Seção 2 apresenta a ferramenta Brechó-SocialSECO, com a sua arquitetura, mecanismos 
+e implementação como extensão da biblioteca de componentes e serviços Brechó; e a 
+Seção 3 conclui o artigo com algumas considerações finais e trabalhos futuros. 
+2. Brechó-SocialSECO 
+Repositórios e bibliotecas de componentes e serviços são importantes para alcançar 
+objetivos de Reutilização de Software, servindo como vitrine para buscar e recuperar 
+componentes existentes na organização e prontos para a reutilização (Overhage & 
+Thomas, 2004). Segundo Pujatti et al. (1994), a reutilização diminui os esforços de 
+desenvolvimento e manutenção dos projetos de software. Um dos protótipos disponíveis 
+nessa área é a biblioteca Brechó3, que permite o desenvolvimento de extensões. A 
+Brechó é um sistema de informação Web com uma base de aplicações, componentes, 
+serviços, 
+produtores/consumidores, 
+com 
+mecanismos 
+de 
+armazenamento, 
+documentação, publicação, busca e recuperação (Werner et al., 2009). 
+ 
+1 Disponível em: www.softwarepublico.gov.br/ 
+2 Disponível em: http://gephi.github.io 
+3 Disponível em: http://reuse.cos.ufrj.br/brecho
+
+A fim de lidar com um conjunto de informações relativas ao funcionamento do 
+ECOS e incentivar as relações sociais, a Brechó-SocialSECO é proposta como um 
+ferramental de apoio. A Brechó-SocialSECO estende a Brechó4 para enriquecê-la com 
+mecanismos sociais que apoiem a manutenção de redes socio-técnicas (Lima et al., 
+2014). A solução apresenta uma arquitetura centrada na biblioteca Brechó, com a 
+inserção dos mecanismos sociais e de mineração, discutidos respectivamente nas 
+Subseções 2.1 e 2.2. Os mecanismos sociais são introduzidos na biblioteca para apoiar a 
+geração de dados, cujas informações extraídas resultam em gráficos gerados pelo plugin 
+da ferramenta Gephi5, por meio do refinamento realizado por mecanismos de mineração 
+de dados. A Figura 1 mostra a arquitetura da solução. 
+ 
+Figura 1. Arquitetura da Solução 
+2.1. Mecanismos Sociais 
+Os mecanismos sociais inseridos na biblioteca por este trabalho foram: equipes, fórum, 
+perfil dos usuários, sistemas de pontuação e de sugestão, e notícias. Para que o usuário 
+tenha acesso a um portal voltado para o uso dos mecanismos sociais de ECOS 
+implantados, foi incorporada a página “Minha Rede” na Brechó (Figura 2). 
+ 
+Figura 2. Tela “Minha Rede” na Brechó-SocialSECO 
+ Como a biblioteca de componentes passa a ser apoiada nas relações sociais e 
+decisões conjuntas dos usuários, a formação de equipes de desenvolvimento tende a ser 
+algo comum (Seichter et al., 2010). Procurando satisfazer esta condição, foi proposta a 
+criação de um novo tipo de usuário, denominado Equipe. A Equipe é composta por um 
+conjunto de outros usuários em que, por padrão, o usuário que criou a equipe é o 
+“administrador” da conta em questão. O administrador da equipe pode delegar 
+ 
+4 Esta biblioteca foi escolhida por utilizar desenvolvimento baseado em componentes (Szyperski et al., 
+2002), facilitando a manutenção e extensão (reutilização), e pelo acesso ao código-fonte. 
+5 Esta ferramenta foi escolhida por ser plataforma open source que disponibiliza API para 
+desenvolvimento, construída na linguagem Java e tendo como input uma conexão com banco de dados.
+
+privilégios a cada usuário (e.g., comprar componentes, criar tópicos em fóruns ou 
+publicar novos componentes na biblioteca). Um usuário pode participar de mais de uma 
+equipe. Como a compra é feita por licenças, uma equipe pode comprar um conjunto de 
+licenças para todos os membros da equipe, ou apenas poucas licenças para alguns deles. 
+Cada equipe conta com um fórum, que serve como recurso para a troca de 
+informações. O fórum é um repositório de mensagens separadas por tema ou assunto, 
+sendo constituído por três setores: Tópicos, Sugestões e Requisitos. Os tópicos são 
+constituídos por discussões que, por sua vez, são formadas por mensagens. A abertura 
+de discussões e mensagens é livre. Cada mensagem apresenta duas opções para leitores: 
+Positivo e Negativo. Quanto mais bem cotada for uma mensagem (i.e., mais 
+escolhas/avaliações positivas), mais útil e relevante é considerada para a comunidade. A 
+avaliação (positivo/negativo) é feita pelos próprios usuários do fórum. 
+O mecanismo de sugestões é formado por mensagens vindas dos usuários do 
+componente. Visa criar um canal de comunicação entre usuários e desenvolvedores. Na 
+Brechó-SocialSECO, demandas e necessidades do ECOS (e.g., novas funcionalidades 
+ou componentes) podem ser compartilhadas como requisitos. Quando um novo requisito 
+é adicionado, é possível que um usuário ou equipe sinalize interesse em solucionar este 
+requisito. O administrador do fórum pode permitir que esses usuários ou equipes 
+desenvolvam uma solução de software oficial, ou informar que uma equipe particular já 
+está solucionando o requisito. A tela do fórum enriquecida com o mecanismo de 
+sugestão (aba “requisitos”) pode ser vista na Figura 3. 
+ 
+Figura 3. Tela do mecanismo “Fórum” na Brechó-SocialSECO 
+A versão original da Brechó possuía um sistema de pontos de recompensa 
+implementado, que incentiva o ator a dar feedback de um componente adquirido a um 
+produtor. Porém, esse sistema não contemplava a área social, o que motivou a sua 
+expansão para criar um mecanismo que impulsionasse o crescimento do ECOS e a 
+obtenção de seus dados, incentivando o ator a contribuir com informações sobre os 
+componentes por meio do fórum. Ao acessar o fórum do componente adquirido, o 
+usuário pode manifestar interesse em solucionar um requisito em aberto. Após criar e 
+publicar essa solução na Brechó, é analisado o seu impacto no ECOS do componente. 
+Essa analise é feita de diversas maneiras, e.g., número de acessos, número de 
+downloads, “likes” da solução, entre outros. 
+As recompensas em pontos são dadas ao autor da solução, conforme a sua 
+utilidade para a comunidade, determinada pela avaliação dos próprios membros. Como 
+usuários ativos recebem mais pontos de recompensa, desenvolvedores e empresas visam 
+este tipo de usuário em seus ecossistemas, estimulando o desenvolvimento do 
+componente e toda a comunidade em sua volta (Manikas & Hansen, 2013). A Brechó
+
+identifica os atores em três principais papéis: Produtor, Consumidor e Gerente da 
+Biblioteca (Werner et al., 2009). Com o aumento das interações entre os atores dentro 
+de um ECOS, foi preciso aumentar a precisão da identificação dos atores na Brechó, de 
+forma a entender melhor como cada ator se situa dentre esses três papéis principais. Para 
+isso, foi preciso atribuir pontuações para cada ação do ator, de modo que cada ação seja 
+ponderada pelo grau associado a cada um dos três papéis principais. Portanto, há um 
+leque de possibilidades, já que os atores podem exercer papeis mesclados (i.e., participar 
+de diferentes formas), com diferentes graus de atribuição (e.g., 20% do tipo A, 30% do 
+tipo B e 50% do tipo C). Por fim, um feed de notícias com as últimas ações realizadas 
+nos mecanismos sociais, na tela “Minha Rede”, está em implementação. 
+2.2. Mecanismos de Mineração 
+Para que as informações obtidas das relações sociais no ECOS sejam transformadas em 
+informações úteis para os stakeholders, é necessário efetuar a mineração dos dados. Este 
+trabalho foi baseado em dois mecanismos de mineração de dados: a mineração de texto 
+(utilizando mensagens de Forúns) e análise de associação (associação de componentes 
+de atores com perfis similares). Após a mineração de dados, os resultados são passados 
+para um ferramental de exibição de informação (neste trabalho, é utilizado o Gephi). 
+A mineração de texto tem por objetivo descobrir tendências de assuntos 
+presentes no fórum de discussão. Assim, é possível criar conteúdos personalizados para 
+cada tipo de fórum ou assunto discutido. Um desses conteúdos é a nuvem de tags, que é 
+constituída por um conjunto de palavras ou termos regularmente comentados ou 
+discutidos em um fórum, e que se apresentam visualmente e proporcionalmente à sua 
+ocorrência nos tópicos. Assim, assuntos bem cotados e que apresentem palavras-chave 
+como “urgência”, “necessidade” e “sugestão” podem ser identificados pela ferramenta 
+como possíveis sugestões, alertando o desenvolvedor/produtor do componente de uma 
+tendência do mercado, além de alimentar o sistema de sugestão. 
+ 
+Figura 4. Tela para análise da rede sócio-técnica no plug-in do Gephi 
+Baseado nas relações entre os atores, a análise de associação procura associar 
+componentes adquiridos por dois ou mais atores. Busca-se encontrar componentes 
+afastados que acabam sendo relacionados, seja pela complementação de suas funções ou 
+por suas dependências. A maior parte dessa informação é retirada dos componentes 
+adquiridos pelos atores do ECOS. Por exemplo, um ator possui um grupo de 
+componentes e, caso haja um ator com perfil similar, é possível que ele tenha interesse
+
+no mesmo grupo de componentes, sendo possível recomendar componentes para atores 
+de mesmo perfil. Para apoiar nesta tarefa, a Figura 4 mostra um diagrama de rede socio-
+técnica exibido pelo plugin construído, que permite realizar uma análise da rede. 
+3. Conclusão 
+Este trabalho apresentou a Brechó SocialSECO, ferramenta que implementa 
+mecanismos sociais e de mineração, estendendo a biblioteca Brechó ao inserir uma 
+visão social para apoiar modelagem e análise de ECOS. Baseados nas relações sociais, 
+dados destas interações transformam-se em novas informações, por meio de técnicas de 
+mineração de dados, ajudando na tomada de decisões e expansão do ECOS. Como 
+trabalhos futuros, um sistema de clustering, que traga informações sobre grupos de 
+perfis semelhantes de usuário, e um sistema de sugestão baseado nessas informações, 
+estão sendo implementados na solução. Além disso, um feed de notícias que informe as 
+alterações realizadas nos mecanismos sociais no repositório está em implementação. Por 
+fim, a inserção de uma análise temporal dos dados coletados e dos gráficos gerados, 
+permitindo que diferentes stakeholders possam analisar o ciclo de vida do ECOS e as 
+mudanças dos perfis de seus usuários, serão implementados. 
+Referências 
+Berk, I., Jansen, S., Luinenburg L. (2010) “Software Ecosystems: A Software Ecosystem 
+Strategy Assessment Model”. In: 4th ECSA, IWSECO, Copenhagen, Denmark, 135-142. 
+Cukierman, H.L., Teixeira, C., Prikladnicki, R. (2007) “Um Olhar Sociotécnico sobre a 
+Engenharia de Software”. Revista de Informática Teórica e Aplicada 14(2):207-227. 
+Goeminne, M. et al. “A Framework for Analysing and Visualising Open Source Software 
+Ecosystems”. In: Joint ERCIM EVOL/IWPSE, Antwerp, Belgium, 42-47. 
+Jansen, S., Finkelstein, A., Brinkkemper, S. (2009) “A Sense of Community: A research 
+Agenda for Software Ecosystems”. In: 31st ICSE, Vancouver, Canada, 187-190. 
+Lima, T. et al. (2014) “ Uma Abordagem Socio-técnica para Apoiar Ecossistemas de Software”. 
+iSys: Revista Brasileira de Sistemas de Informação 7(3):19-37. 
+Manikas, K., Hansen, K.M. (2013) “Software Ecosystems – A Systematic Literature Review”. 
+The Journal of Systems and Software 86(5):1294-1306. 
+Overhage, S., Thomas, P. (2004) “A Business Perspective on Component Trading: Criteria, 
+Immaturities, and Critical Success Factors”. In: 30th Euromicro, Rennes, France, 108-117. 
+Pérez, J. et al. (2012) “SECONDA: Software Ecosystem Analysis Dashboard”. In: 16th CSMR, 
+Szeged, Hungary, 527- 530. 
+Pujatti, L. et al. (1994) “Ambiente de Reutilização de Software: Classificação de Módulos em 
+Tecnologia de Composição”. In: II Jornadas da USP, SUCESU-SP. São Paulo, Brasil, 46-57. 
+Santos, R., Oliveira, J. (2013) “Análise e Aplicações de Redes Sociais em Ecossistemas de 
+Software”. In: IX SBSI, João Pessoa, Brasil, v. 2, 19-24. 
+Szyperski, C., Gruntz, D., Murer, S. (2002) “Component Software – Beyond Object-Oriented 
+Programming”. New York: Addison-Wesley and ACM Press, 2. ed. 
+Seichter, D. et al. (2010) “Knowledge Management in Software Ecosystems: Software 
+Artefacts as First-class Citizens”. In: 4th ECSA, IWSECO, Copenhagen, Denmark, 119-126. 
+Werner, C. et al. (2009) “Towards a Component and Service Marketplace with Brechó 
+Library”. In: IADIS International Conference WWW/Internet 2009, Rome, Italy, 567-574.

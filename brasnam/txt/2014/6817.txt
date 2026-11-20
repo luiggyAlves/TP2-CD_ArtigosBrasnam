@@ -1,0 +1,254 @@
+Uma ferramenta para analisar mudanças na coesão entre
+parlamentares em votações nominais
+Vítor Baptista1, Fernando Brito1, Jansepetrus Brasileiro1, Alexandre Nóbrega Duarte1,
+Ed Porto Bezerra1, Filipe Almeida2, Patrícia Lima2, Samara Guimarães3
+1Centro de Informática – Universidade Federal da Paraíba (UFPB)
+João Pessoa – PB
+2Centro de Ciências Humanas, Letras e Artes – Universidade Federal da Paraíba (UFPB)
+João Pessoa – PB
+3Centro Socio-Econômico – Universidade Federal de Santa Catarina (UFSC)
+Florianópolis – SC
+vitor@vitorbaptista.com, email@fernandobrito.com
+{jansebp, filipekjp, patricialimajornalista}@gmail.com
+samara@samaraguimaraes.com, alexandre@ci.ufpb.br, ed porto@uol.com.br
+Abstract. There is no simplified way of analysing changes in members of parla-
+ment’s behaviour. Consequently, it is difficult to visualize the impact caused by
+historical events, such as corruption scandals or popular manifestations. In our
+understanding, such events result in discussions, affecting members’ cohesion.
+We propose a tool to monitor cohesion metrics over time, making it possible to
+visualize changes in the way members of parlament vote.
+Resumo. Não há uma forma trivial de analisar as mudanças no comportamento
+dos parlamentares. Consequentemente, é difícil observar o impacto de eventos
+históricos, como o escândalo popularmente conhecido como mensalão ou as
+manifestações populares de 2013. Entendemos que eventos desse tipo geram
+discussões, impactando na coesão entre os parlamentares. Dessa forma, pro-
+pomos uma ferramenta para monitorar métricas de coesão entre parlamentares
+ao longo do tempo, permitindo a visualização de mudanças na forma como os
+parlamentares votam.
+1. Introdução
+Há momentos históricos que impactam a sociedade, sejam motivados por movimentos
+sociais, como as manifestações populares de 2013, ou deflagrados pela mídia, como o
+escândalo popularmente conhecido como mensalão. Nessas situações, espera-se que haja
+uma resposta dos parlamentares através da proposição de novos projetos de Lei. Moni-
+torar as votações nominais da câmara de deputados é uma das formas que temos para
+identificar tais respostas, nos permitindo comparar o comportamento dos parlamentares,
+tanto individualmente quanto em grupo, ao longo do tempo.
+Esses acontecimentos são polêmicos, dividindo opiniões dos parlamentares. Po-
+demos perceber isso através de mudanças na coesão dos partidos. Quando foi deflagrado
+
+o mensalão, por exemplo, diversos parlamentares tentaram se desassociar dos acusados
+para preservar seus nomes e chances de reeleição.
+Apesar dos resultados dessas votações nominais estarem disponíveis na Internet,
+tais dados não estão em um formato de fácil entendimento e visualização. Neste traba-
+lho, coletamos estes dados e utilizamos as informações sobre cada uma das votações para
+construir uma rede social interligando os deputados federais. A partir disto, desenvol-
+vemos uma ferramenta para visualizar a coesão entre os parlamentares dentro de cada
+partido e em grupos como a bancada evangélica e os deputados acusados de participação
+no mensalão.
+Na seção 2 definimos uma métrica de coesão e descrevemos como os dados foram
+extraídos e modelados. Demonstramos as funcionalidades da ferramenta usando o grupo
+de deputados federais acusados de participação no mensalão como estudo de caso na
+seção 3.
+Na seção 4, citamos trabalhos relacionados a essa pesquisa e argumentamos sobre
+como o nosso trabalho difere deles. Na 5, concluímos o artigo e apresentamos propostas
+de trabalhos futuros.
+2. Extração e modelagem dos dados
+Os dados dos resultados das votações nominais estão disponíveis através de uma Applica-
+tion Programming Interface (API) na página de dados abertos da Câmara dos Deputados1,
+compreendendo o período de 1998 até o momento atual. Ao total, 1.641 deputados vo-
+taram 603.342 vezes em 1.730 votações, resultando em uma mediana de 353,5 votos por
+votação com desvio-padrão de 72,67
+.
+Neste trabalho, nos limitamos a analisar a 51a, 52a e 53a legislaturas, de 1999 a
+2011, pois são as únicas disponíveis por completo, e desconsideramos as votações onde
+houve consenso entre 95% ou mais dos parlamentares, pois são irrelevantes para o cálculo
+da coesão [Robson e Neiva 2011, Machado 2012].
+Infelizmente, a Câmara não disponibiliza cópia dos dados completos para down-
+load, sendo necessária a extração por etapas. Primeiro, buscamos a lista de proposições
+que foram votadas em cada ano através do método listarProposicoesVotadasEmPlenario.
+Isto nos dá o código e nome de cada proposição, mas para buscar suas votações também
+precisamos do seu tipo (PEC, MP, etc.), então temos que obter mais informações usando
+o método ObterProposicaoPorID. Só então conseguimos, finalmente, obter a votação de
+cada proposição através de ObterVotacaoProposicao.
+Automatizamos esse processo desenvolvendo um programa na linguagem Ruby2
+que extrai os dados mais atualizados e os insere em um banco de dados relacional (o
+SQLite33).
+A partir daí, outro programa os converte em um grafo não-direcional, onde cada
+nó representa um parlamentar, que possui arestas para todos outros parlamentares que
+participaram de ao menos uma votação juntos. O peso dessa aresta é o valor da métrica
+1http://www2.camara.leg.br/transparencia/dados-abertos/
+dados-abertos-legislativo/webservices/proposicoes-1/proposicoes
+2https://www.ruby-lang.org
+3http://www.sqlite.org
+
+Tabela 1. Exemplos da utilizaç ão do Índice de Rice
+Deputado 1
+Deputado 2
+Índice de Rice
+Sim
+Sim
+1
+Sim
+Não
+0
+Não
+Sim
+0
+Não
+Não
+1
+de coesão entre eles, definida em 2.1. Esses grafos são calculados para cada partido e ano,
+e gravados em arquivos JSON4.
+2.1. Métrica de coesão
+Definimos a coesão entre um grupo de parlamentares em uma votação i como a diferença,
+em números absolutos, entre a quantidade de votos Sim e de votos Não, dividida pelo
+Total de votos. Esta métrica, definida pela fórmula 1, é conhecida como índice de Rice
+(IR). [Rice 1924]
+IRi = |Sim −Não|
+Total
+(1)
+A tabela 1 ilustra a utilização do IR para calcular a coesão entre dois deputados em
+uma única votação. Vemos que quando os dois deputados votam da mesma forma, sejam
+ambos favoráveis ou contrários a proposição, o IR é 1, sendo 0 quando os dois deputados
+divergem em seus votos. Para múltiplas votações, calculamos a média aritmética dos
+valores de cada votação.
+Esta métrica é bastante usada para comparar a coesão parlamentar, inclusive na
+análise de dados brasileiros [Robson e Neiva 2011]. Apesar disso, ela apresenta uma
+limitação conhecida: o tamanho do grupo não é levado em consideração.
+Podemos
+dizer que dois grupos de tamanhos diferentes são igualmente coesos, caso ambos te-
+nham um índice 0, 4?
+Empiricamente, sabemos que é mais difícil manter a coesão
+em um grupo grande do que em um grupo pequeno.
+Assim, podemos inferir que
+um IR 0, 6 representa uma coesão maior em um grupo grande que em um pequeno.
+[Nevison 1979, Desposato 2005, Neto e Santos 1997]
+Neste trabalho sempre comparamos pares de parlamentares. Assim, o tamanho
+dos grupos é sempre 2. Poderia-se pensar que não sofremos com essa limitação, mas
+em uma análise mais detalhada percebemos que somos prejudicados por um problema
+semelhante. Nossas comparações são feitas em um conjunto de votações cuja quantidade
+é variável para cada par de membros do grupo. Se dois parlamentares votaram juntos
+80% das vezes, a aresta ligando estes dois deputados em nossa rede terá o mesmo peso,
+independente de estarmos considerando 10 ou 100 votações.
+3. Visualização dos dados
+Entre 1999 e 2011 houve uma média de 113 votações por ano, com desvio-padrão de 47,8
+. Como só existem quatro opções de votos, a probabilidade é alta de um par de
+4http://pt.wikipedia.org/wiki/JSON
+
+deputados ter, em um ano, votado da mesma forma ao menos uma vez. Isso gera um grafo
+denso, onde a maioria dos nós está interconectada. Para 513 deputados federais, total de
+parlamentares eleitos por legislatura, o número máximo de arestas é 131.3285.
+Um grafo com essas características é de difícil visualização na forma usual, onde
+cada nó é um círculo e as arestas são traços interligando-os. Por exemplo, a figura 1
+mostra o grafo com os deputados federais do PT em 2004. Mesmo considerando esse
+subconjunto dos dados, o grafo é de difícil visualização. Esse problema é conhecido
+como “hairball”6[Kosara 2012].
+Figura 1. Deputados Federais do PT em 2004. Estão representados 92 parlamen-
+tares com 4.081 arestas. Densidade 0,97. Grau médio 88,717.
+Para minimizar este problema, usamos uma visualização que independe do
+número de arestas: a matriz de adjacência. Para um grafo não-direcional, ela é defi-
+nida como uma matriz de tamanho n por n, onde n é o número de nós. Cada elemento aij
+da matriz é o peso da aresta entre o par ij. Caso eles não estejam interligados, esse valor
+é zero. [Cormen et al. 2001]
+Um mesmo grafo pode ser representado de diversas formas em uma matriz de
+adjacência, simplesmente variando a ordenação das linhas e colunas. Para expôr as co-
+munidades em uma rede social visualizada dessa forma, é essencial escolher uma boa
+ordem. Neste trabalho ordenamos as matrizes em duas etapas: primeiro, ordenamos os
+partidos; em seguida, os parlamentares dentro de cada partido.
+Para ordenar os partidos, calculamos a média aritmética das coesões de seus par-
+lamentares relacionadas com todos os outros. Assim, os partidos cujos parlamentares são
+mais coesos, em média, com o restante da Casa, aparecem primeiro.
+Dentro de cada partido, ordenamos os parlamentares da mesma forma que fora do
+partido, mas usando o somatório das coesões ao invés da média aritmética.
+Na matriz, ao invés de exibir os valores numéricos das coesões, usamos cores
+dentro de uma escala, facilitando a visualização de comunidades.
+Com isso, conseguimos resultados satisfatórios. A figura 2 mostra a matriz da
+coesão em 2000 dos deputados acusados de terem participado do mensalão. Nela, pode-
+se identificar 3 grupos: o [PL]; o [PMDB, PTB, PSDB e PPB]; e o [PT]. Também con-
+seguimos ver que esta não é a ordenação ideal, dado que o PT deveria estar próximo do
+PL.
+5Seja n o número de nós, o número máximo de arestas em um grafo não-direcional é |n(n−1)|
+2
+6“Bola de pêlo”, em tradução livre dos autores.
+
+Figura 2. Matriz da coesão em 2000 dos deputados acusados de participar do
+mensalão.
+4. Trabalhos relacionados
+Como trabalhos que procuram analisar o comportamento dos membros das casas parla-
+mentares do Brasil podemos citar [Neto e Santos 1997], cujo trabalho consiste em medir
+a coesão na Câmara dos Deputados entre 1946 e 1964; [Robson e Neiva 2011], que ana-
+lisa votações do Senado entre 1989 a 2009, e; [Machado 2012], que foca sua pesquisa nas
+votações nominais ocorridas na Câmara e na infidelidade partidária dos deputados.
+Além deles, [Marinho 2013] analisa o número de comunidades formadas por se-
+nadores, partindo do pressuposto que os membros de um mesmo partido seriam mais
+coesos entre si do que entre outros, o que geraria um número de comunidades similar ao
+número de partidos. A ideia é encontrar o número de correntes ideológicas presentes no
+Senado Federal, e relacioná-las com o número de partidos.
+A [PoliGNU 2013] desenvolveu uma visualização de coesão usando a ideia de um
+radar, onde os partidos e parlamentares são representados como círculos que, quanto mais
+próximos uns dos outros, mais coesos são. Analisaram dados da Câmara dos Deputados,
+Senado Federal e Câmara Municipal de São Paulo.
+Nosso trabalho tem como diferencial ser uma visualização interativa online e, por
+usar um outro tipo de gráfico, pode evidenciar padrões diferentes dos encontrados no
+Radar Parlamentar.
+5. Conclusão
+A ferramenta desenvolvida serve como forma de apresentar mudanças ocorridas dentro da
+Câmara dos Deputados após acontecimentos polêmicos, que geram opiniões divergentes
+entre os parlamentares.
+No presente trabalho descrevemos o processo de extração e limpeza dos dados de
+votações provenientes da Câmara dos Deputados em 2, e apresentamos o índice de Rice
+em 2.1.
+
+Posteriormente, apresentamos um exemplo da utilização da ferramenta que desen-
+volvemos7 para visualizar a coesão entre membros de um grupo de parlamentares através
+de um estudo de caso com base em dados referentes às votações nominais ocorridas na
+Câmara dos Deputados entre 1999 e 2011, focando nos deputados acusados por envolvi-
+mento no caso do mensalão. Nesse estudo, pudemos visualizar o possível impacto que
+este escândalo teve na coesão dos deputados envolvidos.
+Como trabalhos futuros, pretendemos adicionar outras métricas de coesão, que
+evitem as limitações do índice de Rice apresentadas na seção 2.1; analisar diferentes al-
+goritmos para ordenar a matriz de adjacências, pois acreditamos que outras ordenações
+possam revelar outras comunidades que não foram expostas pelo método atual; permi-
+tir a comparação da coesão de diversos partidos e/ou anos lado a lado possibilitando,
+por exemplo, a análise da coesão antes e depois de um fato específico, e; utilizar outras
+métricas da análise de redes sociais, como PageRank [Page et al. 1999] e modularidade
+[Newman e Girvan 2004].
+Referências
+Cormen, T. H., Stein, C., Rivest, R. L., e Leiserson, C. E. (2001). Introduction to Algo-
+rithms. McGraw-Hill Higher Education, 2nda edição.
+Desposato, S. W. (2005). Correcting for Small Group Inflation of Roll-Call Cohesion
+Scores. British Journal of Political Science, 35(04):731.
+Kosara, R. (2012).
+Graphs beyond the hairball.
+http://eagereyes.org/
+techniques/graphs-hairball.
+Machado, D. O. (2012). Relação entre disciplina e infidelidade partidária na Câmara
+dos Deputados. Tese de Doutorado.
+Marinho,
+R.
+(2013).
+Há
+partidos
+políticos
+no
+Brasil?
+http:
+//www.todasasconfiguracoes.com/2013/09/14/
+ha-partidos-politicos-no-brasil/.
+Neto, O. e Santos, F. (1997). The Executive Connection: Explaining the Puzzles of Party
+Cohesion in Brazil. Twentieth LASA Congress, ....
+Nevison, C. H. (1979). Measures of Voting Unity: Applications of Probability to the
+Social Sciences. Em Education Development Center, Inc. Newton, Massachusetts.
+Newman, M. E. e Girvan, M. (2004). Finding and evaluating community structure in
+networks. Physical review E, 69(2):026113.
+Page, L., Brin, S., Motwani, R., e Winograd, T. (1999). The pagerank citation ranking:
+Bringing order to the web.
+PoliGNU (2013). Radar Parlamentar. http://radarparlamentar.polignu.
+org/.
+Rice, S. A. (1924).
+Farmers and workers in american politics.
+Tese de Doutorado,
+Columbia University.
+Robson, P. e Neiva, P. (2011). Coesão e Disciplina Partidária no Senado Federal. 54:289–
+318.
+7http://coesaoparlamentar.herokuapp.com

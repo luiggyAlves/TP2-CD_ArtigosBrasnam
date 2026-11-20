@@ -1,0 +1,511 @@
+Um Estudo Sobre o Impacto da Atenção
+Visual nas Redes Sociais
+Daniele V. Ferreira1, Welington Y.L. Akamine2,
+Genaína Rodrigues1, Mylène C.Q. Farias2
+1Departamento de Ciência da Computação
+Universidade de Brasília (UnB)
+70.910-900, Brasília – DF – Brasil
+2Departamento de Engenharia Elétrica
+Universidade de Brasília (UnB)
+70.919-970, Brasília – DF – Brasil
+Resumo. Ao observar uma cena, o olho humano normalmente filtra uma grande
+quantidade de informações visuais e concentra sua atenção em regiões seleci-
+onadas (salientes). Este processo de seleção é ativamente controlado por me-
+canismos óculo-motores que permitem que o foco de atenção seja mantido em
+um determinado local (fixação), ou seja, mudado para um outro local saliente
+(sacadas). Desta forma, a atenção visual é uma característica do sistema ocu-
+lar humano que tem como objetivo reduzir a complexidade dos dados a serem
+processados e maximizar a quantidade de informações úteis a serem assimila-
+das em uma determinada cena. Por sua vez, as redes sociais provêem ambientes
+ricos em termos de informações visuais, ou seja fotos, vídeos, gráficos, etc.
+Apesar disso, existe uma lacuna de trabalhos que exploram o comportamento
+de usuários em redes sociais online com base em aspectos de atenção visual.
+Nesse trabalho, utilizamos modelos de atenção visual computacionais para ana-
+lisar imagens capturadas de um conjunto de perfis de usuários em redes sociais
+consideradas populares no Brasil. Obtemos como resultado do nosso modelo,
+mapas de saliência e a ordem prevista em que os usuários fixam os olhares nas
+imagens capturadas. Comparamos nossos resultados com estudos que analisam
+como usuários interagem com redes sociais online utilizando dados de clicks-
+tream. Os resultados mostram que existem uma forte correlação entre a ordem
+de fixação ocular prevista e a prioridade de navegação obtida pela análise de
+dados via clickstream.
+Abstract. While observing a scene, the eye filters a big quantity of visual infor-
+mations and concentrates its attention at selected regions (salient areas). This
+selection process is actively controlled by oculomotor mechanisms that allow
+the attention focus to be kept at a specific position (fixation) or to be changed to
+another place (saccades). In other words, visual attention is a characteristic of
+the human visual system that has the goal of reducing the complexity of the vi-
+sual data to be processed and maximizing the quantity of information necessary
+to the understanding of a particular scene. On the other hand, social networks
+provide a rich environment in terms of visual data, i.e. photos, videos, graphs,
+etc. In spite of that, there are few works that analyze the user behavior in so-
+cial networks taking into account visual attention models. In this work, we use
+
+a computational vision attention model to analyze the images captured from a
+set of user profiles of popular social networks in Brazil. With a computational
+attention model, we obtained saliency maps and the predicted order in which
+users looked at the captured images. Then, we compared our results with pre-
+vious studies that analyzed how users interact with social networks based on
+gathered clickstream data. The results show that there is a strong correlation
+between the order of ocular fixation and the clicking priority.
+1. Introdução
+Além da popularidade, redes sociais têm promovido uma mudança significativa na ma-
+neira como as pessoas interagem atualmente. Do ponto de vista econômico, as redes soci-
+ais têm transformado até mesmo a maneira como consumidores no mundo inteiro fazem
+suas decisões de compra. Em 2009, mais de dois terços da população mundial participa-
+vam de redes sociais e de blogs [1]. Hoje, só o Facebook, considerado a rede social mais
+popular, contém cerca de 1 bilhão de usuários ativos mensalmente. Os usuários das redes
+sociais gastam parte significativa do seu tempo (+21%) nessas redes [2]. Logo, enten-
+der o comportamento dos usuários, quando estes interagem nas redes sociais, pode criar
+oportunidades para melhoria das interfaces dessas redes, assim como promover estudos
+diversos sobre interações sociais e distribuição de conteúdo.
+Ao observar uma cena, o olho humano normalmente filtra uma grande quantidade
+de informações visuais e concentra sua atenção em regiões selecionadas (salientes) [13].
+Este processo de seleção é ativamente controlado por mecanismos óculo-motores que
+permitem que o foco de atenção seja mantido em um determinado local (fixação) ou seja
+mudado para um outro local saliente (sacadas). Desta forma, fixações são instintivamente
+concentradas em áreas com grande quantidade de informação. Como consequência, a
+quantidade total de dados a ser processada pelo cérebro para cada cena é minimizada,
+enquanto que a quantidade de informações úteis é maximizada.
+Existem dois mecanismos de seleção visual: bottom-up e top-down. O mecanismo
+bottom-up é uma seleção automática que é controlada principalmente pelas características
+intrínsecas dos sinais. Ele é rápido e de curta duração, sendo executado como uma res-
+posta para as características de baixo nível da imagem que são percebidas como visual-
+mente salientes. O mecanismo top-down é controlado por fatores cognitivos de alto nível e
+por influências externas, como por exemplo informação semântica, preferências pessoais
+e tarefas dadas ao observador, como por exemplo visualização de imagens ou localização
+de defeitos. Este mecanismo é mais lento e requer um esforço voluntário. Existem na
+literatura vários modelos computacionais que simulam o mecanismo de atenção visual do
+sistema visual humano [8, 3, 9]. Entre os modelos disponíveis na literatura, podemos citar
+os modelos bottom-up de Itti et al. [8] e modelo GAFFE [9].
+Nesse trabalho, utilizamos modelos computacionais de atenção visual para anali-
+sar imagens capturadas de um conjunto de perfis de usuários em redes sociais considera-
+das populares no Brasil, conforme dados de 2010 e 2011 da Comscore [6]. Obtemos como
+resultados do nosso modelo mapas de saliência e a ordem prevista em que os usuários fi-
+xam os olhares nas imagens. Comparamos nossos resultados com estudos anteriores de
+Benevenuto et al. que analisam como usuários interagem com redes sociais online via da-
+dos de clickstream [5]. Na maior parte das redes sociais analisadas, os resultados mostram
+
+uma alta correlação entre a ordem de fixação ocular prevista e a prioridade de navegação
+obtida através da análise de dados via clickstream. Em particular, nossa avaliação é con-
+sistente com a de Benevenuto et al., ou seja existe uma maior presença de atividades
+consideradas silenciosas, como navegação do perfil ou fotos.
+As demais seções deste artigo estão organizadas como segue. Na seção 2, forne-
+cemos o referencial teórico que fundamenta a abordagem apresentada nesse trabalho. Na
+seção 4, apresentamos a abordagem proposta na qual aplicamos o algoritmo de atenção
+para gerar os mapas de saliência e avaliar sua relação com o comportamento dos usuários
+das redes sociais, conforme observado por Benevenuto et al.[5]. Na seção 5, são apre-
+sentados os dados obtidos para as redes sociais Orkut, Facebook, LinkedIn e Twitter e
+comparamos com a classificação de Benevenuto et al. para as categorias de todas as ati-
+vidades para cada rede social. Por fim, na seção 6, concluímos o trabalho e apresentamos
+os direcionamentos para trabalhos futuros.
+2. Referencial Teórico
+Essa seção está organizada em duas partes principais. Na primeira, explicamos a análise
+do comportamento de usuários em redes sociais conforme o modelo de clickstream de
+Benevenuto et al.
+[5]. Na segunda parte, explicamos sucintamente os mecanismos de
+seleção visual e os modelos computacionais que simulam o mecanismo de atenção visual
+do sistema visual humano.
+2.1. Caracterização de Comportamento Segundo o modelo de Clickstream
+Em um trabalho anterior, Benevenuto et al. [5] realizaram uma análise do comportamento
+dos usuários em redes sociais online e mostraram que, utilizando dados de clickstream, é
+possível identificar padrões nas interações nesses comportamentos. Eles analisaram as se-
+guintes redes sociais: Orkut, MySpace, LinkedIn e Hi5. Através dos dados de clickstream
+gerados pelas interações via dispositivo mouse e coletadas via um agregador de redes so-
+ciais, os autores conseguiram capturar não apenas as interações visíveis, como também
+aquelas consideradas “silenciosas” como navegação do perfil ou fotos de um usuário.
+Em todas as quatro redes sociais analisadas, foi encontrado um padrão comum, de
+modo que a atividade mais popular era a de navegar nos perfis dos amigos. Na Tabela 1,
+resumimos os resultados observados por Benevenuto et al. para as cinco principais cate-
+gorias das quatro redes sociais analisadas, com base no número de requisições HTTP e
+no compartilhamento de requisições HTTP correspondentes. As estatísticas são normali-
+zadas para cada rede social, de modo que a soma das categorias é de 100% para cada rede
+social. As observações que podem ser feitas desses resultados é de que a categoria Perfil
+e Amigos é a mais popular em todas as redes sociais. Essas navegações incluiam perfis,
+homepage e a lista dos amigos.
+Observe que o LinkedIn apresenta um grau muito menor de interação entre
+usuários por meio de mensagens (Scrapbook) do que o Orkut. Apenas 4% das requisições
+no LinkedIn eram relacionadas a mensagens entre usuários. Como o Linkedin é uma rede
+principalmente para relacionamento profissional (e.g., encontrar colegas de trabalho ou
+colaboradores), é natural esperar que os usuários primariamente naveguem nos perfis e
+criem laços entre si, ao invés de trocar mensagens.
+
+Tabela 1. Quadro comparativo das atividades das cinco principais categorias das
+redes sociais Orkut, MySpace, LinkedIn e Hi5 [5].
+Orkut
+MySpace
+LinkedIn
+Hi5
+Ordem
+Categoria e %
+Categoria e %
+Categoria e %
+Categoria e %
+1
+Perfil e Amigos 41%
+Perfil e Amigos 88%
+Perfil e Amigos 51%
+Perfil e Amigos 67%
+2
+Fotos 31%
+Mensagens 5%
+Outros 42%
+Fotos 18%
+3
+Scrapbook 20%
+Fotos 3%
+Mensagens 4%
+Comentários 6%
+4
+Comunidades 4%
+Outros 3%
+Busca 2%
+Outros 4%
+5
+Busca 2%
+Comunidades 1%
+Comunidades < 1%
+Mensagens 3%
+O MySpace também apresentou um perfil diferente quando comparado ao Orkut,
+apesar da similaridade de seus serviços em relação àqueles providos pelo Orkut. MyS-
+pace mostrou uma interação muito menor através das Fotos. Por fim, as categorias dos
+usuários no Hi5 apresentaram atividades similares àquelas do Orkut, ou seja as ativida-
+des mais frequentes envolvem navegar nas atualizações dos amigos através das categorias
+Perfis, Amigos e Fotos. A categoria mais popular em ambas as redes sociais foi o Perfil e
+Amigos.
+2.2. Modelos Computacionais de Atenção Visual
+Existem na literatura vários modelos computacionais que simulam o mecanismo de
+atenção visual do sistema visual humano [8, 3, 9]. Entre os mais populares, podemos
+citar os modelos bottom-up de Itti et al. [8] e o GAFFE [9]. Para uma dada imagem,
+os modelos computacionais geram um mapa de saliência em escala de cinza, indicando
+quais as regiões mais atrativas nesta imagem. Nos mapas de saliência, os valores mais
+altos (mais claros) correspondem a pixels com maior saliência, enquanto que os valores
+mais baixos (mais escuros) correspondem a pixels com menor saliência. As Figuras 1.(a)
+e 1.(b) mostram, respectivamente, as imagens ‘Rapids’ e ‘Caps’, enquanto que nas Figu-
+ras 1.(c)-1(h) são apresentados os mapas de saliência gerados usando os modelos de Itti e
+GAFFE. Note que os mapas de saliência gerados com os modelos de atenção são capazes
+de capturar as áreas mais salientes das imagens: os chapéus coloridos e o bote.
+Na Figuras 1(i)-1(j) são apresentados os mapas de saliência subjetivos, ou seja,
+os mapas de saliência obtidos através de experimentos utilizando observadores humanos.
+Nestes experimentos, os observadores assistem a várias imagens e um equipamento ras-
+treador ocular (eye tracking) grava as posições na imagem onde ocorrem fixações do olhar
+[10]. Na Figura 2.(a) é apresentado um exemplo de um equipamento rastreador ocular,
+enquanto que na Figura 2.(b) é apresentado um exemplo de uma imagem gerada por este
+tipo de equipamento onde se pode ver as fixações do observador. Esta imagem é poste-
+riormente processada para gerar o mapa de saliência. Embora os mapa subjetivos sejam
+considerados como referência, é importante lembrar que rastreadores oculares são caros
+e difíceis de incorporar em aplicações reais. Além disso, a realização de experimentos
+psico-físicos é um processo lento que requer recursos humanos e físicos. Dessa forma, a
+utilização de modelos computacionais é imprescindível para aplicações em tempo real.
+Neste trabalho, utilizamos o algoritmo GAFFE (Gaze-Attentive Fixation Finding
+Engine) proposto por Rajashekar et al. [9]. O modelo do algoritmo GAFFE é baseado
+na seleção de parâmetros de acordo com dados subjetivos de fixações do olhar humano.
+O algoritmo encontra fixações utilizando uma abordagem bottom-up que considera ape-
+
+(a) Imagem Original ‘Rapids’
+(b) Imagem Original ‘Caps’
+(c) Mapa de Itti para ‘Rapids’
+(d) Mapa de Itti para ‘Caps’
+(g) Mapa de GAFFE para ‘Rapids’
+(h) Mapa de GAFFE para ‘Caps’
+(i) Mapa subjetivo para ‘Rapids’
+(j) Mapa subjective para ‘Caps’
+Figura 1. Mapas de saliência para as imagens ‘Rapids’ and ‘Caps’, calculados
+utilizando os modelos de atenç ão visual de Itti, GAFFE, e et al. [8][9].
+(a)
+(b)
+Figura 2. (a) Equipamento rastreador ocular e (b) sua saída que gera o mapa de
+saliência. (Fonte: The Delft Image Quality Lab, Technical University of Delft –
+http://ii.tudelft.nl/iqlab)
+
+nas características primitivas de cenas naturais. Para desenvolver o algoritmo, foi reali-
+zado um experimento onde foram registrados os movimentos oculares de 29 observadores
+enquanto eles(as) assistiam a 101 imagens naturais do banco de imagens DOVES. Foi,
+então, estudada a estatística de quatro características locais de baixo nível deste conjunto
+de imagens: luminância, contraste e resposta passa-faixa da luminância e contraste. A
+partir deste estudo, descobriu-se que retalhos de imagens em torno das fixações oculares
+tinham, em média, valores maiores para cada uma destas características do que os valores
+correspondentes a retalhos da imagem em regiões aleatórias das imagens. Usando estas
+medidas, o algoritmo GAFFE foi desenvolvido.
+3. Trabalhos Relacionados
+Sítios de redes sociais têm sido fonte de estudos sobre interações sociais e têm desem-
+penhado um importante papel na criação de sistemas de conteúdo distribuído. Sobre-
+maneira, essas redes sociais provêem ambientes ricos quanto a informações visuais, i.e.,
+fotos, vídeos, gráficos, etc. Counts e Fisher [7] utilizaram técnicas de atenção visual para
+explorar o quanto uma interface provida por microblogs (como o Twitter) auxiliam os
+usuários a priorizar as informações que de fato têm relevância e impacto no contexto da
+rede social.
+Vários trabalhos endereçam o problema de encontrar o foco de atenção visual
+em um contexto de interação social [4, 11, 12]. Vinciarelli et al. [12] realizaram um
+levantamento sobre os trabalhos que reconhecem sinais sociais de pessoas e seus com-
+portamentos por meio de uma análise automatizada da atenção visual. Bazzani et al. [4]
+propuseram um algoritmo que detecta o foco de atenção visual fazendo uma aproximação
+do modelo do campo visual de uma pessoa em uma representação tridimensional de ce-
+nas do ambiente real. A partir da construção desse ambiente, são derivadas possíveis
+interações sociais entre as pessoas na cena por meio de algoritmos que conseguem inferir
+o foco da atenção visual. Smith et al. [11] propuseram uma solução para identificar o foco
+de atenção de uma determinada propaganda impressa em um contexto onde pessoas estão
+em movimento.
+Em nosso estudo, o foco não são as interações sociais, mas como as características
+intrínsecas dos objetos na cena (e.g. cor, posição, formato, contraste, etc.) podem motivar
+essas interações em uma determinada rede social. Até o nosso conhecimento, não existem
+trabalhos com a proposta que conduzimos nesse trabalho. E, portanto, existe uma lacuna
+de trabalhos que explorem o comportamento de usuários em redes sociais online com base
+em atenção visual.
+4. Atenção Visual Nas Redes Sociais
+Neste trabalho, foram utilizadas informações sobre o comportamento dos usuários de
+redes sociais para verificar se existe uma relação entre a saliência visual de uma área
+associada a uma categoria e o seu grau de atividade. As categorias das atividades na
+redes sociais desses usuários foram definidas com base no trabalho de Benevenuto et
+al. [5] e ilustradas na Tabela 1. Dessa forma, foram utilizadas as seguintes categorias de
+atividades: ‘Busca’, ‘Scrapbook’, ‘Mensagens’, ‘Testemunhos’, ‘Vídeos’, ‘Fotos’, ‘Perfil
+e Amigos’, ‘Comunidades e Outros’. No entanto, vale ressaltar que nem todas as redes
+sociais possuem todas essas categorias.
+
+Para escolher quais redes sociais deveriam ser analisadas neste trabalho, levamos
+em consideração o estudo da Comscore de março de 2012 [6] que mostrou um cresci-
+mento no número de usuários das principais redes sociais do Brasil, entre os anos de 2010
+e 2011. Também consideramos uma análise feita pelo Google Trends e publicado pelo
+Vincos, onde foram classificadas as três redes sociais mais utilizadas em diversos países.
+No Brasil, o Facebook, o Orkut e o LinkedIn foram as redes classificadas como mais po-
+pulares. Logo, escolhemos estas três redes para o nosso estudo. Também escolhemos
+o Twitter por ter características diferentes das outras três redes. Vale observar também
+que a rede social Facebook não foi incluída na análise de Benevenuto et al.. Mas, em
+virtude da popularidade atual dessa rede social, resolvemos incluí-la em nossa análise na
+mesma classe da rede social Orkut, que reune categorias semelhantes às do Facebook,
+excetuando-se a presença da categoria ‘Comunidades’.
+Para que possamos simular quais as regiões da tela do usuário são mais salientes,
+é necessário gerar imagens com as informações de tela do usuário. Estas imagens são
+usadas pelo algoritmo de atenção visual GAFFE para gerar os mapas de saliência. Com
+este objetivo, foram coletados screenshots de todas as redes sociais consideradas neste
+trabalho. Ao todo, foram coletadas 80 imagens da rede social Orkut, 80 imagens da rede
+social Facebook, 40 imagens da rede social Twitter e 40 imagens da rede social LinkedIn.
+Idealmente, seria interessante ter realizado os testes com um número maior de imagens
+de forma a permitir uma melhor análise estatística dos dados. Entretanto, o número de
+imagens coletadas para esse trabalho foi limitada uma vez que a coleta dos screenshots
+dos perfis exigiu uma autorização prévia do uso da imagem das pessoas envolvidas.
+Após a geração dos mapas de saliência, estes mapas são sobrepostos com as ima-
+gens originais (os screenshots dos perfis da rede social), conforme pode ser visto na Fi-
+gura 3. O algoritmo também permite adicionar números no mapa de saliência que cor-
+respondem à ordem das áreas identificadas, ou seja, a área identificada como ‘1’ é mais
+saliente do que a área ‘2’, que é mais saliente que a área ‘3’, etc. Um exemplo para
+o Orkut pode ser visto pode ser visto Figura 4. Desta forma, é possível identificar no
+screenshot da rede social as áreas consideradas pelo algoritmos como mais salientes e
+classificar quais as categorias de cada rede social foram consideradas como sendo mais
+salientes. Em seguida, analisamos quais as categorias mais populares das redes sociais se-
+gundo Benevenuto et al. e comparamos as categorias mais populares com as categorias
+mais salientes (menor numeração), conforme segue a próxima seção.
+5. Análise dos Resultados
+Depois de gerar todos o mapas de saliências para cada rede social, calculamos a posição
+média de atratividade ou saliência que cada categoria da rede social teve, seu desvio
+padrão e sua respectiva curva normal. Na Figura 5 ilustramos as curvas normais obtidas
+para as categorias ‘Fotos’ no Facebook e ‘Perfis e Amigos’ no Orkut. Observamos nessa
+figura que a categoria ‘Fotos’ no Facebook tem a posição média mais próxima a dois,
+enquanto que a categoria ‘Perfis e Amigos’ no Orkut tem a posição média mais próxima
+à 1.
+Nas Tabelas 2-5 são apresentados os dados para as redes sociais Orkut, Facebook,
+LinkedIn e Twitter. Além dos dados das posições médias de atratividade para cada rede
+social, cada tabela compara esses resultados com as posições obtidas no trabalho de Be-
+
+(a)
+(b)
+(c)
+(d)
+Figura 3. Mapas de saliência sobrepostos com as imagens originais dos scre-
+enshots das redes sociais (a) Facebook, (b) LinkedIn, (c) Orkut e (d) Twitter, cal-
+culados utilizando o modelo GAFFE [9].
+Figura 4. Página do Orkut com seu respectivo mapa de saliência obtido com o
+algoritmo GAFFE.
+nevenuto et al. (ver Tabela 1).
+Para a rede social Orkut (Tabela 2), notamos que houve consistência entre as
+posições 1, 2 e 5 e o trabalho de Benevenuto et al. A categoria ‘Perfil e Amigos’ teve
+uma posição média de atratividade igual a 1,21 e foi classificada na posição 1 por Bene-
+venuto et al. (ver Tabela 1). Já a categoria ‘Fotos’ teve posição média igual a 2,13 e foi
+classificada na posição 2 por Benevenuto et al.. No entanto, os mapas de atenção obti-
+dos mostram que a categoria ‘Comunidade’ teve uma relevância maior do que a categoria
+‘Scrapbook’, ficando em terceiro lugar ao invés do quarto lugar reportado na classificação
+de Benevenuto et al.
+Para analisarmos os dados da rede social Facebook (Tabela 3), utilizamos os dados
+
+(a)
+(b)
+Figura 5. Curvas normais dos dados obtidas para as categorias (a) ‘Fotos’ no
+Facebook, (b) ‘Perfil e Amigos’ no Orkut.
+obtidos por Benevenuto et al. para a rede Orkut. Observamos novamente consistência
+na classificação de Benevenuto et al., principalmente nas posições de 1 a 3. Como o
+Facebook não apresenta a categoria ‘Comunidade’, esta categoria não está presente na
+Tabela 3. Podemos observar na tabela que a categoria ‘Scrapbook’ teve uma posição
+média de atratividade igual a 2,83 e foi classificada na posição 3 por Benevenuto et al..
+Já a categoria ‘Fotos’ teve sua posição média igual a 1,71 e foi classificada na posição 2
+por Benevenuto et al. Por fim, a categoria ‘Perfil e Amigos’ teve uma posição média de
+atratividade igual a 1,4 e foi classificada na posição 1 por Benevenuto et al.
+Para a rede social LinkedIn (Tabela 4), percebemos que o valor da posição média
+da categoria ‘Outros’ é igual a 1,737 e que esta categoria foi classificada na posição 2. A
+categoria ‘Perfil e Amigos’ também obteve uma razoável aproximação, tendo obtido uma
+posição média de 1,325 e uma ordem de atividade da categoria igual a 1.
+No trabalho de Benevenuto et al. não havia sido analisada a rede social Twit-
+ter. Por este motivo, não foi possível fazer uma comparação desses dados com os nossos
+dados. No entanto, conforme apresentado na Tabela 5, o valor da posição média da cate-
+goria ‘Mensagens’ foi igual a 1,63, enquanto que a posição média da categoria ‘Perfil e
+Amigos’ foi 1,85. Logo, a categoria ‘Perfil e Amigos’ teve valores próximos à primeira
+posição, que é ocupada pela categoria ‘Mensagem’. No caso do Twitter, acreditamos que
+a categoria ‘Perfil e Amigos’ ficou em segundo lugar porque essa rede social tem como
+principal característica a troca rápida de mensagens. Outras atividades, ‘Fotos’ e ‘Busca’
+obtiveram valores de posições médias iguais a 2,54 e 3,72, respectivamente.
+Tabela 2. Tabela comparativa da rede social Orkut
+Clickstream
+Saliência
+Categoria
+Popularidade
+ordem
+Posição Média
+Desvio Médio
+Perfil e Amigos
+41%
+1
+1,21
+0,75
+Fotos
+31%
+2
+2,13
+0,75
+Scrapbook
+20%
+3
+3,47
+0,91
+Comunidade
+4%
+4
+2,50
+0.61
+Busca
+2%
+5
+3,86
+0,66
+É possível observar que, em algumas medidas, os valores obtidos para o desvio
+padrão foram altos. Isto de deve a diversos fatores, como por exemplo um número insufi-
+
+Tabela 3. Tabela comparativa da rede social Facebook.
+Clickstream
+Saliência
+Categoria
+Popularidade
+ordem
+Posição Média
+Desvio Médio
+Perfil e Amigos
+41%
+1
+1,45
+0,59
+Fotos
+31%
+2
+1,71
+0,58
+Scrapbook
+20%
+3
+2,83
+0,81
+Busca
+2%
+5
+3,48
+0,26
+Tabela 4. Tabela comparativa da rede social LinkedIn
+Clickstream
+Saliência
+Categoria
+Popularidade
+ordem
+Posição Média
+Desvio Médio
+Perfil e Amigos
+51%
+1
+1,33
+0, 62
+Outros
+42%
+2
+1,74
+0,44
+Busca
+2%
+4
+2,95
+0,44
+Tabela 5. Tabela comparativa da rede social Twitter
+Saliência
+Categoria
+Posição Média
+Desvio Médio
+Mensagem
+1,63
+0,74
+Perfil e Amigos
+1,85
+0,74
+Fotos
+2,54
+0,81
+Busca
+3,72
+0,46
+ciente de amostras. Um segundo possível fator é a personalização dos perfis por parte dos
+usuários que gerou uma grande variação entre os mapas de saliência e, consequentemente,
+uma grande variação entre as posições médias de atratividade.
+6. Conclusões e Trabalhos Futuros
+Este trabalho destinou-se a analisar o comportamento dos usuários de redes sociais com a
+utilização de mapas de saliências das páginas de redes sociais, objetivando encontrar uma
+relação entre o comportamento dos usuários de redes sociais e a atenção visual. Foram
+construídos mapas de saliências de 240 páginas de usuários de redes sociais. Com base
+nesses mapas, foram analisadas as prioridades do foco da atenção visual de cada uma das
+redes sociais.
+Com essa análise, foi possível observar a proximidade dos dados coletados nesse
+trabalho com os obtidos na pesquisa sobre o comportamento dos usuários realizada por
+Benevenuto et al, utilizando o modelo de clickstream. A partir dos dados obtidos, há fortes
+indícios de que é possível utilizar dados de algoritmos de atenção visual para analisar o
+comportamento dos usuários em redes sociais.
+Como trabalho futuro, propõe-se coletar dados em um experimento subjetivo uti-
+lizando um eye-tracker. Desta forma, seria possível coletar um volume de dados bem
+superior e analisar o comportamento do usuário em um intervalo de tempo contínuo, ana-
+lisando uma maior diversidade de conteúdo.
+Referências
+[1] Nielsen Online Report. Social networks & blogs now 4th most popular online activity,
+2009.
+
+[2] Nielsen Online Report. State of the Media: The Social Media Report, 2012.
+[3] Radhakrishna Achanta, Francisco Estrada, Patricia Wils, and Sabine Susstrunk. Salient
+region detection and segmentation. In Antonios Gasteratos, Markus Vincze, and
+John Tsotsos, editors, Computer Vision Systems, volume 5008 of Lecture Notes in
+Computer Science, pages 66–75. Springer Berlin / Heidelberg, 2008.
+[4] L. Bazzani, M. Cristani, D. Tosato, M. Farenzena, G. Paggetti, G. Menegaz, and V. Mu-
+rino. Social interactions by visual focus of attention in a three-dimensional environ-
+ment. Expert Systems, 30(2):115–127, 2013.
+[5] Fabrício Benevenuto, Tiago Rodrigues, Meeyoung Cha, and Virgílio Almeida. Charac-
+terizing user behavior in online social networks. In Proceedings of the 9th ACM
+SIGCOMM conference on Internet Measurement Csonference, pages 49–62. ACM,
+2009.
+[6] Comscore. As redes sociais mais acessadas no brasil, maio 2011.
+[7] Scott Counts and Kristie Fisher. Taking it all in? visual attention in microblog consump-
+tion. In Lada A. Adamic, Ricardo A. Baeza-Yates, and Scott Counts, editors, In
+Proceedings of ICWSM’ 2011. The AAAI Press, 2011.
+[8] Laurent Itti and Christof Koch. Computational modelling of visual attention. Nature
+Reviews Neuroscience, 2(3):194–203, 2001.
+[9] U. Rajashekar, I. Van der Linde, A.C. Bovik, and L.K. Cormack. Gaffe: A gaze-attentive
+fixation finding engine. IEEE Transactions on Image Processing, 17(4):564 –573,
+april 2008.
+[10] H.R. Sheikh, Z.Wang, L. Cormack, and A.C. Bovik. Live image quality assessment data-
+base release 2. http://live.ece.utexas.edu/research/quality.
+[11] K. Smith, S.O. Ba, J. Odobez, and D. Gatica-Perez. Tracking the visual focus of at-
+tention for a varying number of wandering people. Pattern Analysis and Machine
+Intelligence, IEEE Transactions on, 30(7):1212–1229, 2008.
+[12] Alessandro Vinciarelli, Maja Pantic, and Herve Bourlard. Social signal processing: Sur-
+vey of an emerging domain. Image and Vision Computing, 27(12):1743 – 1759,
+2009. Visual and multimodal analysis of human spontaneous behaviour.
+[13] A. Yarbus. Eye movements and vision. New York: Plenum Press, 1967.

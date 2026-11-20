@@ -1,0 +1,447 @@
+Caracterização de ”Caminhos mais prováveis” em uma rede
+complexa de processos jurídicos
+J. L. B. de Araújo1, João A. Monteiro Neto4, F. S. de Siqueira1,
+C. H. Moura Santos1,R. G. de Vasconcelos1,
+Erneson A. Oliveira2,3,Carlos Caminha2,Vasco Furtado2
+1Laboratório de Ciência de Dados e Inteligência Artificial – Universidade de Fortaleza (UNIFOR)
+60.811-905 – Fortaleza – CE – Brazil
+2Programa de Pós Graduação em Informática Aplicada – Universidade de Fortaleza (UNIFOR)
+60.811-905 – Fortaleza – CE – Brazil
+3Mestrado Profissional em Ciências da Cidade – Universidade de Fortaleza (UNIFOR)
+60.811-905 – Fortaleza – CE – Brazil
+4Curso de Direito – Universidade de Fortaleza (UNIFOR)
+60.811-905 – Fortaleza – CE – Brazil
+jlbdearaujo@gmail.com, joaoneto@unifor.br,fsiqueira@edu.unifor.br
+clausmoura@edu.unifor.br,ricardo.vasconcelos@tjce.jus.br
+{erneson,caminha,vasco}@unifor.br
+Abstract. A judicial process is essentially formed by a sequence of acts that are
+translated into procedural changes that carry the history of the development of
+the activities carried out by the most diverse parties in the course of the proce-
+dural demand. In this article, we explain the most likely paths that characterize
+the classes of legal proceedings through a set of rules attributed to a complex
+network. We investigated the sequence of activities most likely and highlight the
+average times required to complete. We observed what would be the main points
+of delays in the possible ways of starting and ending a process in addition to the
+similarity between the possible paths taken. In addition, we indicate how much
+time would be spent, on average, in increasing the number of movements for
+each class of process. The characterization of these networks and the contextu-
+alization of the ideal movement path, associated with the other data generated
+by the proposed method, allow, through a reliable data generation process, a
+detailed observation of the flow of lawsuits, the identification of atypical beha-
+viors and the planning of interventions capable of optimizing the provision of
+the judicial service by the judiciary.
+Resumo. Um processo judicial é formado, em essência, por uma sequência
+de atos que são traduzidos em movimentações processuais que carregam o
+histórico do desenvolvimento das atividades realizadas pelas mais diversas par-
+tes no curso da demanda processual. Neste trabalho, explicitamos os cami-
+nhos mais prováveis que caracterizam as classes de processos judiciais por
+meio de um conjunto de regras atribuídas a uma rede complexa. Observa-
+mos a sequência de atividades mais prováveis e destacamos os tempos médios
+
+necessários para serem concluídas. Observamos quais seriam os principais
+pontos de atrasos nas possíveis formas de inicialização e término de um pro-
+cesso além da similaridade entre os possíveis caminhos tomados. Ademais,
+indicamos qual seria o tempo gasto, em média, no aumento do número de
+movimentações para cada classe de processo. A caracterização dessas redes
+e a contextualização do caminho de movimentação ideal, associado aos ou-
+tros dados gerados pelo método proposto permitem, por meio de um processo
+confiável de geração de dados, uma observação detalhada do fluxo dos pro-
+cessos judiciais, a identificação de comportamentos atípicos e o planejamento
+de intervenções capazes de otimizar a prestação do serviço jurisdicional pelo
+judiciário.
+1. Introdução
+Um processo judicial tem por finalidade eliminar conflitos de interesses divergentes fa-
+zendo uso justo das leis aplicáveis às matérias discutidas no curso da relação proces-
+sual. De modo geral, um processo judicial engloba uma série de etapas, denominadas de
+movimentações processuais, delimitadas e orientadas pelos marcos legais e temporais do
+processo, e são realizados por todos os atores envolvidos na relação processual, Juiz, Pro-
+motor de Justiça, Advogados, Partes e Serventuários do Judiciário. Estruturados de forma
+lógica, mas não linear, essas movimentações guiam o desenvolvimento do processo desde
+o seu início até a sua conclusão. Etapas como Petição inicial, Citação, Réplica, Sentença
+e Recursos são movimentações comuns na maioria dos processos. Em essência, elas car-
+regam informações, na forma sequencial, tais como identificação de quem ajuizou a ação,
+verificação das leis exigidas, argumentos de defesa do réu, apresentação de provas e a
+decisão final. Tais movimentações observadas dependem e variam significativamente de-
+pendendo das matérias envolvidas (direito criminal, direito de família, etc.) o que torna
+ainda mais complexo obter padronização sequencial entre os processos jurídicos. Apesar
+da existência de uma padronização base tendo em conta o tipo de processo, o conjunto de
+movimentações não dependem exclusivamente das classes judiciais as quais os processos
+são atribuídos inicialmente, sendo muitas vezes influenciada pela ‘história’ do processo e
+das necessidades que o Juiz pode ter de realizar os mais diversos atos que possam funda-
+mentar sua decisão final, o que cria dessa forma novas movimentações e ciclos de ações
+necessárias para que o mesmo seja finalizado que são divergentes do caminho inicialmente
+previsto.
+Geralmente, o acréscimo no número de movimentações dentro de um processo
+faz com que o mesmo demore mais tempo a ser finalizado. Assim, a visualização de um
+”caminho processual”ótimo ou sub-ótimo torna-se de grande interesse tanto para as partes
+envolvidas no caso como particularmente para o Poder Judiciário que pode avaliar o nível
+de eficiência de suas unidades identificando possíveis desvios e projetando intervenções
+para correção de incongruências identificadas [Koniaris et al. 2017]. Mesmo que esses
+caminhos possam ser demasiadamente complicados de serem observados matematica-
+mente, além das complexidades de ações subjetivas tomadas pelas partes e pelo juiz no
+curso de um processo, observar quais seriam as movimentações que acarretam os maiores
+atrasos ou maiores acelerações pode servir como um importante elemento encorajador
+para ações pontuais de maximização dos serviços prestados pelo poder judiciário.
+Dessa forma, devido a dificuldade de se estabelecer uma sequência padrão
+
+de movimentações processuais, apresenta-se aqui uma metodologia alternativa de
+caracterização dos processos por meio de interações em redes complexas [Newman 2003,
+Barabási and Bonabeau 2003, Wang and Chen 2003]. Na seção (2) será apresentado uma
+visão geral do problema proposto. Na seção (3) serão apresentados as regras matemáticas
+de criação das redes complexas para as diversas classes processuais escolhidas. Apresen-
+tamos também os caminhos mais prováveis baseados nos dados oriundos das Tabelas Pro-
+cessuais do Tribunal de Justiça (TJ). Os tempos gastos para cada etapa e as conexões entre
+os caminhos mais importantes são destacados durante o texto. Por fim, condensamos os
+resultados na seção (4) onde destacamos uma maneira eficiente de obter a influência dos
+acréscimos possíveis de tempo devido a necessidade de novas movimentações. Na seção
+(5) destacamos os principais pontos da nossa pesquisa com as principais perspectivas.
+2. Estado da arte
+A teoria das redes complexas e uma área altamente interdisciplinar que oferece recur-
+sos para o estudo dos mais variados tipos de sistemas complexos. Muitos processos
+dinâmicos não-lineares e simulações estocásticas podem ser analisados em redes com-
+plexas, tais como: as interações entre as proteínas, relacionamento humano, sistemas
+de transporte aéreo, a Internet, o mercado financeiro, dentre outros sistemas complexos
+[Boccaletti et al. 2006]. É importante comentar que tais matérias não são necessariamente
+excludentes. Geralmente, fenômenos complexos carregam informações de interações en-
+tre múltiplas variáveis onde as influências dos atributos especulados dentro do conteúdo
+estudado relevam, por partes, às relações de multiescala podendo assim, quando possível,
+observar a ascendência de um agente microscópico dentro da rede complexa ao qual seus
+efeitos geram grandes impactos dentro do aglomerado macroscópico analisado. Tipi-
+camente, estudos voltados à interações humanas (especialmente dentro de regiões urba-
+nas), seja por meio de comunicação remota ou através de contatos diretos em redes de
+mobilidade, produzem resultados tanto de interesse econômico como político. Efeitos se-
+cundários de tais interações podem ser vista em redes de transportes urbanos, proliferação
+de doenças, disseminação de informação, entre outros. Dessa forma, encontrar gargalos
+de informações, distinguir pontos de máximo poder de difusão de informação, verificar
+possíveis desperdícios e lucros, são possíveis produtos oriundos de análises através de
+redes complexas [Caminha et al. 2017, Caminha 2012].
+A análise de rede complexa é uma ferramenta crítica para a compreensão de vários
+sistemas complexos [Amaral and Ottino 2004], inclusive como uma abordagem para ob-
+ter uma compreensão quantitativa da estrutura e evolução do direito [Ruhl et al. 2017].
+Cientistas da ciência da computação e especialistas jurídicos têm usado métodos de
+análise de citações, a fim de construir redes de citações de jurisprudência, bem como
+para modelar e quantificar a complexidade do corpus legislativo [Lupu and Voeten 2012].
+Tem sido também utilizada para analisar dados de redes complexas construídas a
+partir de decisões de tribunais nacionais e internacionais, de estatutos, de constituições
+e tratados internacionais. Há também trabalhos neste contexto que exploram, por exem-
+plo, quais características de sistemas complexos ocorrem no direito estatutário, como as
+referências à decisões judiciais são usadas para moldar argumentos jurídicos, ou onde
+a dinâmica social existe entre juízes ou árbitros internacionais. Chandler [J. 2005] exa-
+minou a estrutura de rede complexa de decisão judicial baseada em precedentes, usando
+dados da Suprema Corte dos Estados Unidos. Além disso, a partir de estudos voltados
+
+para criação de índices de qualidades de advogados do Rio de Janeiro, tornou-se possível
+analisar os perfis dos mesmos em relação à atividades voltadas para os processos jurídicos
+trabalhistas. Métricas matemáticas comumente utilizadas em estudos de redes complexas
+como closeness, betweenness, força do vértice e pagerank tornaram-se essenciais para
+ranquear a eficiência de diversos advogados apresentando sua importância na comunidade
+em que trabalha [Ribeiro et al. 2016].
+Apesar de existirem inúmeros trabalhos que caracterizam e analisam dados em
+redes complexas, não foi encontrado qualquer referência que estudasse as movimentações
+dos processos jurídicos, em busca de identificar e apresentar os caminhos mais prováveis
+de processos judiciais por meio de um conjunto de regras atribuídas a uma rede complexa.
+Portanto, uma das contribuições deste trabalho é partir dos dados das classes e
+movimentações dos processos judiciais da justiça estadual cearense, representá-los como
+uma rede complexa, modelando as relações existentes de tal forma que se torne possível
+a caracterização dos processos judiciais.
+3. Metodologia
+Os dados utilizados foram baseados nas classes de movimentações das Tabelas Proces-
+suais Unificadas do Poder Judiciário criadas a partir da Resolução do CNJ nº 46/2007,
+bem como no registro de movimentações internas operadas no âmbito da Justiça Estadual
+cearense. Foram considerados os processos de 1º grau protocolados até o ano de 2019
+e baixados em 2019 nas diversas instâncias do Tribunal de Justiça do Estado do Ceará,
+nas classes: ”7 - Procedimento Comum Cível”, ”1116 - Execução Fiscal”, ”436 - Proce-
+dimento do Juizado Especial Cível”e ”159 - Execução de Título Extrajudicial”. No total
+foram analisadas a quantidade de 4797 processos para a classe Execução de Título Ex-
+trajudicial, 67499 para Procedimento Comum Cível, 29643 Procedimento do Juizado Es-
+pecial Cível e 23039 para Execução Fiscal com pelo menos 300 tipos de movimentações
+diversas.
+A nossa base de dados oriundas do TJ contêm múltiplas informações que dão
+características para os processos. Destacamos que para esse trabalho foram usados da-
+dos das classes judiciais nomeadas como Execução de Título, Procedimento Comum
+Cível, Procedimento do Juizado Especial Cível e Execução Fiscal como sendo as clas-
+ses mais demandadas da Justiça Estadual avaliada. As informações temporais para cada
+movimentação apresentada revelam suas inicializações. Assim, a cada movimentação ini-
+ciada, indicando uma série de atividades ao qual a compete, uma outra etapa termina, indi-
+cando que o termo ”movimentação”está associado a um estado temporal de um processo.
+Nesse caso, rotulamos como ∆T os tempos duradouros de cada movimentação dentro
+de um processo. Identificamos em cada etapa do processo qual é o par OLD →NOW
+como sendo a construção de uma junção entre o tipo de movimentação em uma sequência
+anterior (OLD) e a sequência atual (NOW). Dessa forma, é possível montar uma tabela
+de dados contendo todos os fluxos entre tipos de movimentações consecutivas, além de
+obter os dados dos tempos gastos entre tais movimentações. Assim, definimos como Fij o
+número de sequências observadas que surgiram inicialmente do estado i e estão no estado
+j.
+A matriz F não é simétrica visto que é possível obter elemento com Fij̸ = Fji.
+Dessa forma, a assimetria do problema sugere a construção espacial de uma rede de ações
+
+direcionadas onde os nós carregam as informações de cada tipo de movimentação e as
+arestas vinculam às evoluções sequenciais sintonizadas por Fij. Na Figura (1) é apre-
+sentada uma ilustração da formação de criação da rede complexa processual. Os pontos
+indicam cada tipo de movimentação e as setas indicam os vetores de transformação entre
+movimentações sequenciais.
+A
+F
+D
+C
+B
+E
+FB A
+FA C
+FD B
+Início
+Fim
+T
+Nm
+TD C
+Nm
+D C
+T=λNm +b
+Caminho mais provável: D C
+D
+B
+A
+C
+FD B
+FB A
+FA C
+ΔTD
+ΔTB
+ΔTA
+ΔTC
+TD C
++
++
++
+=
+Nm
+D C=4
+Figura 1. À esquerda é apresentado um modelo esquemático imaginário de uma
+rede complexa direcional para tipos de movimentaç ões contidas em uma
+classe judicial. Cada nó da rede contém um tipo de movimentaç ão (ilustra-
+dos por A, B, C, D, E e F). As diversas larguras das setas representam os
+pesos associados dessa rede aos quais são regulados pelos índices Fij. À
+direita, uma sequência D →B →A →C é apresentada indicando o cami-
+nho mais provável entre os processos jurídicos que inicializam em D e ter-
+minam em C. Neste exemplo, a sequência de caminho mais provável pos-
+sui N D→C
+Mm
+= 4 movimentaç ões com um tempo total TD→C. Assim, a partir
+de todas as possíveis combinaç ões entre movimentaç ões de inícializaç ão
+e término de um processo jurídico, é possível obter uma relaç ão linear en-
+tre T e Nm gerando um coeficiente angular λ que reflete, em média, um
+acréscimo de tempo à um processo jurídico para cada movimentaç ão adi-
+cional.
+Dessa forma, pretende-se, para cada tipo de classe judicial, construir caminhos
+entre as movimentações que represente-a como sendo construída, em sua essência, pelas
+movimentações que serão visitadas.
+Uma maneira indicada de criar o caminho mais provável é verificar qual seria o
+tipo de movimentação mais frequente para a primeira etapa de cada classe judicial. A
+partir daí, os próximos pontos seriam acessados pela incidência de F criando assim um
+caminho ótimo local. Esse tipo de estratégia é visto em técnicas de Greedy algorithm.
+Porém, em sistemas de elevadas ramificações e tomadas de decisão com probabilidades
+entre movimentações similares, essa abordagem pode induzir a um grande número de
+sequências de elevadas degenerescências ou produzir caminhos sub-ótimas temporais.
+Uma alternativa é verificar entre todas as combinações possíveis de caminhos qual seria
+aquele com menor custo, ou mais probabilidade de acontecer. Para esse fim, criamos
+definimos uma matriz Def, chamada de distância efetiva, ao qual seus elementos são
+regulados por:
+
+Def
+ij = exp(−βFij)
+(1)
+onde β =
+1
+⟨Fij⟩regula a influência de Fij. Dessa forma, dizemos que o caminho mais
+provável (CP) de um processo é encontrado minimização de todas as rotas Def
+ij , ou seja:
+CPij = Dijkstra(Def
+ij )
+(2)
+onde Dijkstra [Dijkstra et al. 1959] é a função que retorna os pontos da redes com
+menor custo regulado por Def
+ij . Observa-se na Figura (1) a ilustração de um percusso
+otimizado obtido quando se inicializa um processo jurídico pela movimentação D e o
+termina na C. Nesse contexto, o processo tem Nm = 4 movimentações na sequência
+D →B →A →C com um custo temporal T. É importante mencionar que as esco-
+lhas de D e C foram totalmente arbitrárias e que o caminho mais provável é balanceado
+pelos termos de mais intensidade de F. Porém, um conjunto de resultados oriundos de
+todas as combinações possíveis entre movimentações de inicialização e movimentações
+de término podem nos mostrar um qualitativo da classe processual estudada. Nesta etapa,
+destacamos um parâmetro λ que caracteriza os efeitos temporais médios do acréscimo de
+uma ou mais movimentações processuais para uma dada classe analisada. Dessa forma,
+nosso trabalho consiste em etapas que capturam dados de processos judiciais de uma
+dada classe jurídica, transforma-os em uma matriz de sequência de movimentações F e
+encontra todos os CP’s produzindo assim um parâmetro λ que qualifica a classe jurídica.
+Além disso, é possível observar os pormenores para cada sequência observada dando
+enfase às combinações de inicialização e término de um processo em ordem de maior
+frequência.
+Com isto é possível verificar o tempo médio gasto durante os pares de
+movimentações mais influentes da classe jurídica provendo uma maior clareza ao ana-
+lisar as movimentações.
+4. Resultados
+As movimentações processuais possuem nomes e significado diversos. As ações internas
+que as compõem esclarecem suas atividades criando assim um fluxograma de tarefas que
+ora depende de outras movimentações anteriores à elas dentro de uma processo jurídico,
+ora nutri a produção diversas outras movimentações posteriores às mesmas. A comple-
+xidade entre ”causas e efeitos”tornasse cada mais confusa diante de fatos internos do
+processo que dependerá tanto dos atores envolvidos como tema discutido no processo.
+Assim, é importante comentar que mesmo que o nome de uma movimentação seja auto-
+explicativa, poderão existir pormenores a esta que tratem de assuntos completamente di-
+ferentes. Um exemplo simples é uma movimentação nomeada como Documento. Á prin-
+cipio indica a construção, ou verificação, ou até a requisição de documentos pelas partes
+envolvidas no processo. Para entender qual ação foi tomada é necessário a compreensão
+dos textos produzidos durante o processo. Nosso trabalho não constituiu em tratar dados
+nesse nível. Porém, por meio da equação (2) tornasse possível destacar as movimentações
+mais relevantes dentro de um processo e, através de uma análise mais minuciosa, verificar
+os motivos das dispersões temporais dentro de movimentação.
+
+Dessa forma, para cada classe judicial, obtivemos as movimentações que caracte-
+riza o caminho de etapas mais prováveis (CP). Na Figura (2) apresentamos um painel que
+representa o tempo médio gasto em cada tipo de movimentação para as diversas classes
+estudadas. Para essa etapa destacamos como sendo pontos relevantes de construção do ca-
+minhos aqueles pares que movimentações Fij mais comuns para inicializar e terminar um
+processo. Assim, para a classe Execução de Título Extrajudicial (Figura (2(a))) o cami-
+nho mais provável indica ações que levam às movimentações: Protocolo de Petição →Em
+classificação →Processo apto a ser distribuído →Distribuição por sorteio →Autuação
+→Concluso ao juiz →Recebimento →Concluso para Despacho →Mero expediente
+→Encaminhamento edital/relação para publicação →Despacho/Decisão disponibili-
+zado no Diário de Justiça Eletrônico →Trânsito em julgado →Definitivo. Nota-se que
+durante a movimentação do tipo Recebimento houve o maior gasto de tempo. Nas clas-
+ses Procedimento Comum Cível, Procedimento do Juizado Especial Cível e Execução
+Fiscal (Figuras (2(b)-(d))) os tipos de movimentações preferências são diversos. Para a
+classe Procedimento Comum Cível observamos a sequência Conclusão →Mero expe-
+diente →Encaminhado edital/relação para publicação →Despacho/Decisão disponibili-
+zado no Diário de Justiça Eletrônico →Trânsito em julgado →Definitivo →Expedição
+de Certidão de Arquivamento com destaque temporal, representado acentuações em atra-
+sos, nas movimentações Mero expediente e Trânsito em julgado. Similarmente é possível
+observar nas classes Procedimento do Juizado Especial Cível e Execução Fiscal onde as
+movimentações nomeadas como Expedição de Carta e Certidão emitida criam atrasos de
+grandes tempos.
+É importante mencionar que as quantidades de movimentações listadas no cami-
+nho mais provável de cada classe de processo depende da escolha de seus marcos de
+inicialização e fechamento. Estatisticamente, os pares mais influência se destacaram dos
+demais. Além disso, é possível que existam caminhos com elevado grau de similaridade
+devido às movimentações comuns, mesmo em rotas de mais ou menos etapas.
+Assim, para cada par possível de inicialização e fechamento de um processo, den-
+tro de uma determinada classe, calculamos as variáveis Nm e
+T =
+X
+k
+∆Tk
+(3)
+que são, respectivamente, o número de movimentações encontradas para se obter o ca-
+minho mais provável entre os nós da rede e o tempo total gasto por esse caminho para
+cada etapa imersa nele que demorou um tempo ∆T. Por exemplo, como foi apresen-
+tado na Figura (2(a)), escolhidos como pontos de partidas e fechamento, respectivamente,
+as movimentações Protocolo de Petição e Definitivo, temos uma quantidade de Nm = 13
+movimentações e um total de T = 257 dias. Na Figura (3) são apresentados os gráficos de
+dispersão entre tais variáveis. Nota-se, novamente, que a escala de tempo e a quantidade
+de movimentações exigidas para o obter o caminho mais provável depende da escolha
+da classe estudada. É importante comentar que a relação entre as variavéis sugerem uma
+correlação linear na forma T = λNm + b [Press et al. 1992] onde λ indica, em média,
+o acrescimo de tempo atribuido a um processo a uma variação unitária ao número de
+movimentações daquela classe especifica. As retas em destaque na Figura (3) indicam o
+ajuste linear entre as variáveis com coeficiente de Pearson [Freedman et al. 2007] maior
+
+(a)
+(b)
+(c)
+(d)
+Figura 2. Tempos médios gastos (∆T), em dias, para diversas movimentaç ões
+nas classes (a) Execuç ão de Título Extrajudicial , (b) Procedimento Co-
+mum Cível, (c) Procedimento do Juizado Especial Cível e (d) Execuç ão
+Fiscal. Linhas horizontais indicam o desvio padrão de ∆T. Os nós de
+inicializaç ão e fechamento de um processo são indicados na parte vertical
+de cada gráfico na sua forma ascendente. Por exemplo, em (a), um pro-
+cesso inicia com a movimentaç ão do tipo Protocolo de Petiç ão e termina
+com a movimentaç ão Definitivo.
+que 0.72 para qualquer tipo de classe citada.
+Os valores de λ obtidos pelo ajuste linear para as classes Execução de Título
+
+(a)
+(b)
+(c)
+(d)
+(d)
+(d)
+(d)
+(d)
+Figura 3.
+Tempo total gasto T, em dias, por um processo obtidos por cami-
+nho mais provável. Cada ponto indica uma combinaç ão de uma possível
+movimentaç ão de inicializaç ão com outra possível movimentaç ão de fe-
+chamento gerando uma sequência de Nm movimentaç ões totais. Os re-
+sultados referem-se as classes (a) Execuç ão de Título Extrajudicial , (b)
+Procedimento Comum Cível, (c) Procedimento do Juizado Especial Cível e
+(d) Execuç ão Fiscal, respectivamente. As retas em destaques referem-se
+aos ajustes lineares na forma T = λNm + b.
+Extrajudicial, Procedimento Comum Cível, Procedimento do Juizado Especial Cível e
+Execução Fiscal, são, respectivamente, 21.3 dia/movimentação, 11.5 dia/movimentação,
+11.9 dia/movimentação e 26.4 dia/movimentação. Seus valores refletem, graficamente,
+a inclinação da reta nos gráficos da Figura (3) levando em consideração as dispersões
+de pontos no gráfico. Assim, para cada classe, é possível estimar os efeitos de atrasos
+causados pelo aumento do número de movimentações e ranquear aquelas classes que
+possuem maior velocidade no fechamento de um processo jurídico.
+5. Conclusão
+O trabalho desenvolvido contribui para o desenvolvimento de pesquisas nas área de
+construção e avaliação de redes no contexto jurídico, ao mesmo tempo que possui po-
+tencial para permitir produção de estruturas datificadas de fácil extração capazes de ori-
+entar a implantação de ações de correção e política públicas direcionadas ao aumento de
+produtividade e melhor prestação do provimento de justiça.
+A metodologia utilizada para a criação e avaliação dos dados gerados pelas
+movimentações processuais configura-se como inovadora por dois importantes fatores.
+O primeiro é que utiliza uma abordagem combinando análise de dados e construção de
+
+redes ao contexto legal, abordagem com pouca referência na literatura da computação
+como na literatura jurídica ou de engenharia jurídica. O segundo é porque observa e valo-
+riza uma fonte de informação normalmente menosprezada e pouco valorizada nos estudos
+dedicados a entender a caracterização, dinâmica e eficiência de processos judiciais.
+Por fim, o conjunto de dados gerados pela caracterização das redes movimentação
+processual, especialmente as inferências geradas pela visualização dos intervalos de
+tempo entre as movimentações e também da predição de duração dos processos, ante o
+fluxo de movimentações que eles tomam, permite aos gestores do poder judiciário acesso
+a dados importantes para tanto comparar níveis de performance entre distintas unidades
+jurisdicionais como também verificar a ocorrência de ‘gargalos’ de eficiência. Um bom
+exemplo desse potencial é a observação de que no processo 159 - Execução de Título Ex-
+trajudicial”(Figura (2(d))), a simples expedição de uma carta demora em média mais de
+50 dias, o que indica a necessidade de adoção de medidas corretivas para que a prestação
+jurisdicional seja mais rápida e eficiente.
+Referências
+Amaral, L. and Ottino, J. (2004). Complex networks. augmenting the framework for the
+study of complex systems. European Physical Journal B, 38:147–.
+Barabási, A.-L. and Bonabeau, E. (2003).
+Scale-free networks.
+Scientific american,
+288(5):60–69.
+Boccaletti, S., Latora, V., Moreno, Y., Chavez, M., and Hwang, D.-U. (2006). Complex
+networks: Structure and dynamics. Physics Reports, 424(4):175–308.
+Caminha, C. (2012). Modeling user reports in crowdmaps as a complex network.
+Caminha, C., Furtado, V., Pinheiro, V., and Ponte, C. (2017). Detecção de comunidades
+em redes complexas para identificar gargalos e desperdício de recursos em sistemas de
+ônibus. In Anais do VI Brazilian Workshop on Social Network Analysis and Mining,
+Porto Alegre, RS, Brasil. SBC.
+Dijkstra, E. W. et al. (1959). A note on two problems in connexion with graphs. Nume-
+rische mathematik, 1(1):269–271.
+Freedman, D., Pisani, R., and Purves, R. (2007). Statistics (international student edition).
+Pisani, R. Purves, 4th edn. WW Norton & Company, New York.
+J., C. S. (2005). The network structure of supreme court jurisprudence. university of
+houston law center. SSRN, (2005).
+Koniaris, M., Anagnostopoulos, I., and Vassiliou, Y. (2017). Network analysis in the
+legal domain: a complex model for European Union legal sources. Journal of Complex
+Networks, 6(2):243–268.
+Lupu, Y. and Voeten, E. (2012). Precedent in international courts: A network analysis
+of case citations by the european court of human rights. British journal of political
+science, 42(2):413–439.
+Newman, M. E. (2003). Mixing patterns in networks. Physical review E, 67(2):026126.
+Press, W. H., Teukolsky, S. A., Vetterling, W. T., and Flannery, B. P. (1992). Numerical
+Recipes in C. Cambridge University Press, Cambridge, USA, second edition.
+
+Ribeiro, L., Figueiredo, D., and Nascimento, P. (2016). Análise e ranqueamento da rede
+de advogados induzida por processos judiciais trabalhistas. In Anais do V Brazilian
+Workshop on Social Network Analysis and Mining, pages 13–24, Porto Alegre, RS,
+Brasil. SBC.
+Ruhl, J. B., Katz, D. M., and Bommarito, M. J. (2017). Harnessing legal complexity.
+Science, 355(6332):1377–1378.
+Wang, X. F. and Chen, G. (2003). Complex networks: small-world, scale-free and beyond.
+IEEE circuits and systems magazine, 3(1):6–20.

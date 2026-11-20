@@ -1,0 +1,653 @@
+Monitoramento de Posts Sobre Empresas de E-Commerce 
+em Redes Sociais Utilizando Análise de Sentimentos 
+Thales R. Evangelista1, Thereza P. Pereira Padilha1 
+1Curso de Ciência da Computação – Universidade Federal do Tocantins (UFT) 
+Palmas – TO – Brazil 
+{thales,tpadilha}@mail.uft.edu.br
+Abstract. This paper shows a tool to classify web publications made on social 
+networks such as Facebook and Twitter as positive, negative and neutral. For 
+the classification task, this tool uses SentiWordNet lexical resource and Naive 
+Bayes algorithm. In the realized experiments, the collected publications to 
+classification are from three Brazilian e-commerce companies. The results 
+were very relevant for publications from Twitter using Naive Bayes algorithm, 
+with correct classification rate between 71% and 95%. 
+Resumo. Este artigo mostra o desenvolvimento de uma ferramenta para 
+classificar publicações web postadas em redes sociais, tais como Facebook e 
+Twitter, como positivas, negativas e neutras. Para a tarefa de classificação, 
+essa ferramenta utiliza o recurso léxico SentiWordNet e o algoritmo Naive 
+Bayes. Nos experimentos realizados, as publicações coletadas para a 
+classificação são de três empresas de comércio eletrônico brasileiras. Os 
+resultados obtidos foram bastante relevantes para as publicações oriundas do 
+Twitter utilizando o algoritmo Naive Bayes, variando entre 71% a 95% de 
+classificações corretas. 
+1. Introdução 
+Cada vez mais as redes sociais online, tais como Twitter e Facebook, são utilizadas 
+como um local para as pessoas desabafarem alguma insatisfação com as empresas. 
+Inclusive, os clientes têm percebido que estão obtendo uma resposta mais rápida das 
+empresas devido à publicação de posts nestes meios de comunicação [Castro 2013]. 
+Assim, estas redes acabaram se tornando um canal bastante efetivo de comunicação 
+para os clientes. Por outro lado, as empresas sabem que a repercussão de um comentário 
+"ruim" em uma rede social pode atingir uma grande quantidade de clientes rapidamente 
+e, assim, afetar a reputação da empresa no mercado. Mas, se o comentário for um 
+elogio, este tem o poder até maior do que uma propaganda convencional na televisão. 
+Outro fator importante nas redes sociais é que é possível atingir um público específico, 
+sendo muito mais efetivo do que uma propaganda em massa. 
+ 
+A Burson-Marsteller fez um estudo sobre o uso de redes sociais nas empresas da 
+América Latina e observou que 88% das empresas brasileiras utilizam pelo menos uma 
+rede social. Já na América Latina, este índice cai para 65% das empresas, mas a média 
+global é de 87% [Burson-Marsteller 2013]. O uso das redes sociais ajuda a fortalecer 
+uma marca, além de divulgar produtos e serviços para um público particular. As redes 
+sociais têm um papel fundamental na qualidade dos relacionamentos das marcas com os 
+consumidores e, principalmente, na gestão de sua reputação [Castro 2013]. Hoje a 
+presença da empresa na Internet não é mais um diferencial, mas sim algo essencial.
+
+Sendo a concorrência entre as empresas cada vez mais acirrada, a importância do valor 
+de uma marca forte faz a diferença, sobretudo, em um mundo globalizado, onde todos 
+estão conectados e a troca de informação é muito rápida. 
+ 
+As empresas já perceberam isso e hoje muitas já estão com uma atuação forte 
+nas redes sociais, se tornando quase obrigatório a presença em redes como Facebook, 
+Twitter, entre outras. Devido ao grande volume de informação que se tem na Internet, é 
+humanamente impossível monitorar tudo o que se comenta sobre uma determinada 
+marca sem auxílio de ferramentas computacionais. A partir destas informações, é 
+possível auxiliar as empresas a decidir quais ações devem ser tomadas para melhorar o 
+valor de sua marca perante seus consumidores, descobrir os pontos fortes e fracos de 
+sua empresa e de suas concorrentes, garantindo assim uma vantagem competitiva. 
+ 
+Diante disso, este artigo tem como objetivo apresentar o desenvolvimento de 
+uma ferramenta para monitoramento da reputação de empresas de comércio eletrônico 
+em redes sociais. A ferramenta busca posts de usuários sobre uma determinada 
+companhia nas redes sociais Facebook e Twitter, reconhece padrões em comentários 
+postados na língua portuguesa e classifica se aquele comentário é positivo, negativo ou 
+neutro. Para isso, a ferramenta utiliza técnicas de Recuperação de Informação, 
+Mineração de Textos (MT) e Análise de Sentimentos (AS). 
+ 
+Este artigo está organizado da seguinte forma: seção 2 lista uma revisão de 
+trabalhos relacionados publicados. Na seção 3 descreve alguns conceitos sobre a área de 
+mineração de dados textuais e análise de sentimentos. A seção 4 apresenta o 
+funcionamento dos dois módulos da ferramenta desenvolvida. Na seção 5 descreve a 
+base de dados utilizada para o treinamento da classificação pela ferramenta. A seção 6 
+mostra o resultado da classificação de posts pela ferramenta usando o nome de 3 
+empresas brasileiras de comércio eletrônico e, na seção 7, são apresentadas as 
+conclusões deste trabalho. 
+2. Trabalhos Relacionados 
+A importância de avaliar o sentimento das mensagens divulgadas nas redes sociais 
+(Twitter e Facebook, por exemplo) já foi identificada em diversos trabalhos, tais como 
+[Kwak et al. 2010], [Bollen et al. 2011], [Pak and Paroubek 2010]. O trabalho 
+desenvolvido por [Oliveira 2013] analisa comentários na língua portuguesa utilizando-
+se do SentiWordNet para avaliação da polaridade dos termos presentes nos tweets, onde 
+a média geral de acertos foi de 46,4%. Já o estudo realizado por [Martinazzo 2010] 
+descreve um experimento de um sistema que identifica emoções em textos de língua 
+portuguesa do Brasil, com o objetivo de identificar uma das seis emoções básicas 
+(alegria, raiva, tristeza, desgosto, medo e surpresa) de notícias de páginas de jornais, 
+com a utilização de um método baseado em Latent Semantic Analysis. 
+ 
+Em [Turney 2002], o algoritmo Pointwise Mutual Information e Information 
+Retrieval (PMI-IR) foi usado para estimar a orientação semântica de uma frase por meio 
+do operador NEAR do AltaVista (hoje do Yahoo), que restringe a busca a textos em que 
+as palavras-chave aparecem a uma distância de 10 palavras uma da outra, em qualquer 
+ordem, onde o algoritmo atingiu uma precisão média de 74%. Uma abordagem 
+semelhante ao PMI, mas substituem o operador NEAR por snippets, que são as 
+informações resumidas das páginas retornadas pelo motor de busca é utilizada em [Li et 
+al. 2011]. Já em [Nascimento et al. 2012], o sentimento de tweets em relação às
+
+principais notícias divulgadas na mídia foi analisado e propagado no Twitter, avaliando 
+assim a reação das pessoas a estas notícias. 
+ 
+Este trabalho difere dos esforços anteriores ao propor uma ferramenta de análise 
+de publicações nas redes sociais Twitter e Facebook em relação às empresas do 
+comércio eletrônico utilizando o recurso léxico SentiWordNet e o algoritmo de 
+aprendizado supervisionado Naive Bayes. Além disso, a base de dados para o 
+treinamento da ferramenta foi construída a partir das avaliações dos clientes e-bit do site 
+Buscapé. Atualmente, mais de 21.000 lojas online brasileiras foram avaliadas pelos 
+clientes. Isso possibilita uma identificação da loja entre os consumidores informando 
+quesitos como facilidade de compra (navegação), seleção de produtos, qualidade de 
+informações sobre os produtos, entre outros. 
+3. Mineração de Dados Textuais 
+O estudo da MT tem como propósito procurar padrões em textos em linguagem natural 
+e extrair informação para um determinado objetivo. De uma forma geral, envolve três 
+etapas, que são: pré-processamento, análise dos dados (extração) e avaliação de 
+descobertas. A etapa de pré-processamento está associada a limpeza dos dados, 
+normalmente, realiza-se a correção ortográfica, a remoção de stopwords (artigo, 
+rejeição, preposição) e o stemming (remoção de variações de plural, gerúndio e sufixos 
+temporais). A etapa de análise dos dados refere-se à extração de conhecimento a partir 
+das informações contidas em documentos textuais utilizando algoritmos de aprendizado. 
+Esses algoritmos podem realizar tarefas como associação, sumarização, classificação e 
+clusterização. A avaliação de descobertas verifica os conhecimentos extraídos, podendo 
+ser gerados relatórios a partir das tendências, padrões ou regularidades observadas no 
+documento analisado. 
+ 
+MT atua com a aplicação de algoritmos computacionais que processam grandes 
+volumes de textos em linguagem natural não estruturados com o objetivo de extrair 
+informações relevantes, úteis e inovadoras não explícitas através da identificação de 
+regularidades, tendências e de padrões não triviais, que não poderiam ser recuperadas 
+utilizando métodos habituais de consulta [Aranha and Passos 2006], [Barion and Lago 
+2008]. 
+ 
+Análise de Sentimentos é um ramo da MT voltado para classificar textos não por 
+tópicos, mas sim pelo sentimento ou opinião contida em determinado documento 
+[Santos 2010]. Neste caso, trata-se do estudo computacional de opiniões, sentimentos e 
+emoções expressas em texto com a utilização de técnicas para identificar e extrair 
+informações subjetivas contidas em um dado material, verificando qual sentimento eles 
+representam e decidir se o documento exprime uma opinião positiva, negativa, neutra 
+ou, até mesmo, tentar classificar qual emoção está presente como raiva, felicidade, 
+tristeza [Liu 2010], [Nascimento et al 2012]. 
+ 
+A classificação de sentimentos se assemelha a classificação clássica de texto 
+(por tópicos). A classificação de sentimentos trabalha, principalmente, com palavras 
+contendo teor subjetivo (que carregam consigo um conteúdo opinativo), que indicam 
+sentimentos (opiniões) positivos ou negativos como, por exemplo, ótimo, excelente, 
+maravilhoso, horrível e mau [Liu 2010].
+
+4. Implementação da Ferramenta 
+A ferramenta desenvolvida possui basicamente dois módulos, que são: busca e 
+classificação/visualização de posts, em que permite ao usuário consultar e realizar o 
+monitoramento de publicações feitas nas redes sociais que contenha o termo da busca. A 
+ferramenta foi desenvolvida como uma aplicação web utilizando a linguagem Java e o 
+framework Java Server Faces. 
+4.1. Módulo de Busca 
+O módulo de busca permite ao usuário realizar uma consulta usando as APIs do 
+Facebook e Twitter. A busca nas redes sociais funciona da seguinte forma: 
+primeiramente é utilizada a REST API do Twitter até que não se tenha mais resultados 
+retornados. Depois, é feito uma busca no Facebook com a Graph API e, por fim, 
+quando não tiver mais resultados retornados pelo Facebook e Twitter, se faz uso da 
+Streaming API do Twitter, que tem um fluxo em tempo real de dados do Tweet. 
+ 
+Tanto o Twitter como o Facebook oferecem ao usuário opções para filtrar a 
+busca. Por exemplo, no Twitter, uma busca por “calor lang:pt near:"palmas” procura 
+por tweets que tenham a palavra-chave calor, escrita na língua portuguesa, e feita por 
+pessoas próximas a cidade de Palmas. Já no Facebook, a busca é diferente, pois há um 
+tratamento interno em que o parâmetro lang no Facebook seria locale, e, assim, a busca 
+seria realizada normalmente com o padrão do Twitter. 
+4.2. Módulo de Classificação/Visualização de Posts 
+Para realizar a classificação, este módulo, inicialmente, executa algumas atividades da 
+etapa de pré-processamento de textos como eliminação de stopwords, conversão de 
+todos os caracteres para minúsculo e redução de radicais (stemming) através do 
+SnowballStemmer (versão em português) e tratamento para erros ortográficos, em que se 
+verifica repetições de vogais. Por exemplo, se o usuário fizer uma publicação contendo 
+a palavra “gooosto”, esta será corrigida para “gosto”. Para a tarefa da classificação, a 
+ferramenta tem como suporte o algoritmo Naive Bayes e o recurso léxico SentiWordNet. 
+ 
+O classificador Naive Bayes é um método simples e frequentemente utilizado 
+para o aprendizado supervisionado, fornecendo uma maneira flexível para lidar com 
+qualquer número de atributos ou classes, além disso pequenas quantidades de dados 
+ruins não atrapalham muito os resultados. Também provou-se ter um bom resultado em 
+uma grande variedade de problemas [Jose et al 2010]. 
+ 
+Para problemas de classificação textual, o algoritmo Naive Bayes utiliza a 
+representação de textos do tipo binary bag of words (representação binária de saco de 
+palavras) e suas posições exatas são ignoradas. No modelo binário, cada documento é 
+representado por um vetor de atributos binários, de modo que cada atributo indica a 
+ocorrência ou não dele no documento [Oguri 2006]. Neste caso, Naive Bayes adota o 
+modelo multinomial, sendo mais conhecido como Multinomial Naive Bayes (MNB). 
+ 
+Assumindo que c é a classe, d é o documento a ser classificado, nwd é o número 
+de vezes que a palavra w ocorre no documento d, P(c) sendo a probabilidade a priori da 
+classe c, que é estimado pela proporção de documentos de treinamento que pertencem à 
+classe, a probabilidade da classe c dado um documento de teste é calculado a partir da 
+seguinte fórmula [Langley et al. 1992]:
+
+𝑃(𝑐|𝑑) = 𝑃(𝑐) ∏𝑤𝑑𝑃(𝑤|𝑐)𝑛𝑤𝑑
+𝑃(𝑑)
+ 
+ 
+Neste trabalho, considerando as polaridades da análise de sentimento, o valor da 
+classe c pode ser positivo, negativo ou neutro, e d um post de um usuário. O objetivo é 
+escolher o valor de c para maximizar P(c|d) e, assim, obter a classe com a maior 
+probabilidade. P(w|c) é a probabilidade da característica (a palavra) w aparecer no 
+documento dada à classe c. É preciso treinar os parâmetros P(c) e P(w|c), que é 
+calculada a partir dos dados de treinamento, onde se calcula a frequência relativa de 
+cada palavra na coleção de documentos de treinamento da classe [Bifet and Franck 
+2010]. 
+ 
+O SentiWordNet, por sua vez, é um recurso léxico para a mineração de opinião, 
+onde atribui a cada synset da WordNet três pontuações de sentimento (positividade, 
+negatividade e objetividade). SentiWordNet é distribuído sob a licença Attribution-
+ShareAlike 3.0 Unported e possui 117.374 entradas resultantes de anotações 
+automatizadas em todos os synsets do WordNet com valores de sentimentos. Como 
+SentiWordNet foi projetado para a língua inglesa, foi necessário utilizar uma versão do 
+WordNet em português. Para isso, foi usado o OpenWordNet-PT. No WordNet cada 
+palavra tem uma identificação. Desse modo, inicialmente, se obtém o ID da palavra no 
+OpenWordNet-PT e, depois, com esse ID encontra-se a palavra correspondente inglesa 
+no SentiWordNet. 
+ 
+Um synset no WordNet contém um conjunto de sinônimos representando um 
+conceito, uma classe gramatical e um comentário. No SentiWordNet, cada synset foi 
+associado a três valores numéricos, Pos(s), Neg(s) e Obj(s) que indicam o quanto é 
+positivo, negativo ou objetivo (neutro) o termo contido no synset. Cada um dos três 
+valores varia no intervalo [0.0, 1.0] e a soma deles é 1.0 para cada synset. Logo, Obj(s) 
++ Pos(s) + Neg(s) = 1. 
+ 
+Para obter o valor da orientação semântica de uma publicação com o 
+SentiWordNet, é calculado os valores da orientação semântica de cada palavra. Se o 
+resultado for negativo então o texto analisado é considerado negativo. De modo inverso, 
+se o resultado for maior que zero, então o texto é considerado positivo, e se for zero é 
+considerado neutro. 
+ 
+Por fim, o módulo de visualização/classificação dos posts fornece um gráfico 
+(formato pizza) informando um percentual das classificações realizadas para cada 
+sentimento, bem como a lista de palavras mais frequentes naquela busca, exceto 
+stopwords. 
+5. Base de Treinamento 
+A base utilizada para treinamento da ferramenta foi construída por meio de avaliações 
+de usuários e-bit do site Buscapé. O e-bit atua como um consultor de compras online, 
+onde se tem avaliações dos clientes que efetivamente realizaram compras na Internet 
+[Ebitempresa 2013]. A Figura 1 apresenta uma amostra das avaliações de clientes que 
+compraram em uma loja e forneceram seu feedback via Buscapé. 
+ 
+As avaliações e-bit mostradas têm basicamente três títulos, “Elogio”, 
+“Reclamação” e “Sugestão”. Para o treinamento do classificador, foram utilizadas as
+
+avaliações com o título “Elogio” (considerada avaliação positiva) e avaliações com o 
+título “Reclamação” (considerada avaliação negativa). 
+ 
+Figura 1. Amostra das Avaliações de Usuários e-bit. 
+ 
+ 
+ 
+O processo de recuperar avaliações sobre uma certa empresa ocorre ao fornecer 
+a URL referente a página da empresa no Buscapé (que contém as avaliações feitas pelos 
+usuários) a ferramenta. Depois, a ferramenta percorre automaticamente as páginas 
+capturando todas as avaliações que se enquadram como “Elogio” (classe positiva) ou 
+“Reclamação” (classe negativa) sobre essa determinada empresa e as armazena em 
+arquivos de texto plano .txt. Neste trabalho, foram capturadas 13.199 avaliações 
+positivas e 3.824 negativas. 
+ 
+Já para a classe neutra, foi utilizado a timeline de alguns usuários do Twitter 
+como, por exemplo, “ponto”, “boaspromocoes”, “guiapromocoes” e “familiaextra”. 
+Ao total, 613 tweets foram capturados e considerados como neutros. 
+6. Experimentos Realizados 
+Nesta seção serão apresentados resultados de três experimentos realizados. Para esses 
+experimentos, os resultados duplicados não foram considerados como, por exemplo, o 
+RT (ReTweeting), que nada acrescentaram ao texto original. Apesar de que um RT 
+possa significar uma concordância com a publicação original (assim como um like no 
+Facebook), o interesse desse experimento foi verificar o comportamento do 
+SentiWordNet e do classificador Naive Bayes. 
+ 
+Para cada experimento, é mostrado uma tabela com a quantidade de 
+classificações corretas e incorretas pelo Naive Bayes e SentiWordNet. Além destas
+
+informações, as tabelas apresentam resultados de uma análise manual dos posts com o 
+objetivo de servir de base para a verificação (conferência) do desempenho dos 
+classificadores. Na classificação manual, cada post foi analisado por 3 especialistas e, 
+após cruzar as opiniões fornecidas, foi especificado uma polaridade (sentimento), e 
+quando a classificação automática não coincide com a classificação manual ela é 
+considerada incorreta. No processo de classificação manual não considerou apenas os 
+significados isolados das palavras utilizadas nos tweets mas também as ironias. 
+ 
+A coleta dos posts foi realizada através da interface de busca oferecida pela 
+ferramenta entre os dias 27 e 28 de setembro de 2013. A máquina que realizou os testes 
+tinha um processador Intel® Core™ i7-3630QM e 8GB de memória RAM. Com a 
+finalidade de preservar a imagem das empresas investigadas, estas foram nomeadas 
+neste trabalho de X, Y e Z. 
+6.1 Experimento 1: Empresa X 
+Esta subseção mostra os resultados da classificação gerada pela ferramenta utilizando o 
+nome da empresa X. A Figura 2 ilustra o relatório fornecido pelo módulo 
+classificação/visualização dos posts para rede social Twitter mostrando o percentual de 
+classificação para cada classe de sentimento. Neste caso, obteve-se 19%, 58% e 22% 
+para as classes positiva, negativa e neutra, respectivamente. 
+ 
+ 
+Figura 2. Exemplo do Resultado do Módulo Classificação/Visualização dos Posts. 
+ 
+Para as Tabelas 1 a 6 são usadas as seguintes siglas para mostrar os resultados 
+das classificações: CCNB (classificações corretas pelo Naive Bayes), CINB ( 
+classificações incorretas pelo Naive Bayes), CCS (classificações corretas pelo 
+SentiWordNet), CIS (classificações incorretas pelo SentiWordNet) e CM (classificações 
+realizadas de forma manual). 
+ 
+A Tabela 1 mostra os resultados da classificação fornecidos pela ferramenta para 
+a rede social Twitter. 
+Tabela 1. Resultados para o experimento 1 - Twitter 
+Polaridade 
+CCNB 
+CINB 
+CCS 
+CIS 
+CM 
+Positivo 
+2 
+1 
+2 
+6 
+2 
+Negativo 
+13 
+0 
+6 
+1 
+14
+
+Neutro 
+5 
+0 
+4 
+2 
+5 
+Total 
+20 
+1 
+12 
+9 
+21 
+Como foi possível observar na Tabela 1, foram capturados 21 posts na rede 
+social Twitter e o classificador Naive Bayes obteve um desempenho muito bom, cerca 
+de 95% de taxa de acerto, errando somente a classificação de 1 comentário negativo 
+como positivo. Já o SentiWordNet não teve um bom resultado, apresentando uma certa 
+tendência a classificar os posts de maneira positiva, atingindo somente 57% de taxa de 
+acerto. 
+A Tabela 2 mostra os resultados obtidos para os 32 posts capturados da busca 
+pela empresa X na rede social Facebook. 
+Tabela 2. Resultados para o experimento 1 - Facebook 
+Polaridade 
+CCNB 
+CINB 
+CCS 
+CIS 
+CM 
+Positivo 
+2 
+2 
+5 
+11 
+9 
+Negativo 
+9 
+13 
+5 
+1 
+9 
+Neutro 
+6 
+0 
+7 
+3 
+14 
+Total 
+17 
+15 
+17 
+15 
+32 
+ 
+Utilizando os comentários do Facebook, o classificador Naive Bayes apresentou 
+um resultado pior se comparado com os comentários obtidos do Twitter. Neste caso, 
+houve uma taxa de acerto de somente 53% (17/32). Nesse experimento, observou-se 
+uma tendência do Naive Bayes em classificar um post como negativo, sendo que das 15 
+classificações incorretas, 13 eram de posts que foram incorretamente classificados como 
+negativo. Por outro lado, o SentiWordNet apresentou uma forte tendência na 
+classificação positiva, sendo 11 posts classificados incorretamente desta maneira. 
+6.2 Experimento 2: Empresa Y 
+Esta subseção mostra o desempenho da classificação da ferramenta para a empresa Y. A 
+Tabela 3 mostra o número de classificações corretas e incorretas utilizando 13 posts 
+sobre a empresa Y na rede social Twitter. 
+Tabela 3. Resultados para o experimento 2 - Twitter 
+Polaridade 
+CCNB 
+CINB 
+CCS 
+CIS 
+CM 
+Positivo 
+5 
+1 
+4 
+1 
+5 
+Negativo 
+4 
+0 
+2 
+0 
+7 
+Neutro 
+1 
+2 
+1 
+5 
+1 
+Total 
+10 
+3 
+7 
+6 
+13 
+ 
+Novamente o classificador Naive Bayes se comportou bem com os dados 
+provenientes do Twitter, com 76% de acerto na classificação. Já SentiWordNet 
+continuou com resultados ruins, tendo apenas 53% de acerto, permanecendo sua 
+tendência em classificar um post de maneira positiva. Na Tabela 4 são apresentados os 
+resultados da classificação dos 17 posts recuperados usando a busca pela empresa Y na 
+rede social Facebook. 
+ 
+Tabela 4. Resultados para o experimento 2 - Facebook
+
+Polaridade 
+CCNB 
+CINB 
+CCS 
+CIS 
+CM 
+Positivo 
+5 
+4 
+4 
+5 
+5 
+Negativo 
+2 
+5 
+1 
+2 
+4 
+Neutro 
+1 
+0 
+4 
+1 
+8 
+Total 
+8 
+9 
+9 
+8 
+17 
+ 
+Neste caso, o classificador Naive Bayes apresentou também um resultado ruim, 
+inclusive, pior do que o experimento 1, tendo somente 47% de taxa de acerto. No geral, 
+o SentiWordNet obteve 52% de taxa de acerto mas, para a classe positiva, teve um 
+desempenho de 80%, isto é, dos 5 posts positivos apresentados, o algoritmo conseguiu 
+acertar 4 posts. Neste experimento, observou-se que os dois algoritmos tiveram 
+desempenhos ruins, não superior a 52% de taxa de acerto. 
+6.3 Experimento 3: Empresa Z 
+Esta subseção traz os resultados dos classificadores e dos filtros de busca das APIs do 
+Twitter e Facebook utilizando empresa Z como fonte de pesquisa. A Tabela 5 mostra os 
+resultados da classificação com os 38 posts recuperados do Twitter. 
+Tabela 5. Resultados para o experimento 3 - Twitter 
+Polaridade 
+CCNB 
+CINB 
+CCS 
+CIS 
+CM 
+Positivo 
+3 
+3 
+4 
+15 
+5 
+Negativo 
+12 
+5 
+4 
+2 
+13 
+Neutro 
+12 
+3 
+12 
+1 
+20 
+Total 
+27 
+11 
+20 
+18 
+38 
+Neste experimento, o classificador Naive Bayes obteve um resultado aceitável, 
+cerca de 71% de taxa de acerto das classificações. Os resultados observados nos 
+experimentos 1 e 2 continuaram se repetindo nesse experimento, apesar de que o Naive 
+Bayes tenha classificado corretamente 12 dos 13 tweets negativos. O maior número de 
+classificações incorretas realizadas ocorreu classificando erradamente uma publicação 
+de forma negativa, continuando sua tendência a classificar um post como negativo. Já o 
+SentiWordNet permaneceu com a média dos acertos anteriores, neste experimento 
+obteve-se 52% de acerto. Do mesmo modo, o SentiWordNet continuou com forte 
+tendência em classificar um post de maneira positiva, com 15 classificações que foram 
+consideradas positivas de forma errada. 
+A Tabela 6 mostra o resultado da classificação da ferramenta para os 4 posts 
+recuperados na rede social Facebook. O número de posts recuperados nesta rede foi 
+considerado muito baixo, porém não há como prever se haverá posts de uma certa 
+empresa, principalmente, se considerando um intervalo curto de tempo. 
+Tabela 6. Resultados para o experimento 3 - Facebook 
+Polaridade 
+CCNB 
+CINB 
+CCS 
+CIS 
+CM 
+Positivo 
+0 
+1 
+0 
+1 
+0 
+Negativo 
+0 
+0 
+0 
+2 
+0
+
+Neutro 
+3 
+0 
+1 
+0 
+4 
+Total 
+3 
+1 
+1 
+3 
+4 
+ 
+Com relação às classificações automáticas, o Naive Bayes teve uma taxa de 
+acerto em 75% contra 25% do SentiWordNet. Na classificação manual, os posts foram 
+definidos como classe neutra porque eram relativos à promoção de produtos. 
+6.4 Análise Comparativa dos Resultados 
+Pôde-se observar que os resultados de classificação com os textos do Facebook 
+obtiveram um desempenho pior em comparação aos resultados obtidos com o Twitter, 
+principalmente, com o algoritmo Naive Bayes. No Twitter se tem mais críticas às 
+empresas, funcionando como um serviço de atendimento ao consumidor (SAC), e no 
+Facebook isto não ocorre com tanta frequência. Os posts feitos no Facebook, 
+geralmente, têm muitas imagens, e o texto sozinho acaba não fazendo sentido, 
+dificultando a classificação, além de trazer alguns resultados que não tem relação com a 
+busca feita (como propagandas). Outro fator que também pode ter contribuído para que 
+o Facebook possuísse um desempenho pior na classificação foi a base de treinamento 
+utilizada para classificar uma publicação como neutra. Outro problema encontrado no 
+Facebook e Twitter é que o uso das APIs (REST API e Graph API) é bem restrito, 
+como observado nos experimentos, a quantidade de posts recuperados é bem pequena. 
+ 
+De modo geral, o SentiWordNet apresentou resultado pior do que o classificador 
+Naive Bayes. Isto pôde ser observado, principalmente, no experimento 2, em que 17 
+tweets foram classificados erradamente como positivos. Verificou-se que estes tweets 
+eram, em sua maioria, propagandas (geralmente divulgando promoções) e foram 
+considerados pertencentes a classe neutra pela classificação manual. Mas, como em 
+propagandas normalmente têm palavras com orientação semântica positiva, o 
+SentiWordNet as classificou como positivas. Assim, a falta de uma análise do contexto 
+do texto antes da definição de uma classe contribuiu para este desempenho. 
+7. Conclusões 
+Este trabalho teve como objetivo analisar e classificar publicações (tweets) de usuários 
+sobre empresas brasileiras de comércio eletrônico disponibilizadas nas redes sociais 
+Facebook e Twitter sob o ponto de vista de sentimento (positivo, negativo ou neutro). 
+Para isso, foi desenvolvida uma ferramenta web para classificação utilizando o 
+algoritmo Naive Bayes e o recurso léxico SentiWordNet. Essa ferramenta se mostrou 
+capaz de identificar sentimentos (positivo, negativo, neutro) dos usuários da rede social. 
+ 
+A base de dados utilizada para treinamento foi considerada bastante satisfatória 
+para o domínio em questão, pois se tratava de avaliações reais de clientes que 
+compraram no comércio eletrônico brasileiro. Esta foi uma valiosa fonte de dados em 
+que há dezenas de milhares de avaliações de consumidores já rotuladas com as classes 
+elogio e reclamação, visto que uma classificação manual para isso seria demorada e 
+dispendiosa. 
+ 
+De acordo com os experimentos realizados, foi possível observar que as 
+classificações utilizando os posts da rede social Twitter tiveram melhor resultado, 
+sobretudo, utilizando o algoritmo Naive Bayes. Nos experimentos, a sua taxa de acerto
+
+variou de 71% (experimento 3) a 95% (experimento 1). Constatou-se ainda que há uma 
+tendência muito maior das pessoas postarem reclamações ao invés de elogios nas redes. 
+ 
+A limitação da quantidade de posts recuperados das APIs (Graph do Facebook e 
+REST do Twitter) impediu uma análise em larga escala da classificação de posts de 
+usuários. Uma solução para este problema seria a inclusão de uma rotina para realizar 
+uma busca exaustiva na captura de posts mais antigos e, assim, ter um monitoramento 
+mais profundo da reputação de uma empresa. No entanto, de acordo com os 
+experimentos realizados, pode-se afirmar que a empresa Y possui uma reputação muito 
+positiva nas redes sociais avaliadas. 
+Referências Bibliográficas 
+Aranha, C. and Passos, E. (2006) “A Tecnologia de Mineração de Textos: Artigo 
+tutorial”. RESI - Revista Eletrônica de Sistemas de Informação. n. 2, 
+http://revistas.facecla.com.br/index.php/reinfo/article/view/171, Setembro. 
+Barion, C. N. and Lago, D. (2008). Mineração de Textos. In Revista de Ciências Exatas 
+e Tecnologia, v. 3, n. 3, p. 123-140. 
+Bifet, A. and Frank, E. (2010). Sentiment Knowledge Discovery in Twitter Streaming 
+Data. In Proceedings of the 13th international conference on Discovery science, 
+pages 1-15. 
+Bollen, J., Pepe, A. and Mao, H. (2011). Modeling public mood and emotion: Twitter 
+sentiment and socio-economic phenomena. In Proceedings of the Fifth International 
+AAAI Conference on Weblogs and Social Media, pages 17-21. 
+Burson-Marsteller (2013) “The Latin America Social Media Check-up 2013”. 
+http://sites.burson-marsteller.com/social/LatamResults.aspx. 
+Castro, M. (2013) "Redes sociais forçam empresas a responder rápido", 
+http://exame.abril.com.br/rede-de-blogs/midias-sociais/2013/04/02/redes-sociais-
+forcam-empresas-a-responder-rapido/. 
+Ebitempresa (2013) “O que é a e-bit?”. http://www.ebitempresa.com.br/quem.asp. 
+Jose, K., Bhatia, N., Krishna, S. (2010). TWITTER SENTIMENT ANALYSIS. 
+Department of Computer Science & Engineering, National Institute of Technology 
+Calicut at Monsoon. 
+Kwak, H., Lee, C., Park, H. and Moon, S. (2010). What is Twitter, a social network or a 
+news media? In Proceedings of the 19th International Conference on World Wide 
+Web, pages 591–600. 
+Langley, P., Iba, W. and Thompson, K. (1992). An analysis of Bayesian classifiers. In 
+Proceedings of the Tenth National Conference on Artificial Intelligence, pages 399–
+406. 
+Li, Y., Ye, Q., Zhang, Z. and Wang, T. (2011) “Snippet-Based Unsupervised Approach 
+For Sentiment Classification Of Chinese Online”, Reviews International Journal of 
+Information Technology & Decision Making Vol. 10, No. 6, p. 1097–1110. 
+Liu, B. (2010) “Sentiment Analysis and Subjectivity”. In Handbook of Natural 
+Language Processing, Second Edition. CRC Press.
+
+Martinazzo, B. (2010). Um Método de Identificação de Emoções em Textos Curtos Para 
+o Português do Brasil. 68 f. Dissertação de Mestrado, Pontifícia Universidade 
+Católica do Paraná, Curitiba. 
+Nascimento, P., Aguas, R., Lima, D., Kong, X., Osiek, B., Xexeo, G. and Souza, J. 
+(2012). Análise de sentimento de tweets com foco em notícias. Brazilian Workshop 
+on Social Network Analysis and Mining. 
+Oguri, P. (2006). Aprendizado de Máquina para o Problema de Sentiment 
+Classification. 54 f. Dissertação de Mestrado, Pontifícia Universidade Católica do 
+Rio de Janeiro. 
+Oliveira, C. W. (2013). Análise de Sentimentos de Comentários em Português 
+Utilizando SENTIWORDNET. Monografia de Especialização em Desenvolvimento 
+de Sistemas para Web, Departamento de Informática, Universidade Estadual de 
+Maringá. 
+Pak, A. and Paroubek, P. (2010). Twitter as a corpus for sentiment analysis and opinion 
+mining. In Proceedings of the 7th Conference on International Language Resources 
+and Evaluation, pages 1320-1326. 
+Santos, M. (2010). Protótipo para Mineração de Opinião em Redes Sociais: Estudo de 
+Casos Selecionados Usando o Twitter. Monografia. Departamento de Ciência da 
+Computação, Universidade Federal de Lavras. 
+Turney, P. (2002). Thumbs up or thumbs down? Semantic orientation applied to unsu-
+pervised classification of reviews. In Proceedings of the Association for 
+Computational Linguistics, pages 417–424.

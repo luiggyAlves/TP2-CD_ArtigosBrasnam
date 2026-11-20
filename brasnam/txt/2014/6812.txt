@@ -1,0 +1,592 @@
+Pesquisa Eleitoral em Redes Sociais:
+Inclusão da Análise de Novas Dimensões ∗
+Renato Miranda Filho1,2, Jussara M. Almeida1, Gisele L. Pappa1
+1Departamento de Ciência da Computação
+Universidade Federal de Minas Gerais (UFMG)
+CEP 31270-010 – Belo Horizonte – MG – Brasil
+2Instituto Federal de Minas Gerais (IFMG)
+CEP 34515-640 – Sabará – MG – Brasil
+{renato.miranda,jussara,glpappa}@dcc.ufmg.br
+Abstract. This paper aims to use public data from social networks to conduct
+election surveys and studies. Although prior work has already focused on this
+task, none has taken into account the unique user identification together with
+inherent factors of the virtual environment, such as sentiment analysis of messa-
+ges, detection of spammers as well as of journalistic content. Our experimental
+results show that more elaborate analyses are able to improve the numbers achi-
+eved by the method used in other works.
+Resumo. Este trabalho tem como principal objetivo utilizar dados públicos de
+redes sociais para realizar pesquisas (análises) eleitorais. Embora alguns tra-
+balhos já tenham focado nessa tarefa, nenhum deles levou em consideração a
+identificação de usuários únicos aliada a fatores inerentes do ambiente virtual,
+tais como a análise de sentimentos das mensagens, a detecção de spammers e
+de conteúdo jornalístico. Os resultados alcançados mostram que análises mais
+elaboradas são capazes de melhorar os números alcançados pela metodologia
+empregada em outros trabalhos.
+1. Introdução
+Apesar de terem sido inicialmente criadas como meios de comunicação de caráter in-
+terpessoal, focando nos contatos entre pessoas e na discussão sobre os assuntos de suas
+preferências, as redes sociais se tornaram uma fonte de informação riquíssima para acom-
+panhar o que essa população virtual pensa ou vive nos mais diversos contextos, tornando-
+se, algumas vezes, um instrumento de utilidade pública.
+Diversos trabalhos utilizaram dados provenientes de redes sociais para prever re-
+sultados de eleições [Tumasjan et al. 2010, Jungherr et al. 2012, Gayo-Avello et al. 2011,
+Gayo-Avello 2012], padrões de disseminação de doenças [Gomide et al. 2011], ou ofere-
+cer a empresas uma visão geral do que o consumidor pensa sobre ela e seus produtos
+[Culnan et al. 2010]. O impacto das redes sociais virtuais é tamanho que empresas têm
+hoje departamentos especializados em marketing e relações do consumidor em redes so-
+ciais.
+∗Este trabalho foi parcialmente financiado pela Fapemig, CNPq, CAPES e InWeb.
+
+Se avaliarmos os trabalhos que se propuseram a realizar pesquisas eleitorais por
+meio de dados coletados em redes sociais verificamos que eles normalmente são basea-
+dos em técnicas de contagem. Assim, nenhum deles levou em consideração simultanea-
+mente pontos importantíssimos em análises dessa natureza, tais como: (i) características
+comportamentais dos usuários (por exemplo, usuários spammers e usuários que postam
+conteúdos jornalísticos deveriam ser desconsiderados destas análises); e (ii) o sentimento
+das mensagens postadas, uma vez que o texto coletado normalmente não está estruturado.
+Com o objetivo de avaliar o impacto dos pontos mencionados acima para a
+realização de pesquisas eleitorais, este artigo considera o contexto das eleições muni-
+cipais de 2012 com dados coletados no Twitter referentes aos pleitos de seis municípios:
+São Paulo (SP), Rio de Janeiro (RJ), Belo Horizonte (MG), Curitiba (PR), Salvador (BA)
+e Porto Alegre (RS). Assim, após coletar as mensagens referentes ao pleitos ou candidatos
+das cidades mencionadas, o método identifica cada usuário, caracterizado por um perfil
+no Twitter, infere e remove usuários considerados spammers e jornalísticos e contabiliza
+os votos conforme o sentimento identificado nas mensagens postadas.
+Nós comparamos o número total de acertos da estratégia proposta com os acertos
+de uma abordagem baseada na contagem de menções, utilizada pela grande maioria dos
+métodos, assim como com o total de acertos obtidos por institutos tradicionais de pesquisa
+(IBOPE e DataFolha). Nossos resultados indicam que, comparando com a abordagem
+baseada na contagem de menções, a estratégia proposta acerta os vencedores de mais
+cidades, são elas: Belo Horizonte, Salvador e São Paulo, enquanto o método concorrente
+acertou apenas em Belo Horizonte e Salvador. Mais ainda, embora a abordagem proposta
+acerte menos que os institutos tradicionais, verificamos que existem cenários nos quais os
+institutos erraram e a técnica proposta acertou como, por exemplo, Salvador. Tais cenários
+demonstram que a abordagem proposta pode ser considerada uma técnica complementar
+para a realização de pesquisas eleitorais.
+O resto artigo está estruturado da seguinte forma, A Seção 2 apresenta alguns
+trabalhos que serviram de base para este artigo. A Seção 3 descreve o método proposto.
+A Seção 4 relata os resultados obtidos e a Seção 5 apresenta as conclusões e propostas de
+continuidade deste trabalho.
+2. Trabalhos Relacionados
+Dado o grande volume de informação disponível, as redes sociais estão sendo cada vez
+mais exploradas para monitorar e prever eventos no mundo real como, por exemplo,
+eleições.
+Imerso no cenário do pleito parlamentar da Alemanha, ocorrido em 2009,
+[Tumasjan et al. 2010] observaram que o Twitter é utilizado como uma plataforma para
+deliberações políticas, inclusive com características de discussões e trocas de ideias. Além
+disso, os autores também argumentaram que, como preditor do resultado das eleições, a
+simples contagem de menções aos partidos ou candidatos é capaz de acompanhar pesqui-
+sas eleitorais tradicionais e acertar com exatidão o resultado final da eleição. Este trabalho
+também realizou a análise de sentimentos das mensagens coletadas, traduzindo elas para o
+inglês e submetendo o texto ao software LIWC2007 (Linguistic Inquiry and Word Count).
+Como resultado foi observado que o comportamento dos eleitores se aproxima das ideias
+difundidas pela campanha eleitoral como, por exemplo, retratando coalisões ou ataques.
+Já em [Jungherr et al. 2012] os autores realizaram um experimento sobre as
+
+eleições federais da Alemanha de 2009 com a técnica proposta por [Tumasjan et al. 2010]
+e não validaram a afirmativa de que é possível prever o resultado final do pleito com a
+contagem de menções. Os autores apontaram algumas limitações de tal técnica como,
+por exemplo, a falta de regras bem fundamentadas para a coleta, da escolha dos par-
+tidos e do período de tempo correto que deveria se avaliar. O trabalho realizado por
+[Gayo-Avello et al. 2011] também coloca em xeque o poder preditivo de eleições pelas
+redes sociais. Neste trabalho, os autores analisaram tweets coletados sobre as eleições de
+2010 para o congresso americano e não observaram nenhuma relação entre os resultados
+inferidos a partir dos tweets e os resultados eleitorais.
+[Gayo-Avello 2012] realizaram uma pesquisa bibliográfica sobre trabalhos que
+têm como objetivo a previsão eleitoral com base em dados coletados do Twitter, e focaram
+sua análise em falhas e limitações das abordagens já empregadas. Algumas delas são: i)
+limitação nas abordagens de contagem de voto, em que muitas vezes é utilizado somente
+o volume bruto de tweets ou de usuários únicos que citaram os candidatos; (ii) análise de
+sentimento do conteúdo dos tweets realizada de forma ingênua; e (iii) falta de emprego de
+técnicas para detectar boatos e informações falsas.
+Um comportamento relevante que devemos identificar e filtrar, tanto quanto
+possível, da análise é a atuação de usuários spammers. Para tal, nós utilizaremos a técnica
+proposta em [Benevenuto et al. 2010]. Neste trabalho, os autores fizeram um estudo ex-
+tenso das características das contas de usuários do Twitter cujas mensagens continham
+palavras típicas ou URLs referentes a termos do trending topics. Os usuários foram rotu-
+lados manualmente como sendo spammers ou não spammers, e depois utilizados em um
+processo de classificação com o método Support Vector Machine (SVM). Outros traba-
+lhos, tais como [Lumezanu et al. 2012], também investigaram o comportamento de pro-
+pagandistas no Twitter identificando padrões nas mensagens que poderiam caracterizar
+este tipo de comportamento. [Ghosh et al. 2012] identificaram como ocorre a aquisição
+de seguidores por parte dos usuários spammers no Twitter. Já [McCord and Chuah 2011]
+analisaram a eficácia diferentes algoritmos de classificação, a saber Random Forest, SVM,
+Naive Bayes e K-Nearest Neighbor (KNN) na tarefa de detectar spammers no Twitter,
+concluindo que o melhor classificador é o Random Forest. Nesse trabalho mostramos que
+o Random Forest realmente se comporta melhor que o SVM para o problema em questão.
+Outra grande deficiência recorrente em monitoramento e previsões de eventos é a
+falta de mecanismos utilizados para distinguir, por exemplo, uma simples menção a um
+candidato de um voto. Assim, a solução proposta neste trabalho é utilizar um método
+para análise de sentimentos nesta tarefa. A análise de sentimentos de conteúdo textual é
+abordada em vários trabalhos anteriores. Por exemplo, [Mukherjee et al. 2012] propuse-
+ram um sistema multi-etapas, denominado TwiSent. Neste trabalho, os autores abordam
+alguns problemas inerentes à tarefa de identificar os sentimentos dos tweets, tais como:
+(i) presença de usuários spammers; (ii) anomalias no texto como, por exemplo, grafia
+incorreta; e (iii) a especificidade de entidades no contexto do tema pesquisado.
+Já o trabalho apresentado em [Bora 2012] propõe uma abordagem para rotulagem
+de sentimentos que consiste no uso de um conjunto com 40 palavras de sentimento su-
+gestivo, positivo ou negativo, como um rótulo ruidoso para então treinar um classificador
+Naive Bayes. Uma comparação abordando oito diferentes métodos para análise de senti-
+mentos é realizada por [Gonçalves et al. 2013]. Foi verificado que nenhum dos métodos
+
+avaliados pode ser considerado o melhor independente da fonte do texto. Diversas dessas
+abordagens foram testadas nesse trabalho, e serão detalhadas na próxima seção.
+3. Um Método para Previsão de Eleições no Twitter
+Figura 1. Esquema para pesquisa eleitoral
+A Figura 1 ilustra o método empregado para melhorar os resultados de previsões
+eleitorais de forma a não focar somente em menções aos candidatos, mas também abordar
+outros fatores inerentes do meio virtual. Ele consiste em quatro etapas: (i) preparação
+dos dados; (ii) identificação da intenção do voto, por meio da análise de sentimento
+das mensagens postadas pelos usuários; (iii) identificação de usuários legítimos, com a
+caracterização comportamental dos indivíduos; e (iv) análise dos resultados. A segunda
+e a terceira etapas representam as maiores contribuições deste trabalho. As próximas
+subseções detalham como cada uma dessas fases foram implementadas.
+3.1. Preparação dos dados
+Foram escolhidas 6 capitais de estado para serem analisadas, com base no total de tweets
+coletados durante o período de análise e na importância econômica das regiões, são elas:
+Belo Horizonte (MG), Curitiba (PR), Porto Alegre (RS), Rio de Janeiro (RJ), Salvador
+(BA) e São Paulo (SP). A partir deste momento representaremos os nomes das cidades
+pelas siglas de seus respectivos estados.
+Após definidas as cidades, foi definido um conjunto de termos capazes de identi-
+ficar cada candidato, como seus nomes. A etapa seguinte foi a coleta dos tweets contendo
+estes termos. Esta coleta foi realizada por meio da API disponibilizada pelo próprio Twit-
+ter1, em que, no fluxo de mensagens, são filtradas aquelas de interesse. Foram então iden-
+tificados os usuários que postaram as mensagens. A fim de se analisar o comportamento
+destes usuários, também foram coletados os últimos 200 tweets de cada um deles.
+Ao total foram coletados 1,295,418 tweets, publicados por 222,412 usuários dis-
+tintos, entre os dias 18 de julho de 2012 e 17 de outubro de 2012. Em média, cada um
+destes usuários postou 5.8 tweets com algum termo relacionado a um candidato, com uma
+mediana de 1. O usuário mais frequente postou 5,072 mensagens e o menos frequente 1.
+O período de análise das votações foi considerado como as 10 semanas que an-
+tecederam ao pleito, ou seja, entre os dias 29 de julho de 2012 e 6 de outubro de 2012.
+Isto foi feito para evitar possíveis flutuações anormais causadas, por exemplo, pela reper-
+cussão dos últimos debates eleitorais. Desta forma, consideramos as últimas 10 semanas
+com peso linearmente crescente para os votos computados, ou seja, a semana 1 com peso
+1, a semana 2 com peso 2, e assim sucessivamente.
+1http://dev.twitter.com/
+
+Antes de definirmos este período, avaliamos diversos outros cenários, dentre eles:
+1 ou 2 dias, onde pouquíssimos votos eram computados, e o período completo de coleta
+sem atribuição de pesos, onde acontecimentos momentâneos como, por exemplo, debates
+eleitorais, interferiam significativamente nos resultados alcançados.
+O pré-processamento do texto dos tweets consistiu na remoção de acentos,
+pontuações e palavras conhecidas como stop-words, que representam, por exemplo, a
+classe de palavras dos artigos.
+3.2. Análise de sentimentos
+Como mostrado na Figura 1, nesta etapa estamos interessados em responder perguntas
+como: i) qual a opinião do indivíduo? O que o indivíduo pensa? Para tanto, será realizada
+uma análise de sentimentos nos tweets coletados.
+Foi observado na literatura que existe uma grande gama de métodos para
+realização de análises desta natureza. Além disto, os autores de [Gonçalves et al. 2013]
+observaram que a eficácia de diferentes técnicas varia muito com a fonte do texto anali-
+sado, não sendo encontrado nenhum método que ganhasse em todos os cenários possíveis.
+Logo, considerando as inúmeras aplicações práticas para aplicar tais técnicas, este ainda
+é um campo fértil para novos estudos.
+Entre os métodos mais utilizados para a realização de análise de sentimentos em
+mensagens de micro-blogs estão os seguintes:
+• Dicionários léxicos: conjunto de palavras previamente rotuladas como positivas,
+negativas ou neutras, em que, conforme as ocorrências, indicam as polaridades
+das mensagens analisadas.
+• Algoritmos supervisionados com mensagens classificadas manualmente.
+• Algoritmos supervisionados com rótulos baseados em indicadores de emoção,
+como os emoticons.
+Neste trabalho, analisamos mensagens que se referem apenas a uma entidade, ou
+seja, um único candidato. Além disso, utilizamos uma abordagem baseada em um comitê
+de classificação, onde os tweets são rotulados conforme a polaridade indicada pela maioria
+de três classificadores: léxico, supervisionado com rotulação manual e supervisionado
+com rotulação automática. Cada classificador atribui +1, caso a mensagem seja positiva,
+ou -1, caso seja negativa. O classificador léxico também poderá atribuir voto 0 caso
+nenhum termo rotulado pelo seu dicionário seja encontrado na mensagem analisada ou
+haja um empate entre termos rotulados como positivos e negativos. Se a soma for positiva
+a mensagem é considerada positiva. Se a soma for negativa a mensagem é considerada
+negativa. Caso a soma seja zero a mensagem é descartada das análises. Mais detalhes
+sobre os classificadores são apresentados nas subseções a seguir.
+3.2.1. Dicionário Léxico
+Como mencionado anteriormente, o dicionário léxico é formado por um conjunto de pala-
+vras rotuladas como representantes de sentimentos positivos, negativos ou neutros. Exis-
+tem diversos dicionários do idioma inglês bem consolidados para tal tarefa como o MPQA
+
+Opinion Corpus2 e o General Inquirer3. Porém, o mesmo não ocorre para o português,
+idioma alvo deste trabalho.
+Para o português, encontramos na literatura dicionários, por exemplo, cons-
+tituídos a partir da extração de termos em blogs com comentários sobre componentes
+de veículos [Ribeiro Jr. et al. 2012], ou seja, com termos muito específicos de um dado
+contexto diferente do avaliado por este trabalho.
+Assim, rotulamos um conjunto inicial de palavras específicas para o cenário de
+eleições com sentimentos positivos ou negativos. Este conjunto foi definido observando o
+contexto dos tweets coletados. Para as eleições verificou-se que normalmente são usados
+termos para designar a conduta política do candidato ou a vontade do eleitor, tais como
+“ladrão” e “corrupto” para sentimento negativo, e “apoio” e “voto” para positivo.
+Uma prática comum que é realizada em trabalhos deste tipo, para aumentar a
+cobertura dos termos, é expandir o dicionário inicialmente desenvolvido por dicionários
+de sinônimos de palavras. Desta forma, expandimos o conjunto inicialmente criado pelo
+dicionário de sinônimos Dicio4 e removemos duplicatas, ou seja, termos que aparecem
+nas duas listas finais. Obtivemos como resultado um dicionário composto por 194 termos
+positivos e 292 negativos.
+3.2.2. Algoritmo supervisionado - Rotulação manual
+Algoritmos supervisionados utilizam informações obtidas por meio de conteúdos rotu-
+lados, previamente identificados, para amostras de treino na tarefa de aprendizagem e,
+então, generalizam as observações feitas para classificar novos dados. Nesta etapa, utili-
+zamos como treinamento um conjunto de 200 tweets distintos escolhidos aleatoriamente
+e rotulados manualmente como positivo ou negativo.
+Quatro classificadores foram avaliados: i) SVM; ii) Random Forest; iii) Naive
+Bayes; e iv) Naive Bayes Multinomial. Todos os resultados foram obtidos usando as
+versões Weka destes classificadores [Witten and Frank 2005]. O Naive Bayes Multino-
+mial (NBM) foi escolhido por ser extremamente rápido e apresentar bons resultados com
+texto, e o SVM e Random Forest por estarem entre os classificadores estado da arte. Em
+todos os classificadores foram utilizados os parâmetros padrão. Os experimentos foram
+realizados utilizando um procedimento de validação cruzada de cinco partições.
+Os resultados obtidos são apresentados na Tabela 1. Considerando que a melhor
+taxa de acerto foi obtida pelo algoritmo Naive Bayes (80.5%), este será utilizado nesta
+etapa da análise de sentimentos dos tweets.
+3.2.3. Algoritmo supervisionado - Rotulação automática
+Conforme mostrado por [Hu et al. 2013], indicadores de emoção sugerem que o senti-
+mento contido em uma mensagem é consistente com os sinais presentes nela. Neste
+2http://www.cs.pitt.edu/mpqa/opinionfinder_1.html
+3http://www.wjh.harvard.edu/ĩnquirer/
+4http://www.dicio.com.br
+
+Tabela 1. Análise de sentimentos - Acurácia obtida com algoritmos supervisio-
+nados (%)
+Método
+Rotulação manual
+Rotulação automática
+SVM
+62.5
+65.85
+Random Forest
+75.5
+69.95
+Naive Bayes
+80.5
+67.8
+Naive Bayes Multinomial
+78
+74.8
+trabalho utilizamos os emoticons “:)” e “:-)” para denotar a polaridade positiva de uma
+mensagem e “:(” e “:-(” para polaridade negativa. Assim, mensagens com esses s Ãmbo-
+los foram automaticamente classificadas como positivas ou negativas, e depois utilizadas
+como dados de treinamento para um classificadore supervisionado.
+Dentre as mensagens rotuladas, escolhemos 1,000 distintas de forma aleatória
+para cada classe, resultando em 2,000 tweets, utilizados para treinar os classificadores
+apresentados na subseção 3.2.2. Os textos de cada mensagem passaram por um pré-
+processamento em que foram retiradas stop-words, pontuações, emoticons e termos com
+frequência menor que três no conjunto, resultando em um total de 1,062 diferentes pala-
+vras para descrever a base de dados.
+Os resultados de classificação obtidos, considerando um processo com validação
+cruzada de 5 folds, é apresentado na Tabela 1. Considerando que a melhor taxa de acerto
+foi obtida pelo algoritmo Naive Bayes Multinomial (74.8%), este será utilizado nesta
+etapa da análise de sentimentos dos tweets.
+3.2.4. Método baseado em comitê de classificação
+Como mencionado, nós propomos um método que combina as três abordagens descri-
+tas nas seções anteriores - dicionário léxico, Naive Bayes com rotulação manual e Naive
+Bayes Multinomial com rotulação automática - por meio de um comitê de classificação.
+Para avaliarmos o método proposto, comparando-o com os métodos aplicados individu-
+almente, utilizamos 200 tweets distintos escolhidos aleatoriamente e rotulados manual-
+mente como positivo ou negativo. Assim, avaliamos a cobertura, ou seja, porcentagem
+de tweets não classificados como neutros, e a acurácia provida por cada método. Os
+resultados obtidos são mostrados na Tabela 2.
+Como podemos observar, o dicionário léxico construído foi capaz de prover uma
+boa acurácia. No entanto, tal método possui uma baixa cobertura: apenas 43% das men-
+sagens selecionadas foram classificadas como positivas ou negativas.
+O método capaz de prover a melhor acurácia foi o classificador supervisionado
+com mensagens de treinamento rotuladas manualmente. Porém, devido à pouca quanti-
+dade de tweets rotulados para a etapa de treinamento optamos por utilizar o Comitê de
+classificação em nosso trabalho, por ser capaz de alcançar uma boa acurácia e uma cober-
+tura razoável. A cobertura do Comitê é menor que as coberturas obtidas com os métodos
+supervisionados, pois quando ocorre divergência entre rótulos atribuídos pelos diversos
+classificadores e a soma final é 0 a mensagem é ignorada.
+
+Tabela 2. Análise de sentimentos - avaliaç ão dos métodos
+Método
+Acurácia (%)
+Cobertura (%)
+Dicionário Léxico (L)
+74.7
+43
+Supervisionado manualmente (RM)
+80.5
+100
+Supervisionado automaticamente (RA)
+63.5
+100
+Comitê
+80.3
+79
+3.3. Caracterização comportamental
+Como mostrado na Figura 1, nesta etapa estamos interessados em responder perguntas
+como: i) posso confiar no usuário? O perfil é verdadeiro? É um propagandista? É um
+difusor de conteúdo jornalistico? Esta análise serve para excluirmos de nossas avaliações
+usuários indesejáveis, ou seja, aqueles cujos tweets não representam a opinião de um
+indivíduo, mas que possuem outras finalidades.
+Nesse trabalho, são considerados usuários spammers aqueles com interesse de
+difundir vírus, pornografia ou propagandas. Os usuários jornalísticos, por sua vez, são
+indivíduos ou organizações que publicam conteúdos jornalísticos, ou seja, conteúdos cuja
+finalidade seja a difusão de notícias e não de opinião de indivíduos específicos. Assim,
+consideramos usuários legítimos todos os demais usuários (ou seja, usuários que não são
+considerados como spammers ou jornalísticos).
+Para identificarmos a primeira categoria de usuários mencionada foi utilizada a
+base de dados desenvolvida por [Benevenuto et al. 2010], em que foram manualmente
+rotulados como spammers e não spammers um conjunto de 1,065 usuários. Tais usuários
+são descritos por 62 atributos retratando, por exemplo, a média de tweets postados com
+URL e a média de tweets postados com hashtags. No trabalho utilizado como referência
+foi avaliado o poder de classificação dos usuários spammers com o algoritmo SVM.
+Neste trabalho, além de reproduzirmos os resultados alcançados anteriormente,
+também avaliamos os algoritmos KNN, MultiLayer Perceptron (MLP) e Random Fo-
+rest (RF), utilizando implementações disponibilizadas pela ferramenta Weka com uma
+validação cruzada de 5 folds. Os parâmetros do SVM foram otimizados de forma idêntica
+ao trabalho anterior, por meio da ferramenta easy provida pelo pacote libSVM, chegando
+aos seguintes valores: c = 32.0 e g = 0.0078125.
+Para os demais algoritmos foi utilizado a estratégia de projeto simples, ou seja,
+ignoramos a interação entre os fatores, variando um de cada vez e fixando o valor que
+proporciou melhor resultado. Os valores utilizados são: (i) MLP: taxa de aprendizagem =
+0.5, camadas escondidas = 1 e momentum = 0.1; (ii) KNN: k = 10 e métrica de similari-
+dade = 1/distância; e (iii) RF: número de árvores = 20 e profundidade = 10. O algoritmo
+que obteve os melhores resultados foi o Random Forest, tanto em termos de média F1
+(0.88) quanto de acurácia (88.64%).
+Fizemos ainda testes para reduzir a dimensionalidade da base de dados, utilizando
+os seguintes métodos para seleção de atributos: Chi-squared, Information Gain e Algo-
+ritmo Genético [Eiben and Smith 2003]. Comparando os 10 melhores atributos selecio-
+nados pelos dois primeiros algoritmos eles foram exatamente os mesmos. O mesmo foi
+observado para os 20 melhores atributos. Já o algoritmo genético selecionou atributos
+mais diversificados, quando comparado aos dois outros métodos, tendo produzido resul-
+tados superiores também. Uma lista completa dos atributos selecionados está disponível
+
+online.5
+Utilizando os 20 atributos selecionados pelo algoritmo genético no algoritmo de
+classificação Random Forest obteve-se uma média F1 de 0.90 e acurácia de 90.33%, resul-
+tado avaliado com 99% de confiaça por um teste-t como sendo estatisticamente superior
+às demais abordagens avaliadas.
+A fim de caracterizar usuários jornalísticos, foram coletados usuários que
+possuíam a substring “noticia” em seus screen names. Estes usuários foram representados
+utilizando os mesmos atributos definidos para as classes anteriores. O atributo “fração de
+tweets com palavras spam”, ou seja, palavras que constavam no trending topics do Twit-
+ter no período da coleta foi substituído por “número de seguidores por seguidos”, pois a
+relação de tais termos não estava disponível. Desta forma, executamos com o algoritmo
+Random Forest, utilizando os atributos selecionados, um conjunto rotulado de usuários
+spammers, jornalísticos e não spammers. Tal processo resultou em uma taxa média de
+acerto de 88.77%. Assim, a etapa de análise comportamental consistirá no algoritmo
+Random Forest treinado com a base rotulada contendo usuários spammers, jornalístico e
+não spammers, descritos por 20 atributos.
+4. Resultados
+Nossa análise irá focar na previsão do resultado para o acerto do primeiro lugar (p@1)
+– vencedor das eleições e para os dois primeiros lugares, candidatos que disputam o se-
+gundo turno. Como ponto de comparação serão utilizados os acertos encontrados diante
+dos resultados reais, resultados obtidos avaliando a menção simples e resultados de pes-
+quisas de opinião realizadas pelos renomados institutos: Instituto Brasileiro de Opinião e
+Estatística6 (IBOPE) e DataFolha7.
+A contabilidade dos votos atribuídos a cada candidato será computada conforme
+a Equação 1. Observe que são levados em consideração tanto votos positivos quanto ne-
+gativos. Se um usuário publica mensagens positivas somente sobre um candidato seu
+voto é conferido a ele. Caso as mensagens publicadas por um usuário expresse um sen-
+timento negativo somente sobre um candidato seu voto é distribuído igualmente entre os
+candidatos não citados.
+V otos candidatoi =
+positivoi + PN
+j=1,i̸=j(negativoj
+N−1
+)
+PN
+j=1 positivoj + PN
+j=1 negativoj
+(1)
+Serão apresentados resultados considerando dois tipos de contabilização de votos:
+“menção” dos usuários, onde serão permitidos votos múltiplos oriundos de um único in-
+divíduo e “usuários únicos”, em que será computado apenas um voto para cada usuário,
+que se refere a apenas um candidato durante o período analisado. Um usuário é equiva-
+lente a uma conta/perfil no Twitter.
+Os resultados obtidos são apresentados na Tabela 3, para a avaliação do vencedor,
+e na Tabela 4, quando a intenção é descobrir os dois participantes que irão concorrer no
+5http://www.dcc.ufmg.br/r̃enato.miranda/brasnam_eleicao.html
+6http://www.ibope.com.br/
+7http://datafolha.folha.uol.com.br/
+
+segundo turno. Note que as duas primeiras colunas apresentam variações das dimensões
+consideradas (sentimento – Sen e SJ – spam e jornalismo). Quadrados de cor verde re-
+presentam acertos, brancos os erros e pretos a não realização de pesquisas.
+Tabela 3. Resultados Eleiç ões - p@1 (Sen: análise de sentimento; SJ: remoç ão
+de usuários spammers e jornalísticos) - Quadrados de cor verde representam
+acertos, brancos os erros e pretos a não realizaç ão de pesquisa.
+Característica
+Resultado
+Sen
+SJ
+Menção
+Usuário único
+MG
+PR
+RS
+RJ
+BA
+SP
+MG
+PR
+RS
+RJ
+BA
+SP
+X
+X
+X
+X
+Institutos Tradicionais
+IBOPE
+-
+-
+-
+-
+-
+-
+DataFolha
+-
+-
+-
+-
+-
+-
+Tabela 4. Resultados Eleiç ões - Segundo turno (Sen: análise de sentimento;
+SJ: remoç ão de usuários spammers e jornalísticos) - Quadrados de cor verde
+representam acertos, brancos os erros e pretos a não realizaç ão de pesquisa.
+Característica
+Resultado
+Sen
+SJ
+Menção
+Usuário único
+MG
+PR
+RS
+RJ
+BA
+SP
+MG
+PR
+RS
+RJ
+BA
+SP
+X
+X
+X
+X
+Institutos Tradicionais
+IBOPE
+-
+-
+-
+-
+-
+-
+DataFolha
+-
+-
+-
+-
+-
+-
+Como podemos observar, foi possível acertar em um maior número de cidades o
+vencedor das eleições utilizando o método completo, ou seja, análise de sentimento aliado
+à exclusão de usuários spammers e jornalísticos do que as tradicionais técnicas baseadas
+na contagem de menção simples. Se por um lado a estratégia do usuário único foi deter-
+minante para encontrar o vencedor do PR, ela também prejudicou a correta avaliação para
+a capital de RS, tanto para o vencedor quanto para os dois candidatos escolhidos para o
+segundo turno.
+A cidade mais crítica para o IBOPE foi a capital de SP, em que não foi possível
+acertar nem o primeiro nem os dois primeiros colocados, pois foi divulgado empate entre
+os três primeiros candidatos. Outras cidades em que a pesquisa do IBOPE também falhou
+foram BA, para o primeiro colocado, e PR, para o segundo turno. Podemos observar que,
+dentre as 6 cidades escolhidas para análise, o Data Folha divulgou pesquisas em somente
+5 delas, sendo que acertou todos os vencedores do primeiro turno nas cidades analisadas
+e para o segundo turno errou em SP e PR.
+Comparando nossos resultados com os cenários mais complicados para os institu-
+tos tradicionais só foi possível a correta previsão para o vencedor de SP quando utilizada
+análise de sentimentos das mensagens, mas para os dois primeiros colocados nenhuma
+estratégia acertou. A previsão para BA superou o IBOPE, sendo correta em praticamente
+todos os cenários avaliados, desde a simples menção até o total de análise. A cidade com
+dados não divulgados pelo DataFolha foi exatamente essa.
+
+Algumas das vantagens da abordagem proposta frente ao método de pesquisa uti-
+lizado pelos institutos tradicionais são: (i) redução de custos associados a tarefa de entre-
+vistar indivíduos pessoalmente; (ii) não direcionamento da resposta, ou seja, não existe
+a figura de um entrevistador que poderá induzir o entrevistado acerca de determinada
+resposta; e (iii) maior escalabilidade do método, podendo facilmente ser coletadas e ana-
+lisadas mensagens referentes ao mais diversos pleitos. Logo este tipo de pesquisa pode
+servir como ferramenta de apoio às pesquisas tradicionais.
+Como esperado, prever corretamente os dois primeiros colocados nos pleitos é
+uma tarefa significativamente mais fácil que acertar somente o vencedor. Nestes casos,
+foram obtidos resultados semelhantes entre as abordagens avaliadas e os institutos tradi-
+cionais de pesquisa.
+5. Conclusões e Trabalhos Futuros
+Neste artigo apresentamos uma abordagem para realização de pesquisas eleitorais em re-
+des sociais diferente dos métodos anteriormente propostos, que se resumiam na contagem
+de menções. Esta proposta leva em consideração a identificação de usuários únicos aliado
+a aspectos inerentes do ambiente virtual, tais como: (i) coleta e pré-processamento; (ii)
+análise comportamental; e (iii) análise de sentimento, sendo as duas últimas as principais
+contribuições do trabalho. Algumas importantes definições também foram criadas como,
+por exemplo, o tempo para coleta das mensagens, a caracterização de usuários legítimos
+e a diferenciação entre simples menções com a real intenção de voto a um candidato.
+Comparando com a abordagem tradicional baseada na contagem de menções,
+acertamos em mais cidades os candidatos vencedores das eleições. Comparando o to-
+tal de acertos dos institutos tradicionais frente a abordagem proposta, apesar de acertar-
+mos menos, verificamos que exitem cenários que acertamos facilmente e que os institutos
+tradicionais erraram.
+Podemos considerar que os resultado obtidos apresentam uma opinião enviesada
+por usuários Twitter e, por isso, não foram capazes de alcançar fielmente as respostas
+reais. No entanto, esse resultado representam de forma mais confiável, comparando com
+os trabalhos já realizados, a opinião de um importante parte da sociedade que está em
+constante crescimento, ou seja, indivíduos que usam redes sociais. Com isso, podemos
+concluir que a abordagem proposta pode ser um complemento às pesquisas de opinião
+tradicionais.
+Como trabalhos futuros pretendemos desenvolver uma ferramenta para previsão
+eleitoral que trabalhe online, expandir o método proposto para eleições que abrangem
+grandes territórios como, por exemplo, pleitos presidenciais e estudar as interações entre
+usuários de diferentes regiões e suas intenções de votos utilizando, para tanto, técnicas de
+georreferenciamento.
+Referências
+Benevenuto, F., Magno, G., Rodrigues, T., and Almeida, V. (2010). Detecting spammers
+on twitter. In Collaboration, Electronic messaging, Anti-Abuse and Spam Conference
+(CEAS).
+Bora, N. N. (2012). Summarizing public opinions in tweets. In Journal Proceedings of
+CICLing 2012, CICLing 2012.
+
+Culnan, M. J., McHugh, P. J., and Zubillaga, J. I. (2010). How large u.s. companies can
+use twitter and other social media to gain business value. MIS Quarterly Executive,
+9(4):243–259.
+Eiben, A. E. and Smith, J. E. (2003). Introduction to Evolutionary Computing. Springer-
+Verlag.
+Gayo-Avello, D. (2012). “I wanted to predict elections with twitter and all i got was this
+lousy paper” – A balanced survey on election prediction using twitter data. CoRR -
+http://arxiv.org/abs/1204.6441.
+Gayo-Avello, D., Metaxas, P., and Mustafaraj, E. (2011). Limits of electoral predictions
+using twitter. In Int. Conf. on Weblogs and Social Media (ICWSM), pages 490–493.
+Ghosh, S., Viswanath, B., Kooti, F., Sharma, N. K., Korlam, G., Benevenuto, F., Ganguly,
+N., and Gummadi, K. P. (2012). Understanding and combating link farming in the
+twitter social network. In Int. Conf. on World Wide Web, WWW ’12, pages 61–70.
+Gomide, J., Veloso, A., Meira, Jr., W., Almeida, V., Benevenuto, F., Ferraz, F., and Tei-
+xeira, M. (2011). Dengue surveillance based on a computational model of spatio-
+temporal locality of twitter. In Int. Web Science Conference, WebSci ’11, pages 3:1–
+3:8.
+Gonçalves, P., Araújo, M., Benevenuto, F., and Cha, M. (2013). Comparing and com-
+bining sentiment analysis methods. In Conf. on Online Social Networks, COSN ’13,
+pages 27–38.
+Hu, X., Tang, J., Gao, H., and Liu, H. (2013). Unsupervised sentiment analysis with
+emotional signals. In Int. Conf. on World Wide Web, WWW ’13, pages 607–618.
+Jungherr, A., Jürgens, P., and Schoen, H. (2012). Why the pirate party won the german
+election of 2009 or the trouble with predictions: A response to Tumasjan, A., Sprenger,
+T. O., Sander, P. G., & Welpe, I. M. “Predicting elections with twitter: What 140
+characters reveal about political sentiment”. Soc. Sci. Comput. Rev., 30(2):229–234.
+Lumezanu, C., Feamster, N., and Klein, H. (2012). #bias: Measuring the tweeting beha-
+vior of propagandists. In Int. Conf. on Weblogs and Social Media (ICWSM), pages
+210–217.
+McCord, M. and Chuah, M. (2011). Spam detection on twitter using traditional classifiers.
+In Int. Conf. on Autonomic and trusted computing, ATC’11, pages 175–186.
+Mukherjee, S., Malu, A., A.R., B., and Bhattacharyya, P. (2012). Twisent: a multistage
+system for analyzing sentiment in twitter. In Int. Conf. on Information and knowledge
+management, CIKM ’12, pages 2531–2534.
+Ribeiro Jr., S., Jr., Z., Meira Jr., W., and Pappa, G. L. (2012). Positive or negative? using
+blogs to assess vehicles features. ENIA - Brazilian Conf. on Intelligent System.
+Tumasjan, A., Sprenger, T., Sandner, P., and Welpe, I. (2010). Predicting elections with
+twitter: What 140 characters reveal about political sentiment. In Int. Conf. on Weblogs
+and Social Media (ICWSM), pages 178–185.
+Witten, I. H. and Frank, E. (2005). Data Mining: Practical Machine Learning Tools and
+Techniques with Java Implementations. Morgan Kaufmann, 2nd edition.

@@ -1,0 +1,819 @@
+Ajuste de parâmetros do modelo epidemiológico SIR em redes
+sociais geradas por modelos para simulação da covid-19 em
+município mineiro
+Paulo Gabriel Nunes Cançado1, Vinícius da Fonseca Vieira1, Carolina Ribeiro Xavier1
+1Departamento de Ciência da Computação - Universidade Federal de São João del-Rei (UFSJ)
+São João del-Rei – MG – Brasil
+paulo.ncancado@gmail.com, {carolinaxavier,vinicius}@ufsj.edu.br
+Abstract. Due to the pandemic caused by the coronavirus, the study of epide-
+miological models has become essential for decision-making by the population
+and governments. Understanding the dynamics of virus propagation in the po-
+pulation makes it possible to design effective policies to combat the epidemic.
+With that in mind, this work aims to investigate the propagation of the corona-
+virus in the city of São João del-Rei. For this, an algorithm that uses the SIR
+epidemiological model based on complex networks to simulate the propagation
+of the virus in the network was proposed. The results of each simulation are
+compared with real data, obtained from the website of the Secretary of Health
+of the State of Minas Gerais. Finally, the parameters β and γ of the SIR model,
+which represent, respectively, the probability of infection and the probability
+of recovery, will be adjusted using a genetic algorithm. After finishing the ad-
+justment process, some hypothetical coronavirus propagation scenarios will be
+simulated.
+Resumo. Devido à pandemia causada pelo coronavírus, o estudo de modelos
+epidemiológicos tornou-se essencial para a tomada de decisão da população e
+dos governos. Compreender a dinâmica de propagação do vírus na população
+possibilita elaborar políticas efetivas de combate à epidemia. Pensando nisso,
+este trabalho tem como objetivo investigar a propagação do coronavírus na
+cidade de São João del-Rei. Para isso, foi proposto um algoritmo que uti-
+liza o modelo epidemiológico SIR baseado em redes complexas para simular
+a propagação do vírus na rede. Os resultados de cada simulação são compara-
+dos com dados reais, obtidos no site da Secretaria da Saúde do Estado de Minas
+Gerais. Por último, os parâmetros β e γ do modelo SIR que representam, res-
+pectivamente, a probabilidade de infecção e a probabilidade de recuperação,
+serão ajustados utilizando um algoritmo genético. Após o término do processo
+de ajuste, alguns cenários hipotéticos de propagação do coronavírus serão si-
+mulados.
+1. Introdução
+A COVID-19 é uma doença infecciosa causada pelo vírus SARS-CoV-2. Sabe-se que
+cerca de 80% das infecções são leves ou assintomáticas, 15% são graves e 5% são
+críticas [World Health Organization 2020a]. As infecções graves e críticas provocam a
+
+deficiência de oxigênio no organismo do indivíduo, podendo levar a sua morte caso ne-
+nhum tratamento médico seja realizado.
+O
+primeiro
+caso
+diagnosticado
+de
+infecção
+humana
+pelo
+coronavírus
+ocorreu
+em
+dezembro
+de
+2019
+na
+cidade
+de
+Wuhan,
+localizada
+na
+China
+[World Health Organization 2020b]. No dia 11 de março de 2020, a Organização Mundial
+da Saúde (OMS) elevou o estado de contaminação da COVID-19 à pandemia, indicando
+que a propagação do vírus estava presente em quase todos os continentes.
+De fato, os impactos causados são assustadores. Estima-se que houveram cerca de
+700 milhões de infecções pelo coronavírus no mundo. Infelizmente, cerca de 7 milhões
+de pessoas perderam suas vidas em detrimento desse vírus. O Brasil é o segundo país com
+maior número de mortes. Estima-se que ocorreram por volta de 38 milhões de infecções,
+que ocasionaram o óbito de aproximadamente 700 mil pessoas [Worldometer 2021].
+Nesse contexto, para entender sobre a propagação de uma doença infecciosa como
+o COVID-19, é necessário compreender a sua dinâmica de contágio na população alvo,
+tal tarefa pode ser feita através de um modelo epidemiológico. Assim, o modelo SIR
+(Suscetível/Infectado/Recuperado) é o mais apropriado para representar essa dinâmica.
+A transmissão do coronavírus se dá, principalmente, por gotículas de saliva e/ou
+secreções expelidas pelos indivíduos contaminados. Dessa forma, as pessoas que mantêm
+contato direto com o infectado estão mais propensas a contrair o vírus. Nesse contexto,
+o modelo SIR baseado em redes complexas [Newman 2002, Scabini et al. 2021] poderia
+ser mais compatível ao problema do que o modelo epidemiológico original, caso a rede
+de contatos entre as pessoas estivesse disponível. O emprego de uma rede complexa nesse
+modelo para simular as relações interpessoais dos indivíduos da população proporcionam
+simulações de espalhamento mais realistas e introduzem heterogeneidade no processo de
+infecção.
+Cada doença transmissível possui uma dinâmica própria de infecção e de
+recuperação. Consequentemente, é necessário ajustar individualmente os seus parâmetros
+probabilísticos, que representam a taxa de infecção e de recuperação dos indivíduos de
+uma determinada população. Por se tratar de uma busca entre infinitos números entre
+zero e um, é interessante utilizar alguma meta-heurística. Uma abordagem possível para
+ajustá-los é por meio de algoritmo genético. Essa técnica de busca permite encontrar
+soluções aproximadas para o problema, podendo ser aplicada em diferentes contextos.
+Portanto, o objetivo deste trabalho é investigar a propagação do coronavírus na ci-
+dade de São João del-Rei. Nesse contexto, é proposto um algoritmo que efetua simulações
+da propagação do coronavírus em uma rede social que representa a população, visando
+encontrar as taxas de infecção e de recuperação da doença para a cidade em questão. A
+propagação do vírus na população foi simulada por meio do modelo epidemiológico SIR,
+baseado em redes complexas. O resultado de cada simulação é comparado com dados
+reais, possibilitando mensurar o grau de semelhança da simulação com a realidade. Em
+suma, a ideia principal é encontrar os valores dos parâmetros β e γ do modelo SIR que
+produzem simulações com a mesma tendência observada nos dados. Em virtude disso, a
+função do Algoritmo Genético é ajustar o valor desses parâmetros. Após o processo de
+ajuste, alguns cenários de propagação do vírus são investigados.
+O restante do texto está organizado da forma que segue. A Seção 2 apresenta
+
+o referencial teórico, elucidando alguns conceitos necessários para o entendimento da
+proposta. Já na Seção 3, estão os trabalhos utilizados no embasamento do projeto. Na
+Seção 4, são relatados os procedimentos e os métodos adotados no desenvolvimento do
+projeto. Os resultados obtidos são expostos na Seção 5, os cenários simulados estão na
+Seção 6 e as considerações finais serão descritas na Seção 7.
+2. Fundamentação Teórica
+2.1. Modelo SIR
+SIR (Suscetível/Infectado/Recuperado) é um modelo epidemiológico compartimental cri-
+ado por Kermack e McKendrick [Kermack and McKendrick 1927] em 1927.
+Nesse
+modelo, a população é dividida em três compartimentos que representam os possíveis
+estágios da doença. Matematicamente, o modelo pode ser descrito pelas Equações Dife-
+renciais 1, 2 e 3,
+∂S
+∂t = −βS I
+N ,
+(1)
+∂I
+∂t = +βS I
+N −γI
+(2)
+∂R
+∂t = +γI
+(3)
+em que S, I e R representam respectivamente a quantidade de indivíduos suscetíveis,
+infectados e recuperados. Além disso, a população total é representada pela Equação 4.
+N = S + I + R
+(4)
+O parâmetro β representa a taxa probabilística de infecção. Já o parâmetro γ
+refere-se à taxa de recuperação. Esses dois parâmetros possuem valores diferentes para
+cada doença, sendo necessário ajustá-los.
+2.2. SIR Baseado em Redes Complexas
+O modelo SIR baseado em redes complexas é uma adaptação do modelo SIR original
+que tem como objetivo representar a natureza probabilística da propagação da doença na
+população [Júnior et al. 2021].
+A propagação do vírus é simulada em uma rede complexa, que visa representar as
+interações interpessoais dos indivíduos da população. Isso incorpora heterogeneidade ao
+sistema, possibilitando que a probabilidade de infecção seja diferente para cada indivíduo.
+Nesse modelo, assim como no modelo clássico anteriormente apresentado, exis-
+tem dois parâmetros probabilísticos. Eles são comumente denominados como β e γ. O
+parâmetro β é a probabilidade de um nó infectado contaminar outro dado que existe uma
+aresta entre eles. Já o parâmetro γ é a probabilidade de um nó infectado se recuperar.
+Como a menor porção de tempo simulada neste trabalho é de um dia, os parâmetros en-
+contrados se referem a probabilidades diárias de infecção e recuperação.
+
+2.3. Erd˝os–Rényi
+Erd˝os–Rényi é um modelo proposto por Paul Erd˝os e Alfréd Rényi [Erdos et al. 1960]
+para a criação de redes aleatórias. Segundo Satorras et al [Pastor-Satorras et al. 2015],
+um “grafo Gp(N) é construído a partir de um conjunto de n vértices, em que as n(n - 1)/2
+possíveis ligações entre esses vértices ocorrem conforme uma probabilidade p”.
+Embora o número de arestas nesse modelo não seja fixo, é possível calcular o
+valor esperado de arestas no grafo [Newman 2010]. Assim, essa quantidade de arestas
+pode ser calculada por meio da Equação 5,
+⟨m⟩=
+(n
+2)
+X
+m=0
+mp(m) =
+n
+2
+
+p,
+(5)
+em que m, n e p correspondem respectivamente ao número de arestas, ao número de
+vértices e à probabilidade de criação de uma aresta entre dois vértices.
+3. Trabalhos Relacionados
+A modelagem de epidemias é uma área que vem se destacando nas últimas décadas devido
+a sua capacidade de representar a dinâmica de certos eventos que acontecem no mundo
+real. Ao contrário do que muitos imaginam, a modelagem de epidemias não se restringe
+a doenças endêmicas. Rumores [Qian et al. 2015] e “malwares” [Kleinberg 2007] apre-
+sentam uma difusão semelhante à de doenças infectocontagiosas em redes complexas.
+Em geral, o modelo SIR é o mais indicado para modelagem de doenças que conce-
+dem imunidade permanente aos infectados. Em especial, o modelo SIR baseado em redes
+complexas, pois leva em consideração as interações dos indivíduos de uma população no
+processo de propagação de uma doença, possibilitando representar com maior semelhança
+o comportamento de vírus real e, consequentemente, entender melhor o comportamento
+dessa doença [Scabini et al. 2021].
+No entanto, pode-se ressaltar que o modelo tradicional SIR não leva em
+consideração o período de incubação. Esse período influencia diretamente na propagação
+de uma doença em uma determinada população. Em virtude disso, alguns autores pro-
+puseram adaptações ao modelo SIR, embutindo um atraso no processo de propagação
+[Huang et al. 2016, Xia et al. 2012, Arquam et al. 2018], possibilitando entender melhor
+o equilíbrio epidêmico de certas doenças.
+É válido ressaltar que o novo coronavírus está estimulando diversas pesquisas na
+área de modelagem de epidemias. Alguns estudos baseados no modelo SIR em redes
+complexas foram capazes de fazer previsões assertivas para diferentes cenários de isola-
+mento social, exibindo as possíveis quantidades de infecções, mortes e ocupação de leitos
+para cada cenário [Scabini et al. 2021]. Outros, demonstraram como a migração pendular
+corroborou na propagação da COVID-19 na região da Lombardia [Lombardi et al. 2021].
+Por fim, algumas pesquisas evidenciam a eficiência do isolamento social para contenção
+do coronavírus [Lymperopoulos 2021].
+Semelhantemente aos trabalhos descritos acima, este trabalho tem o intuito de
+ajustar os parâmetros do modelo SIR para o novo coronavírus, utilizando-se o modelo
+
+baseado em redes complexas. No entanto, será utilizado algoritmo genético para ajuste
+desses parâmetros, efetuando simulações e comparando-as com os dados reais.
+4. Metodologia
+4.1. Dados
+Para ajustar os parâmetros β e γ é preciso conhecer a quantidade de indivíduos infectan-
+tes (transmitindo a doença) e recuperados existente no intervalo de tempo que se deseja
+ajustar. Os dados utilizados foram retirados de boletins epidemiológicos disponibilizados
+no site da Secretaria da Saúde do Estado de Minas Gerais. Nesses boletins, são divul-
+gados os números diários de novas infecções, mortes e a quantidade atual de indivíduos
+recuperados. A Tabela 1 apresenta um exemplo desses dados.
+Data
+Confirmados
+Óbitos
+Recuperados
+24/02/2021
+8
+0
+4
+25/02/2021
+22
+0
+9
+26/02/2021
+7
+0
+13
+27/02/2021
+12
+0
+23
+28/02/2021
+11
+3
+40
+Tabela 1. Dados obtidos dos boletins epidemiológicos
+Após realizar alguns ajustes, pode-se obter a quantidade de indivíduos infectantes
+ativos e recuperados que existe no período de tempo investigado. Assim, a quantidade
+de indivíduos infectantes ativos em um determinado período pode ser determinada pela
+Equação 6,
+Id = IAd −REd −OAd,
+(6)
+em que IA é a quantidade total de casos confirmados, RE é a quantidade de pessoas que
+se recuperaram do coronavírus, OA é o montante de óbitos ocorridos e d é a data.
+Além disso, no modelo SIR são considerados como indivíduos recuperados (re-
+movidos) todos aqueles que não podem mais contrair a doença, como, por exemplo, os
+curados e os mortos por ela. Dessa forma, o número de recuperados existentes em um
+intervalo pode ser obtido por meio da Equação 7,
+Rd = REd + OAd,
+(7)
+em que RE é a quantidade de pessoas que se recuperaram do coronavírus, OA é o montante
+de óbitos ocorridos e d é a data.
+Manipulando os dados da Tabela 1, conforme as equações descritas acima, obtém-
+se a Tabela 2. Os dados devem estar neste formato para o funcionamento correto do
+algoritmo.
+
+Data
+Infec. Acumul.(IA)
+Óbitos Acumul. (OA)
+Infec. Ativos (I)
+Removidos (R)
+24/02/2021
+8
+0
+4
+2834
+25/02/2021
+30
+0
+21
+2842
+26/02/2021
+37
+0
+24
+2846
+27/02/2021
+49
+0
+26
+2851
+28/02/2021
+60
+3
+17
+2855
+Tabela 2. Dados após as manipulaç ões
+4.2. Rede
+As redes têm papel fundamental no modelo SIR baseado em redes complexas. São elas
+as responsáveis por trazer verossimilhança com a realidade, proporcionando heterogenei-
+dade no processo de infecção na simulação. Seu objetivo é tentar representar a dinâmica
+de interações entre os indivíduos de uma população. Quanto maior for a sua proximidade
+com a realidade, mais fácil se torna compreender a difusão de uma doença na comuni-
+dade analisada. Nesse contexto, esse projeto investigará a propagação do coronavírus no
+modelo de rede Erd˝os-Rényi.
+Erd˝os-Rényi é um modelo de rede no qual as interações entre os nós são geradas
+utilizando aleatoriedade. Para criar esse modelo de rede, é necessário definir a quantidade
+de nós e a probabilidade de criação de aresta entre dois nós. Como os dados utilizados são
+referentes aos infectados e recuperados da região de São João del-Rei, o número de nós
+do grafo gerado deve ser equivalente ao tamanho da população dessa cidade, em torno de
+90.497 nós. Durante os testes do algoritmo proposto, constatou-se que a probabilidade de
+criação de aresta deve ser próxima de 0.00007, gerando uma rede na qual o grau médio
+dos nós é de aproximadamente 6,3 conexões. Valores maiores de probabilidade de criação
+de aresta formam redes mais densas, que aceleram o processo de difusão da doença na
+rede. Valores menores produzem redes esparsas, cujas simulações podem terminar pre-
+cocemente, devido à falta de arestas para propagar a doença, situações que divergem da
+realidade observada.
+4.3. Algoritmo Genético
+Algoritmo Genético é uma técnica de busca utilizada para encontrar soluções aproximadas
+para problemas complexos. Será essa técnica a responsável por encontrar e ajustar os
+valores β e γ utilizados nas simulações.
+Primeiramente, cria-se uma população inicial que será o ponto de partida para o
+processo de ajuste dos parâmetros. Cada indivíduo dessa população é uma solução candi-
+data. Para o problema em questão, os indivíduos serão compostos por três atributos, sendo
+eles os parâmetros β, γ e a nota atribuída a simulação. Além disso, esses parâmetros estão
+na forma de cromossomo binário e são inicializados aleatoriamente. É possível determi-
+nar o tamanho do cromossomo binário. No entanto, 10 bits se mostraram empiricamente
+suficientes para o problema em foco.
+INT(bin) =
+n−1
+X
+i=0
+2 i ∗bin[i]
+(8)
+
+Os valores de β e γ de cada indivíduo da população inicial são utilizados
+como probabilidade diária de infecção e de recuperação nas simulações. Para isso, a
+representação binária desses parâmetros é convertida para decimal conforme a Equação
+8. Em seguida, esse valor em decimal é mapeado para um valor numérico entre 0 e 1, que
+é efetuado de acordo com a Equação 9. Em ambas as equações, a variável n refere-se a
+quantidade de bits do cromossomo. Ademais, a variável x0 na equação abaixo é valor em
+decimal a ser convertido.
+x =
+1
+2 n −1 ∗x0
+(9)
+São selecionados na rede utilizada dois conjuntos de nós, incumbidos de serem
+os nós infectados e recuperados iniciais da simulação. Após inicializá-los, efetua-se a
+simulação e sua nota é calculada conforme a Equação 10. É válido ressaltar que todas as
+simulações utilizam o mesmo conjunto inicial de nós infectados e recuperados, possibili-
+tando que haja igualdade nesse processo.
+Em cada geração, os indivíduos da população atual são selecionados aos pares
+para dar origem a uma nova população, filhos da geração atual. A escolha desses pais é
+feita utilizando a técnica de roleta viciada, em que a probabilidade de escolha do indivíduo
+é inversamente proporcional a sua nota. Ou seja, quanto menor o EMQ, maior a chance
+do indivíduo de ser selecionado como pai.
+Em posse de diversos pares de pais, a nova população será concebida combinando
+os seus cromossomos β e γ. A estratégia de recombinação utilizada foi o crossover em
+um único ponto. Imediatamente, aplica-se o processo de mutação nos cromossomos dos
+indivíduos gerados, com o intuito de explorar novas soluções do espaço de busca e fugir
+de ótimos locais. Valores de mutação equivalentes a 5% se mostraram satisfatórios nos
+testes empíricos. A população atual é substituída por essa nova população e os processos
+descritos acima serão aplicados novamente.
+Desse modo, a ideia geral do AG é gerar novas populações baseadas em indivíduos
+aptos da população anterior. Esse procedimento acontece até que se tenha alcançado o
+número de gerações estabelecidas inicialmente. Pode-se ressaltar que o número de in-
+divíduos por população pode ser definido. Assim, o processo de crossover tenta gerar
+novos indivíduos tão bons quanto a geração anterior. E a mutação permite que as soluções
+não fiquem presas em ótimos locais. Portanto, as soluções encontradas para o problema
+tendem a melhorar ao longo de novas gerações, ajustando os valores de β e γ e, conse-
+quentemente, minimizando o erro encontrado nas simulações.
+4.4. Função Objetivo
+Em suma, o propósito do algoritmo desenvolvido é encontrar quais valores de β e γ geram
+simulações de propagação do vírus na rede que seguem a mesma tendência observada nos
+dados reais. Ou seja, o algoritmo visa minimizar o erro entre os resultados da simulação
+e os dados reais. A função objetivo empregada no algoritmo genético é definida pela
+Equação 10,
+min f (s) = 1
+2n
+n
+X
+i=1
+(IRi −ISi)2 + 1
+2n
+n
+X
+i=1
+(RRi −RSi)2
+(10)
+
+em que IR e RR são, respectivamente, os números de infectados e recuperados observados
+nos dados. Já as variáveis IS e RS representam, respectivamente, os números de infectados
+e recuperados ocorridos na simulação. A variável n, na equação, indica a quantidade de
+dias simulados.
+Cada solução candidata simulada recebe uma avaliação, que será utilizada pelo
+algoritmo genético no processo de seleção dos indivíduos. Essa avaliação é dada pela
+média do EQM1 do número de infectados e recuperados da simulação em comparação
+aos dados reais. Quanto menor for o valor dessa avaliação, maior é a proximidade entre
+os dados entregues pela simulação e a realidade. A utilização do erro quadrático médio
+na Equação 10 tem o intuito de inibir disparidades nos valores encontrados na simulação.
+Isso estimula o algoritmo a escolher pelas simulações que seguem a tendência dos dados
+reais durante todo o período simulado.
+5. Resultados
+5.1. Ajuste dos Parâmetros
+Por representar a probabilidade de infecção diária, o parâmetro β é extremamente sensível
+às medidas de combate ao coronavírus, tais como o distanciamento social. Assim, torna-
+se interessante escolher, como período de ajuste, um intervalo de tempo no qual essas
+políticas de contenção permaneceram estáveis em seu decorrer. Em virtude disso, foi es-
+tabelecido o intervalo de tempo em que a cidade de São João del-Rei esteve na Onda Roxa
+para realização do ajuste. Esse período inicia-se em 12/03/2021 e tem seu término regis-
+trado no dia 22/04/2021. O algoritmo implementado, os dados utilizados e os resultados
+obtidos podem ser acessados no GitHub2.
+Foram realizados cinco ajustes para o período estabelecido. Para cada um deles,
+uma rede Erd˝os-Rényi de tamanho 90.479 foi criada, utilizando uma probabilidade de
+criação de aresta entre dois nós equivalente a 0,00007. Além disso, em cada execução
+foi utilizado um conjunto diferente de nós infectados e recuperados iniciais. Nelas, foram
+criadas 300 gerações de 20 indivíduos cada, empregando 0,05 como taxa de mutação. O
+tamanho escolhido para os cromossomos binários foi de dez bits. A tabela 3 exibe os
+resultados obtidos nesses ajustes.
+Execução
+β
+γ
+EQM Infectados
+R2 Infectados
+EQM Recuperados
+R2 Recuperados
+Tempo de Execução
+01
+0.01075
+0.03030
+2473.87
+0.8743
+2990.90
+0.9568
+6h59 min
+02
+0.01075
+0.03714
+925.78
+0.9529
+653.58
+0.9906
+7h43 min
+03
+0.01173
+0.03910
+1148.12
+0.9416
+512.36
+0.9926
+7h43 min
+04
+0.01173
+0.04007
+934.04
+0.9525
+461.58
+0.9933
+6h52 min
+05
+0.01173
+0.03910
+1116.24
+0.9433
+515.68
+0.9926
+6h57 min
+Tabela 3. Comparaç ão entre as simulaç ões
+É possível observar que houve exito no processo de ajuste para o período simu-
+lado. É interessante ressaltar que, mesmo utilizando diferentes conjuntos iniciais de nós
+e redes, os valores encontrados para β e γ são bem próximos nos diferentes cenários de
+ajuste. Isso reforça a ideia de que os valores encontrados refletem as probabilidades de
+infecção e recuperação do período analisado para o modelo SIR simulado.
+1Erro Quadrático Médio
+2https://github.com/Paulognunes/Ajuste-de-Parametros-do-modelo-SIR.git
+
+0
+5
+10
+15
+20
+25
+30
+35
+40
+Dias
+400
+500
+600
+700
+Número de Pessoas
+Comparação Infectados
+Infectados Reais
+Infectados Simulados
+Figura 1. Série temporal do número
+de infectados
+0
+5
+10
+15
+20
+25
+30
+35
+40
+Dias
+3000
+3200
+3400
+3600
+3800
+Número de Pessoas
+Comparação Recuperados
+Recuperados Reais
+Recuperados Simulados
+Figura 2. Série temporal do número
+de removidos
+Além disso, a execução 04 obteve a maior performance. Os valores encontrados
+por ela foram de β = 0.01173 e γ = 0.04007. Tanto o EQM quanto o R23 demonstram a
+proximidade do ajuste entre as curvas. Por fim, as Figuras 1 e 2 são séries temporais que
+comparam os números de infectados e recuperados da simulação em relação aos dados
+reais.
+6. Simulando Cenários
+De posse dos parâmetros ajustados, é possível simular alguns cenários hipotéticos, possi-
+bilitando compreender melhor a dinâmica de propagação do vírus mediante suas medidas
+de contenção. Os cenários simulados utilizam a rede e os parâmetros encontrados pela
+execução 04, que é o ajuste com a menor média de EQM. Foram inicializados 685 in-
+divíduos infectados nessa rede, que correspondem ao número de infectantes ativos após o
+fim da Onda Roxa na cidade de São João del-Rei. O número de recuperados iniciais pode
+variar de acordo com a proposta do cenário.
+6.1. Distanciamento Social
+O distanciamento social refere-se a um conjunto de medidas adotadas com o objetivo
+de desacelerar a propagação do vírus ao restringir o grau de interação dos indivíduos
+da população. Uma situação de aumento do distanciamento social, como o isolamento
+horizontal, pode ser simulado ao remover uma parcela das ligações da rede utilizada.
+Analogamente, para simular um relaxamento dessa medida de controle, basta acrescentar
+uma porcentagem de arestas na rede. Assim, esse cenário tem como intuito investigar a
+efetividade do distanciamento social na contenção inicial da epidemia. Isto é, no período
+em que toda a população está suscetível ao vírus.
+Para isso, três simulações de 365 dias foram efetuadas, iniciando-se no primeiro
+dia após o término da Onda Roxa. A primeira utiliza a rede original, sem efetuar qualquer
+alteração. Já, na segunda, houve um acréscimo de 40% de arestas na rede, replicando
+um relaxamento nas medidas de distanciamento social. Na terceira, 40% das arestas da
+rede foram removidas, representando um quadro de isolamento horizontal. Todas elas
+utilizaram o mesmo conjunto inicial de nós infectados. Como o objetivo desse cenário é
+apurar a propagação do vírus no período inicial da pandemia, nenhum nó recuperado foi
+3Coeficiente de Determinação
+
+0
+50
+100
+150
+200
+250
+300
+350
+Dias
+0
+20000
+40000
+60000
+80000
+Número de Pessoas
+Simulação Convencional
+Suscetíveis
+Infectados
+Recuperados
+Figura 3. Simulaç ão utilizando a rede original
+inicializado na rede. As Figuras 3, 4 e 5 descrevem as séries temporais resultantes das
+simulações.
+0
+50
+100
+150
+200
+250
+300
+350
+Dias
+0
+20000
+40000
+60000
+80000
+Número de Pessoas
+Relaxamento do Distanciamento Social
+Suscetíveis
+Infectados
+Recuperados
+Figura 4. Diminuiç ão do distancia-
+mento social
+0
+50
+100
+150
+200
+250
+300
+350
+Dias
+0
+20000
+40000
+60000
+80000
+Número de Pessoas
+Isolamento Horizontal
+Suscetíveis
+Infectados
+Recuperados
+Figura 5. Simulaç ão do isolamento
+horizontal
+Como era de se esperar, os resultados obtidos demonstraram a efetividade do iso-
+lamento social para retardar a propagação do coronavírus, aplicando o famoso “achata-
+mento de curva”. Nessas simulações, pôde-se observar uma enorme diferença no número
+máximo de infectantes ativos e no instante de tempo que isso ocorreu.
+A primeira
+simulação apresentou o pico de infectantes no 175° dia, sendo este de 6.199 indivíduos.
+Já, na segunda, que corresponde ao cenário de relaxamento do distanciamento social, o
+pico de infectantes ocorreu precocemente no intervalo simulado, ocorrendo no 95° dia e
+alcançando cerca de 17.621 indivíduos. Por último, o pico de infectantes do cenário de
+isolamento horizontal ocorreu no 8° dia, atingindo apenas 722 indivíduos.
+6.2. Vacinação
+A vacinação é o mecanismo mais eficiente de combate à transmissão do coronavírus
+na população.
+Sua função é estimular o corpo a produzir respostas imunológicas,
+preparando-o para o combate de certas doenças. Vacinar indivíduos de uma população
+dificulta a propagação do agente infeccioso e, consequentemente, acelera o processo de
+imunidade coletiva.
+
+Neste cenário, é examinada a eficácia da vacinação para conter a difusão do co-
+ronavírus. Foram efetuadas quatro simulações de 365 dias. Em duas delas é investigado
+a propagação do vírus em uma população parcialmente imunizada, utilizando-se a es-
+tratégia de vacinação aleatória. Nas outras duas, é averiguado a disseminação do vírus
+em uma população onde os nós com mais interações, também chamados de hubs, foram
+vacinados. Foi suposto que a imunização é uma passagem forçada do estágio S →R no
+modelo SIR, concedendo 100% de imunidade aos indivíduos vacinados. As porcentagens
+de vacinados na população serão, respectivamente, de 10% para as simulações 1 e 2 e de
+30% para as simulações 3 e 4.
+0
+50
+100
+150
+200
+250
+300
+350
+Dias
+0
+10000
+20000
+30000
+40000
+50000
+60000
+70000
+80000
+Número de Pessoas
+Simulação de Vacinação Aleatória
+Suscetíveis
+Infectados
+Recuperados
+Figura 6.
+Populaç ão parcialmente
+imunizada (10%) utilizando a
+vacinaç ão aleatória
+0
+50
+100
+150
+200
+250
+300
+350
+Dias
+0
+10000
+20000
+30000
+40000
+50000
+60000
+70000
+80000
+Número de Pessoas
+Simulação de Vacinação dos Hubs
+Suscetíveis
+Infectados
+Recuperados
+Figura 7.
+Populaç ão parcialmente
+imunizada (10%) utilizando a
+vacinaç ão de hubs
+Comparando-se as figuras 6 e 7 com a figura 3, que é um cenário onde não há
+nenhum indivíduo vacinado, constata-se que a vacinação de 10% da população foi capaz
+de reduzir o avanço do vírus. Neste cenário de vacinação aleatória, houve um pico de
+3.427 infectantes ativos, ocorrendo no 161° dia da simulação. Já a estratégia de vacinação
+dos hubs apresentou um resultado mais promissor. O pico de infectantes foi de apenas
+961 indivíduos, que aconteceu no 73° dia dessa simulação.
+0
+50
+100
+150
+200
+250
+300
+350
+Dias
+0
+10000
+20000
+30000
+40000
+50000
+60000
+Número de Pessoas
+Simulação de Vacinação Aleatória
+Suscetíveis
+Infectados
+Recuperados
+Figura 8.
+Populaç ão parcialmente
+imunizada (30%) utilizando a
+vacinaç ão aleatória
+0
+50
+100
+150
+200
+250
+300
+350
+Dias
+0
+10000
+20000
+30000
+40000
+50000
+60000
+Número de Pessoas
+Simulação de Vacinação dos Hubs
+Suscetíveis
+Infectados
+Recuperados
+Figura 9.
+Populaç ão parcialmente
+imunizada (30%) utilizando a
+vacinaç ão de hubs
+Conforme pode ser observado nas figuras 8 e 9, a vacinação de 30% da população
+conteve drasticamente a propagação do vírus. Neste cenário de vacinação aleatória, o pico
+
+de infecções foi de 743 indivíduos, sucedendo no 73° dia de simulação. No cenário de
+vacinação dos hubs, houve um pico de 691, decorrendo no 3° dia da simulação. Além
+disso, a partir do 263° dia, o número de infectados ativos caiu para zero, mantendo-se
+assim até o término da simulação deste cenário.
+É interessante salientar que, embora a estratégia de vacinação dos hubs seja mais
+eficiente que a vacinação aleatória, ela é pouco factível no mundo real porque seria ne-
+cessário conhecer toda a estrutura da rede para aplicá-la [Pastor-Satorras et al. 2015].
+7. Considerações Finais
+O objetivo deste trabalho foi investigar a propagação do coronavírus na cidade de São
+João del-Rei. Para isso, foi desenvolvido um algoritmo que utiliza o modelo SIR baseado
+em redes complexas para simular a propagação do vírus na população. Cada simulação
+efetuada tem os seus resultados confrontados com os dados de boletins epidemiológicos
+da cidade, possibilitando mensurar a sua distância da realidade. Por último, os parâmetros
+β e γ do modelo SIR foram ajustados por meio de um algoritmo genético.
+O algoritmo implementado se mostrou satisfatório para a realização do processo
+de ajuste. O erro encontrado na maioria das simulações é relativamente pequeno, tendo
+em vista que a métrica utilizada para mensurar foi do EQM. Além disso, após a realização
+do ajuste, foi possível simular alguns cenários hipotéticos, possibilitando investigar a efe-
+tividade das medidas de combate ao coronavírus. Os resultados desses cenários confir-
+mam o que diversos cientistas alertam: a vacinação e o distanciamento social são ferra-
+mentas extremamente efetivas para o controle da propagação do vírus na população.
+Deve-se ressaltar que algumas limitações foram constatadas no algoritmo. Ele
+apresenta dificuldade de ajustar longos intervalos de tempo. Além do mais, a metodologia
+proposta neste trabalho não é capaz de ajustar períodos nos quais há uma inversão no
+sentido da curva de infectantes ativos nos dados. Isso é totalmente compreensível, já que
+o parâmetro β pode mudar ao longo do tempo.
+Para trabalhos futuros, pretendem-se propor algumas adaptações no algoritmo im-
+plementado, possibilitando o ajuste dos parâmetros para quaisquer períodos, inclusive
+aqueles nos quais ocorrem a inversão do sentido da curva de infectantes. Assim, se-
+ria extremamente interessante desenvolver uma rede complexa utilizando os dados mu-
+nicipais de São João del-Rei, semelhantemente ao trabalho realizado pelo José Mauro
+[Ribeiro et al. 2021]. Isso aumentaria a autenticidade do processo de simulação, permi-
+tindo que o algoritmo seja capaz de realizar predições.
+Referências
+Arquam, M., Singh, A., and Sharma, R. (2018). Modelling and analysis of delayed sir
+model on complex network. In International Conference on Complex Networks and
+their Applications, pages 418–430. Springer.
+Erdos, P., Rényi, A., et al. (1960). On the evolution of random graphs. Publ. Math. Inst.
+Hung. Acad. Sci, 5(1):17–60.
+Huang, C., Cao, J., Wen, F., and Yang, X. (2016). Stability analysis of sir model with
+distributed delay on complex networks. PloS one, 11(8):e0158813.
+
+Júnior, R. A., Vieira, V. F., and Xavier, C. R. (2021). Estudo de critérios de distribuição de
+vacinas com doses limitadas-uma abordagem baseada em redes complexas. In Anais
+do X Brazilian Workshop on Social Network Analysis and Mining, pages 103–114.
+SBC.
+Kermack, W. O. and McKendrick, A. G. (1927). A contribution to the mathematical
+theory of epidemics. Proceedings of the royal society of london. Series A, Containing
+papers of a mathematical and physical character, 115(772):700–721.
+Kleinberg, J. (2007). The wireless epidemic. Nature, 449(7160):287–288.
+Lombardi, A., Amoroso, N., Monaco, A., Tangaro, S., and Bellotti, R. (2021). Complex
+network modelling of origin–destination commuting flows for the covid-19 epidemic
+spread analysis in italian lombardy region. Applied Sciences, 11(10):4381.
+Lymperopoulos, I. N. (2021). # stayhome to contain covid-19: Neuro-sir–neurodynamical
+epidemic modeling of infection patterns in social networks. Expert Systems with Ap-
+plications, 165:113970.
+Newman, M. E. (2002). Spread of epidemic disease on networks. Physical review E,
+66(1):016128.
+Newman, M. E. J. (2010). Networks : an introduction. Oxford University Press.
+Pastor-Satorras, R., Castellano, C., Van Mieghem, P., and Vespignani, A. (2015). Epide-
+mic processes in complex networks. Reviews of modern physics, 87(3):925.
+Qian, Z., Tang, S., Zhang, X., and Zheng, Z. (2015). The independent spreaders invol-
+ved sir rumor model in complex networks. Physica A: Statistical Mechanics and Its
+Applications, 429:95–102.
+Ribeiro, J. M., Alencar, R., Martins, G., Xavier, C., Evsukoff, A., and Vieira, V. (2021).
+Caracterização da relação entre redes sociais e mobilidade de indivíduos em contextos
+urbanos. In Anais do X Brazilian Workshop on Social Network Analysis and Mining,
+pages 32–43. SBC.
+Scabini, L. F., Ribas, L. C., Neiva, M. B., Junior, A. G., Farfán, A. J., and Bruno, O. M.
+(2021). Social interaction layers in complex networks for the dynamical epidemic
+modeling of covid-19 in brazil. Physica A: Statistical Mechanics and its Applications,
+564:125498.
+World Health Organization (2020a). Coronavirus disease 2019 (COVID-19): situation
+report, 46.
+World Health Organization (2020b). Coronavirus disease 2019 (COVID-19): situation
+report, 94.
+Worldometer (2021). Brazil coronavirus cases.
+Xia, C., Wang, L., Sun, S., and Wang, J. (2012). An sir model with infection delay and
+propagation vector in complex networks. Nonlinear Dynamics, 69(3):927–934.
