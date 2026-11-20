@@ -1,0 +1,1 @@
+# Geografia da autoria no BraSNAM: universidades e regiões brasileiras em perspectiva bibliométrica
